@@ -7,11 +7,14 @@ import { MemberService } from '../../../core/services/member.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { DailyPlanner } from '../../../shared/models/workout-plan.model';
+import { AssignDailyRequest, AssignWorkoutModalComponent } from '../../../shared/components/assign-workout-modal/assign-workout-modal.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-user-workout-calendar',
   standalone: true,
-  imports: [CommonModule, PTMemberDetailWorkoutCalendarComponent],
+  imports: [CommonModule, PTMemberDetailWorkoutCalendarComponent, AssignWorkoutModalComponent],
   templateUrl: './user-workout-calendar.component.html',
   styleUrl: './user-workout-calendar.component.scss',
 })
@@ -38,6 +41,7 @@ export class UserWorkoutCalendarComponent implements OnInit {
         this.userId = profile.id;
         this.memberInfo = { firstName: profile.firstName };
         this.loadActivePlanAndWorkoutLogs();
+        this.loadWorkoutPlans();
       }
     });
   }
@@ -48,6 +52,7 @@ export class UserWorkoutCalendarComponent implements OnInit {
         const plan = res?.data;
         if (plan) {
           this.activeSplit = {
+            planId: plan.id,
             planName: plan.name,
             days: (plan.days || []).map((d: any) => ({
               id: d.id,
@@ -107,6 +112,18 @@ export class UserWorkoutCalendarComponent implements OnInit {
     });
   }
 
+  /** Plans the member can use; daily ones also feed the calendar's per-day override options. */
+  loadWorkoutPlans(): void {
+    this.workoutPlanService.getPlans().subscribe({
+      next: plans => this.workoutPlans = (plans || []).filter(p => !p.isCustom || p.createdBy === this.userId),
+      error: () => this.workoutPlans = []
+    });
+  }
+
+  get dailyPlans(): DailyPlanner[] {
+    return this.workoutPlans.filter((p): p is DailyPlanner => p.type === 'Daily');
+  }
+
   openAssignSplitModal(): void {
     this.workoutPlanService.getPlans().subscribe({
       next: (plans) => {
@@ -123,6 +140,26 @@ export class UserWorkoutCalendarComponent implements OnInit {
 
   closeAssignSplitModal(): void {
     this.showAssignSplitModal = false;
+  }
+
+  /** Puts a daily workout on the chosen weekdays as weekly overrides of the member's program. */
+  assignDailyWorkout(request: AssignDailyRequest): void {
+    const dayId = request.plan.dayId;
+    if (!dayId) {
+      this.notification.error('This daily workout has no exercises saved yet.');
+      return;
+    }
+
+    forkJoin(request.weekdays.map(dayOfWeek =>
+      this.memberService.saveRecurringOverride(this.userId, { dayOfWeek, workoutPlanDayId: dayId, isRestDay: false })
+    )).subscribe({
+      next: () => {
+        this.notification.success(`${request.plan.name} added on ${request.weekdays.join(', ')}.`);
+        this.closeAssignSplitModal();
+        this.loadActivePlanAndWorkoutLogs();
+      },
+      error: () => this.notification.error('Failed to add the daily workout. Please try again.')
+    });
   }
 
   assignWorkoutSplit(plan: any): void {

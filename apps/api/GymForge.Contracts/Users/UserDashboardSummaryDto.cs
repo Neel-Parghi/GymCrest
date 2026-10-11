@@ -8,18 +8,23 @@ namespace GymForge.Contracts.Users
         // Header info
         public string Greeting { get; set; } = "Good morning";
         public string UserName { get; set; } = string.Empty;
+        public bool ShowGymBuddy { get; set; } = true;
         
         // Goals & Targets
-        public string? GoalTitle { get; set; }
-        public int GoalProgressPct { get; set; }
+        public string? GoalTitle { get; set; } 
+        public int GoalProgressPct { get; set; } 
+        public double? TargetWeight { get; set; }
         public int TargetCalories { get; set; }
         public int TargetTrainingTime { get; set; } // in minutes
+        public int TargetCaloriesBurn { get; set; } 
         
         // Today's Activity
         public int CaloriesBurnedToday { get; set; }
         public int ActiveTrainingTimeMinutes { get; set; }
+        public int CardioMinutesToday { get; set; }
+        public int StrengthSetsToday { get; set; }
         public int WorkoutStreak { get; set; }
-        public bool StreakAtRisk { get; set; } // Today is a scheduled workout day and hasn't been logged yet
+        public bool StreakAtRisk { get; set; }
         
         // Monthly stats
         public int MonthlySessionCount { get; set; }

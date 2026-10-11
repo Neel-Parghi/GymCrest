@@ -46,6 +46,17 @@ namespace GymForge.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }   
 
+        public async Task<List<WorkoutPlanDay>> GetPlanDaysByIdsAsync(IEnumerable<Guid> dayIds)
+        {
+            List<Guid> ids = dayIds.Distinct().ToList();
+            if (ids.Count == 0) return [];
+
+            return await _dbContext.WorkoutPlanDays
+                .Include(d => d.Exercises.OrderBy(e => e.SortOrder))
+                .Where(d => ids.Contains(d.Id))
+                .ToListAsync();
+        }
+
         public async Task<WorkoutPlan> CreatePlanAsync(WorkoutPlan plan)
         {
             await _dbContext.WorkoutPlans.AddAsync(plan);

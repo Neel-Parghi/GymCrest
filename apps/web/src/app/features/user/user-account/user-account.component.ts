@@ -253,7 +253,7 @@ export class UserAccountComponent implements OnInit {
     const confirmed = await this.confirmation.confirm({
       title: 'Delete your account?',
       message: 'Your profile, logs and history will be permanently removed. This cannot be undone.',
-      confirmText: 'Schedule deletion',
+      confirmText: 'Delete account',
       cancelText: 'Cancel',
       type: 'danger'
     });
@@ -261,8 +261,13 @@ export class UserAccountComponent implements OnInit {
 
     this.isDeleting.set(true);
     this.userService.scheduleAccountDeletion().subscribe({
-      next: () => {
+      next: res => {
         this.isDeleting.set(false);
+        if ((res?.data as { deleted?: boolean } | null)?.deleted) {
+          this.notification.success('Your account has been deleted.');
+          this.authApi.logout();
+          return;
+        }
         this.notification.success('Account deletion scheduled. You will receive an email confirmation.');
       },
       error: err => {

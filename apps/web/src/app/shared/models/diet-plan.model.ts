@@ -1,3 +1,5 @@
+import { DietType } from '../constants/fitness-preferences';
+
 export interface DietPlanDto {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface DietPlanDto {
   fats: number;
   calories: number;
   goal: string;
+  dietType?: DietType | null;
   gymId?: string;
   createdBy: string;
   isCustom: boolean;
@@ -34,6 +37,7 @@ export interface CreateDietPlanRequest {
   carbs: number;
   fats: number;
   goal: string;
+  dietType?: DietType | null;
   isCustom: boolean;
   isTemplate: boolean;
   meals: CreateDietPlanMealDto[];
@@ -47,6 +51,7 @@ export interface UpdateDietPlanRequest {
   carbs: number;
   fats: number;
   goal: string;
+  dietType?: DietType | null;
   isCustom: boolean;
   isTemplate: boolean;
   meals: CreateDietPlanMealDto[];

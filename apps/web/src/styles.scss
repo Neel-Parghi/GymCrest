@@ -104,6 +104,10 @@
   @include m.tokens;
 }
 
+* {
+  @include m.thin-scrollbar;
+}
+
 @include bp.laptop {
   :root {
     --sidebar-width: 220px;

@@ -23,10 +23,15 @@ export function toDateKey(date: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+const SPLIT_WEEKDAYS = ['Monday', 'Wednesday', 'Friday'];
+
+const namesWeekday = (dayName: string | undefined) =>
+  WEEKDAY_NAMES.some(w => (dayName || '').toLowerCase().includes(w.toLowerCase()));
+
 /**
- * Picks the plan day scheduled for a given date.
- * Weekly plans match on the weekday in the day name; abstract splits (Day 1, Day 2…)
- * fall on Monday / Wednesday / Friday. Returns null when nothing is scheduled (rest).
+ * Picks the plan day scheduled for a given date; mirrors WorkoutScheduleResolver in the API.
+ * A day named after the weekday wins (weekly plans, and weekday overrides on any plan); otherwise the
+ * unnamed split days (Day 1, Day 2…) fall on Monday / Wednesday / Friday. Returns null on rest days.
  */
 export function resolveScheduledDay<T extends SchedulableDay>(days: T[], date: Date): T | null {
   if (!days || days.length === 0) return null;
@@ -35,13 +40,7 @@ export function resolveScheduledDay<T extends SchedulableDay>(days: T[], date: D
   const weekdayMatch = days.find(d => d.dayName && d.dayName.toLowerCase().includes(weekday.toLowerCase()));
   if (weekdayMatch) return weekdayMatch;
 
-  const isAbstractSplit = !days.some(d =>
-    WEEKDAY_NAMES.some(w => (d.dayName || '').toLowerCase().includes(w.toLowerCase()))
-  );
-  if (!isAbstractSplit) return null;
-
-  if (weekday === 'Monday') return days[0];
-  if (weekday === 'Wednesday' && days.length > 1) return days[1];
-  if (weekday === 'Friday' && days.length > 2) return days[2];
-  return null;
+  const splitDays = days.filter(d => !namesWeekday(d.dayName));
+  const slot = SPLIT_WEEKDAYS.indexOf(weekday);
+  return slot >= 0 && slot < splitDays.length ? splitDays[slot] : null;
 }

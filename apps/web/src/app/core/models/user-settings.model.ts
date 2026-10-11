@@ -1,14 +1,10 @@
 import { FormControl, FormGroup } from '@angular/forms';
-
-export interface GoalOption {
-  value: string;
-  label: string;
-  hint: string;
-  icon: string;
-}
+import { ActivityLevel, DietType, FitnessGoalId } from '../../shared/constants/fitness-preferences';
 
 export interface FitnessForm {
-  primaryGoal: FormControl<string>;
+  primaryGoal: FormControl<FitnessGoalId | ''>;
+  activityLevel: FormControl<ActivityLevel | null>;
+  dietPreference: FormControl<DietType | null>;
   targetWeight: FormControl<number | null>;
   targetCalories: FormControl<number | null>;
   targetTrainingTime: FormControl<number | null>;
@@ -22,8 +18,15 @@ export interface NotificationsForm {
   workoutReminders: FormControl<boolean>;
 }
 
+export interface DashboardForm {
+  showGymBuddy: FormControl<boolean>;
+}
+
 export interface UserPreferences {
   primaryGoal?: string;
+  activityLevel?: ActivityLevel | null;
+  dietPreference?: DietType | null;
+  trainingDaysPerWeek?: number | null;
   targetWeight?: number | null;
   targetCalories?: number | null;
   targetProtein?: number | null;
@@ -32,6 +35,14 @@ export interface UserPreferences {
   targetTrainingTime?: number | null;
   emailNotificationsEnabled?: boolean;
   workoutRemindersEnabled?: boolean;
+  showGymBuddy?: boolean;
+}
+
+export interface SuggestedTargets {
+  targetCalories: number;
+  targetProtein: number;
+  targetCarbs: number;
+  targetFats: number;
 }
 
 export type FitnessValue = ReturnType<FormGroup<FitnessForm>['getRawValue']>;

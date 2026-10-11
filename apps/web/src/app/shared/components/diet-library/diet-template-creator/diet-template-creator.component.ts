@@ -5,6 +5,7 @@ import { FIELD_LIMITS } from '../../../constants/validation.constants';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { DropdownOption } from '../../../../shared/models/dropdown.model';
+import { DIET_TYPES } from '../../../../shared/constants/fitness-preferences';
 import { CONSTANTS } from '../../../../core/constants/constants';
 import { TimePickerComponent } from '../../time-picker/time-picker.component';
 import { round2 } from '../../../utils/number';
@@ -37,6 +38,11 @@ export class DietTemplateCreatorComponent implements OnInit {
     { value: 'Maintenance', label: 'Maintenance & Health', icon: 'fa-solid fa-heart' }
   ];
 
+  dietTypeOptions: DropdownOption[] = [
+    { value: '', label: 'Not specified', icon: 'fa-solid fa-utensils' },
+    ...DIET_TYPES.map(d => ({ value: d.value, label: d.label, icon: d.icon }))
+  ];
+
   ngOnInit(): void {
     this.initForm(this.plan);
   }
@@ -46,6 +52,7 @@ export class DietTemplateCreatorComponent implements OnInit {
       name: [plan?.name || '', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       description: [plan?.description || '', [Validators.maxLength(300)]],
       goal: [plan?.goal || 'Muscle Gain', [Validators.required]],
+      dietType: [plan?.dietType || ''],
       protein: [plan?.protein ?? null, [Validators.required, Validators.min(0)]],
       carbs: [plan?.carbs ?? null, [Validators.min(0)]],
       fats: [plan?.fats ?? null, [Validators.min(0)]],
@@ -255,6 +262,7 @@ export class DietTemplateCreatorComponent implements OnInit {
       carbs: val.carbs ?? 0,
       fats: val.fats ?? 0,
       goal: val.goal,
+      dietType: val.dietType || null,
       meals: val.meals.map((m: any, idx: number) => ({
         name: m.mealTitle.trim(),
         time: this.to12h(m.mealTime),

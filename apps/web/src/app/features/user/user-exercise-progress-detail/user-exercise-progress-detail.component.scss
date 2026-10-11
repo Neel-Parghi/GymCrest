@@ -3,6 +3,25 @@
 
 @include progress.base;
 
+// Desktop: the page fills the viewport; the columns scroll inside, and in History only the session list does.
+:host {
+  @include m.from-desktop {
+    height: 100%;
+  }
+}
+
+.progress-page {
+  @include m.from-desktop {
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+// Flat cards on this page only; the shared member card keeps its shadow elsewhere.
+.card {
+  box-shadow: none;
+}
+
 $cell-h: 54px;
 $total-h: 26px;
 $head-h: 40px;
@@ -17,7 +36,11 @@ $row-gap: 6px;
   @include m.from-desktop {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    flex: 1;
+    // Short screens: keep the columns usable; the page scrolls instead.
+    min-height: 360px;
   }
 }
 
@@ -27,6 +50,20 @@ $row-gap: 6px;
   flex-direction: column;
   gap: 14px;
   min-width: 0;
+
+  @include m.from-desktop {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+// The history card takes the rest of the side column and scrolls its list, not the column.
+.history-card {
+  @include m.from-desktop {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 .muted {
@@ -458,6 +495,13 @@ $row-gap: 6px;
   list-style: none;
   margin: 0;
   padding: 0;
+
+  @include m.from-desktop {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 
   li {
     display: flex;

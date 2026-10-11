@@ -455,6 +455,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("DietType")
+                        .HasColumnType("text");
+
                     b.Property<decimal>("Fats")
                         .HasColumnType("numeric");
 
@@ -2530,16 +2533,25 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ActivityLevel")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DietPreference")
+                        .HasColumnType("text");
+
                     b.Property<bool>("EmailNotificationsEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<string>("ExperienceLevel")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Limitations")
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ModifiedBy")
@@ -2550,6 +2562,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("PrimaryGoal")
                         .HasColumnType("text");
+
+                    b.Property<bool>("ShowGymBuddy")
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("TargetCalories")
                         .HasColumnType("integer");
@@ -2568,6 +2583,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
 
                     b.Property<double?>("TargetWeight")
                         .HasColumnType("double precision");
+
+                    b.Property<int?>("TrainingDaysPerWeek")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

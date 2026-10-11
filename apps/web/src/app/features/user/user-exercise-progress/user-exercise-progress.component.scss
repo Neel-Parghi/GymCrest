@@ -1,12 +1,22 @@
 @use 'member' as m;
 
+// Desktop: the page fills the viewport and only the session log scrolls, so its height follows the screen.
 :host {
   display: block;
+
+  @include m.from-desktop {
+    height: 100%;
+  }
 }
 
 .progress-page {
   @include m.page;
   padding-top: 4px;
+
+  @include m.from-desktop {
+    height: 100%;
+    min-height: 0;
+  }
 }
 
 .page-head {
@@ -240,8 +250,12 @@
   @include m.from-desktop {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: var(--m-gap);
     align-items: start;
+    flex: 1;
+    // Short screens: never squeeze the row below the chart; the page scrolls instead.
+    min-height: 360px;
   }
 }
 
@@ -331,6 +345,11 @@
   gap: 4px;
   padding-bottom: 8px;
 
+  @include m.from-desktop {
+    align-self: stretch;
+    min-height: 0;
+  }
+
   h2 {
     @include m.section-title;
     margin-bottom: 6px;
@@ -343,8 +362,10 @@
   padding: 0;
 
   @include m.from-desktop {
-    max-height: 420px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }
 

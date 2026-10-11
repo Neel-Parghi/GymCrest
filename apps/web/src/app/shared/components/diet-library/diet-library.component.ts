@@ -7,6 +7,7 @@ import { ConfirmationPopupComponent } from '../confirmation-popup/confirmation-p
 import { DietPlanService } from '../../../core/services/diet-plan.service';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { macroCalorieSplit } from '../../utils/nutrition';
+import { DietType, dietTypeLabel, suitsDiet } from '../../constants/fitness-preferences';
 
 @Component({
   selector: 'app-diet-library',
@@ -27,7 +28,20 @@ export class DietLibraryComponent implements OnInit {
   @Input() embedded: boolean = false;
   @Output() onAssign = new EventEmitter<any>();
 
+  /** The member's diet; when set, plans that don't suit it are hidden until they choose to see all. */
+  @Input() set dietPreference(value: DietType | null | undefined) {
+    this.preference = value ?? null;
+    this.applyDietFilter();
+  }
+
   loggedInUserId: string = '';
+
+  /** Every plan the viewer can see; dietPlans is the part currently shown. */
+  private allPlans: any[] = [];
+  private preference: DietType | null = null;
+  showAllDiets = false;
+  hiddenPlanCount = 0;
+  readonly dietTypeLabel = dietTypeLabel;
 
   dietPlans: any[] = [];
   showCreateModal = false;
@@ -60,17 +74,38 @@ export class DietLibraryComponent implements OnInit {
       next: (plans) => {
         if (this.ownerMode || !this.currentUserId) {
           // Trainer/owner mode: see all non-custom templates in the gym
-          this.dietPlans = (plans || []).filter((p: any) => !p.isCustom);
+          this.allPlans = (plans || []).filter((p: any) => !p.isCustom);
         } else {
           // User mode: User sees global templates + their own plans
-          this.dietPlans = (plans || []).filter((p: any) => !p.isCustom || p.createdBy === this.currentUserId);
+          this.allPlans = (plans || []).filter((p: any) => !p.isCustom || p.createdBy === this.currentUserId);
         }
+        this.applyDietFilter();
       },
       error: (err) => {
         console.error('Failed to load diet templates:', err);
         this.notification.error(CONSTANTS.DIET_PLANNER_MODULE.LOAD_ERROR);
       }
     });
+  }
+
+  get preferenceLabel(): string {
+    return dietTypeLabel(this.preference).toLowerCase();
+  }
+
+  toggleShowAllDiets(): void {
+    this.showAllDiets = !this.showAllDiets;
+    this.applyDietFilter();
+  }
+
+  private applyDietFilter(): void {
+    const filterByDiet = !!this.preference && !this.showAllDiets;
+    // The active plan always stays visible, even if it doesn't match.
+    this.dietPlans = filterByDiet
+      ? this.allPlans.filter(p => suitsDiet(p.dietType, this.preference) || p.id === this.activeDietId)
+      : this.allPlans;
+    this.hiddenPlanCount = this.preference
+      ? this.allPlans.filter(p => !suitsDiet(p.dietType, this.preference) && p.id !== this.activeDietId).length
+      : 0;
   }
 
   openCreateModal(): void {

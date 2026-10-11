@@ -49,9 +49,9 @@ namespace GymForge.Application.BackgroundJobs
                 return;
             }
 
-            GymMember? member = await _gymMemberRepository.GetByUserIdAsync(userId);
-            
-            if (member != null)
+
+            List<GymMember> members = await _gymMemberRepository.GetAllByUserIdAsync(userId);
+            foreach (GymMember member in members)
             {
                 member.UserId = null;
                 await _gymMemberRepository.UpdateAsync(member);

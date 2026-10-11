@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using GymForge.Infrastructure.Extensions;
 using GymForge.Contracts.Members;
 using GymForge.Shared.Enums;
+using GymForge.Shared.Helpers;
 
 namespace GymForge.Infrastructure.Repositories
 {
@@ -90,6 +91,13 @@ namespace GymForge.Infrastructure.Repositories
                                     .Include(x => x.Subscriptions)
                                     .Include(x => x.Address)
                                     .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<List<GymMember>> GetAllByUserIdAsync(Guid userId)
+        {
+            return await _dbContext.GymMembers
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task<GymMember?> GetByUserIdAsync(Guid userId)
@@ -254,37 +262,31 @@ namespace GymForge.Infrastructure.Repositories
                 ConversionRate = conversionRate
             };
 
+            DateTime localToday = AppTimeZone.Today;
+            HashSet<DateTime> holidays = (await _dbContext.GymHolidays
+                    .Where(h => h.GymId == gymId && (h.BranchId == null || !branchId.HasValue || h.BranchId == branchId))
+                    .Select(h => h.Date)
+                    .ToListAsync())
+                .Select(AppTimeZone.ToLocalDate)
+                .ToHashSet();
+
             List<StreakLeaderDto> streakList = new List<StreakLeaderDto>();
             foreach (GymMember member in members)
             {
-                List<DateTime> checkInDates = attendanceLogs
+                HashSet<DateTime> checkInDays = attendanceLogs
                     .Where(a => a.MemberId == member.Id)
-                    .Select(a => a.CheckInTime.Date)
-                    .Distinct()
-                    .OrderByDescending(d => d)
-                    .ToList();
+                    .Select(a => AppTimeZone.ToLocalDate(a.CheckInTime))
+                    .ToHashSet();
 
                 int currentStreak = 0;
-                if (checkInDates.Any())
+                if (checkInDays.Count > 0)
                 {
-                    DateTime expectedDate = today;
-                    if (checkInDates[0] == today || checkInDates[0] == today.AddDays(-1))
+                    DateTime firstCheckIn = checkInDays.Min();
+                    DateTime cursor = checkInDays.Contains(localToday) ? localToday : localToday.AddDays(-1);
+                    for (; cursor >= firstCheckIn; cursor = cursor.AddDays(-1))
                     {
-                        currentStreak = 1;
-                        expectedDate = checkInDates[0].AddDays(-1);
-
-                        for (int i = 1; i < checkInDates.Count; i++)
-                        {
-                            if (checkInDates[i] == expectedDate)
-                            {
-                                currentStreak++;
-                                expectedDate = expectedDate.AddDays(-1);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
+                        if (checkInDays.Contains(cursor)) currentStreak++;
+                        else if (!holidays.Contains(cursor)) break;
                     }
                 }
 

@@ -7,7 +7,9 @@ using GymForge.Contracts.PlanGeneration;
 using GymForge.Contracts.Users;
 using GymForge.Domain.Entities;
 using GymForge.Domain.Interface;
+using GymForge.Shared.Constants;
 using GymForge.Shared.Enums;
+using GymForge.Shared.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -30,6 +32,9 @@ namespace GymForge.Application.Modules.Users.Services
         private readonly IMapper _mapper;
         private readonly IPlanGenerationService _planGenerationService;
         private readonly ILogger<UserService> _logger;
+
+        /// <summary>Steps in the member onboarding wizard; completing it leaves the member on the last one.</summary>
+        private const int OnboardingStepCount = 4;
 
         public UserService(
             IAuthRepository authRepository,
@@ -256,15 +261,19 @@ namespace GymForge.Application.Modules.Users.Services
 
             return new UserPreferenceDto
             {
-                PrimaryGoal = user.Preference?.PrimaryGoal,
+                PrimaryGoal = user.Preference?.PrimaryGoal == null ? null : FitnessGoals.Normalize(user.Preference.PrimaryGoal),
                 TargetWeight = user.Preference?.TargetWeight,
                 TargetCalories = user.Preference?.TargetCalories,
                 TargetProtein = user.Preference?.TargetProtein,
                 TargetCarbs = user.Preference?.TargetCarbs,
                 TargetFats = user.Preference?.TargetFats,
                 TargetTrainingTime = user.Preference?.TargetTrainingTime,
+                DietPreference = user.Preference?.DietPreference,
+                ActivityLevel = user.Preference?.ActivityLevel,
+                TrainingDaysPerWeek = user.Preference?.TrainingDaysPerWeek,
                 EmailNotificationsEnabled = user.Preference?.EmailNotificationsEnabled ?? true,
-                WorkoutRemindersEnabled = user.Preference?.WorkoutRemindersEnabled ?? true
+                WorkoutRemindersEnabled = user.Preference?.WorkoutRemindersEnabled ?? true,
+                ShowGymBuddy = user.Preference?.ShowGymBuddy ?? true
             };
         }
 
@@ -276,15 +285,19 @@ namespace GymForge.Application.Modules.Users.Services
 
             user.Preference ??= new UserPreference { CreatedOn = DateTime.UtcNow };
             
-            user.Preference.PrimaryGoal = dto.PrimaryGoal;
+            user.Preference.PrimaryGoal = string.IsNullOrWhiteSpace(dto.PrimaryGoal) ? null : FitnessGoals.Normalize(dto.PrimaryGoal);
             user.Preference.TargetWeight = dto.TargetWeight;
             user.Preference.TargetCalories = dto.TargetCalories;
             user.Preference.TargetProtein = dto.TargetProtein;
             user.Preference.TargetCarbs = dto.TargetCarbs;
             user.Preference.TargetFats = dto.TargetFats;
             user.Preference.TargetTrainingTime = dto.TargetTrainingTime;
+            user.Preference.DietPreference = DietTypes.Normalize(dto.DietPreference) ?? user.Preference.DietPreference;
+            user.Preference.ActivityLevel = ActivityLevels.Normalize(dto.ActivityLevel) ?? user.Preference.ActivityLevel;
+            user.Preference.TrainingDaysPerWeek = dto.TrainingDaysPerWeek ?? user.Preference.TrainingDaysPerWeek;
             user.Preference.EmailNotificationsEnabled = dto.EmailNotificationsEnabled ?? true;
             user.Preference.WorkoutRemindersEnabled = dto.WorkoutRemindersEnabled ?? true;
+            user.Preference.ShowGymBuddy = dto.ShowGymBuddy ?? true;
             user.Preference.ModifiedOn = DateTime.UtcNow;
 
             await _userRepository.UpdateUserAsync(user);
@@ -363,9 +376,8 @@ namespace GymForge.Application.Modules.Users.Services
 
             user.Profile ??= new UserProfile { CreatedOn = DateTime.UtcNow };
             user.Profile.IsOnboarded = true;
-            user.Profile.CurrentOnboardingStep = 3;
+            user.Profile.CurrentOnboardingStep = OnboardingStepCount;
 
-            user.Profile ??= new UserProfile { CreatedOn = DateTime.UtcNow };
             user.Preference ??= new UserPreference { CreatedOn = DateTime.UtcNow };
 
             user.Profile.DateOfBirth = dto.DOB;
@@ -378,8 +390,13 @@ namespace GymForge.Application.Modules.Users.Services
             {
                 user.Preference.TargetWeight = (double)dto.TargetWeight.Value;
             }
-            user.Preference.PrimaryGoal = dto.PrimaryGoal;
+            user.Preference.PrimaryGoal = FitnessGoals.Normalize(dto.PrimaryGoal);
             user.Preference.ExperienceLevel = dto.ExperienceLevel;
+            user.Preference.ActivityLevel = ActivityLevels.Normalize(dto.ActivityLevel);
+            user.Preference.DietPreference = DietTypes.Normalize(dto.DietPreference);
+            user.Preference.TrainingDaysPerWeek = dto.TrainingDaysPerWeek;
+            user.Preference.TargetTrainingTime = dto.SessionLengthMinutes ?? user.Preference.TargetTrainingTime;
+            user.Preference.Limitations = string.IsNullOrWhiteSpace(dto.Limitations) ? null : dto.Limitations.Trim();
 
             double heightInMeters = (double)dto.Height / 100.0;
             double bmi = 0;
@@ -407,14 +424,21 @@ namespace GymForge.Application.Modules.Users.Services
 
             try
             {
-                StarterPlanResultDto starterPlans = await _planGenerationService.GenerateStarterPlansAsync(
-                    user.Id, dto.PrimaryGoal, dto.ExperienceLevel, dto.Height, dto.Weight, dto.DOB, dto.Gender);
+                StarterPlanResultDto starterPlans = await _planGenerationService.GenerateStarterPlansAsync(user.Id, new StarterPlanProfileDto
+                {
+                    PrimaryGoal = user.Preference.PrimaryGoal,
+                    ExperienceLevel = dto.ExperienceLevel,
+                    ActivityLevel = user.Preference.ActivityLevel,
+                    DietPreference = user.Preference.DietPreference,
+                    TrainingDaysPerWeek = dto.TrainingDaysPerWeek,
+                    SessionLengthMinutes = dto.SessionLengthMinutes,
+                    HeightCm = dto.Height,
+                    WeightKg = dto.Weight,
+                    DateOfBirth = dto.DOB,
+                    Gender = dto.Gender
+                });
 
-                user.Preference.TargetCalories = starterPlans.TargetCalories;
-                user.Preference.TargetProtein = starterPlans.TargetProtein;
-                user.Preference.TargetCarbs = starterPlans.TargetCarbs;
-                user.Preference.TargetFats = starterPlans.TargetFats;
-
+                ApplyTargets(user.Preference, starterPlans);
                 await _userRepository.UpdateUserAsync(user);
                 await _unitOfWork.SaveChangesAsync();
             }
@@ -423,6 +447,67 @@ namespace GymForge.Application.Modules.Users.Services
                 // Starter plan generation is a best-effort enhancement - onboarding must succeed regardless.
                 _logger.LogError(ex, "Failed to generate starter plans for user {UserId} during onboarding.", user.Id);
             }
+        }
+
+        public async Task<StarterPlanResultDto?> GetSuggestedTargetsAsync(string? goal, string? activityLevel)
+        {
+            Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
+            User? user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            StarterPlanProfileDto? profile = await BuildPlanProfileAsync(user, goal, activityLevel);
+            return profile == null ? null : _planGenerationService.CalculateTargets(profile);
+        }
+
+        public StarterPlanResultDto PreviewTargets(StarterPlanProfileDto profile) =>
+            _planGenerationService.CalculateTargets(profile);
+
+        public async Task<StarterPlanResultDto> RegenerateStarterPlansAsync()
+        {
+            Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
+            User? user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            StarterPlanProfileDto profile = await BuildPlanProfileAsync(user, null, null)
+                ?? throw new Exception("Add your height, weight, date of birth and gender before generating a plan.");
+
+            StarterPlanResultDto targets = await _planGenerationService.GenerateStarterPlansAsync(user.Id, profile);
+
+            user.Preference ??= new UserPreference { CreatedOn = DateTime.UtcNow };
+            ApplyTargets(user.Preference, targets);
+            await _userRepository.UpdateUserAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            return targets;
+        }
+
+        private async Task<StarterPlanProfileDto?> BuildPlanProfileAsync(User user, string? goalOverride, string? activityLevelOverride)
+        {
+            (double? heightCm, double? weightKg) = await _userRepository.GetLatestBodyMetricsAsync(user.Id);
+            if (heightCm is not > 0 || weightKg is not > 0 || user.Profile?.DateOfBirth == null) return null;
+
+            UserPreference? preference = user.Preference;
+            return new StarterPlanProfileDto
+            {
+                PrimaryGoal = string.IsNullOrWhiteSpace(goalOverride) ? preference?.PrimaryGoal : goalOverride,
+                ExperienceLevel = preference?.ExperienceLevel,
+                ActivityLevel = string.IsNullOrWhiteSpace(activityLevelOverride) ? preference?.ActivityLevel : activityLevelOverride,
+                DietPreference = preference?.DietPreference,
+                TrainingDaysPerWeek = preference?.TrainingDaysPerWeek,
+                SessionLengthMinutes = preference?.TargetTrainingTime,
+                HeightCm = (decimal)heightCm.Value,
+                WeightKg = (decimal)weightKg.Value,
+                DateOfBirth = user.Profile.DateOfBirth.Value,
+                Gender = user.Profile.Gender?.ToString() ?? string.Empty
+            };
+        }
+
+        private static void ApplyTargets(UserPreference preference, StarterPlanResultDto targets)
+        {
+            preference.TargetCalories = targets.TargetCalories;
+            preference.TargetProtein = targets.TargetProtein;
+            preference.TargetCarbs = targets.TargetCarbs;
+            preference.TargetFats = targets.TargetFats;
+            preference.ModifiedOn = DateTime.UtcNow;
         }
 
         public async Task<UserDashboardSummaryDto> GetUserDashboardSummaryAsync()
@@ -435,7 +520,7 @@ namespace GymForge.Application.Modules.Users.Services
         {
             Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
             IEnumerable<DailyRoutine> routines = await _userRepository.GetDailyRoutinesAsync(userId);
-            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, DateTime.UtcNow.Date);
+            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, AppTimeZone.TodayAsUtcDate);
             List<Guid> completedIds = completion?.CompletedRoutineIds ?? new List<Guid>();
 
             return routines.Select(r => new DailyRoutineDto
@@ -507,14 +592,14 @@ namespace GymForge.Application.Modules.Users.Services
         public async Task ToggleDailyRoutineAsync(Guid id)
         {
             Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
-            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, DateTime.UtcNow.Date);
+            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, AppTimeZone.TodayAsUtcDate);
 
             if (completion == null)
             {
                 completion = new DailyRoutineCompletion
                 {
                     UserId = userId,
-                    Date = DateTime.UtcNow.Date,
+                    Date = AppTimeZone.TodayAsUtcDate,
                     CompletedRoutineIds = new List<Guid> { id },
                     CreatedOn = DateTime.UtcNow
                 };

@@ -167,6 +167,7 @@ export class WorkoutPlanService extends BaseApiService {
       return {
         ...basePlan,
         type: 'Daily',
+        dayId: virtualDay.id,
         targetCategory: virtualDay.category || '',
         exercises: [...(virtualDay.exercises || [])]
           .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))

@@ -5,6 +5,7 @@ using GymForge.Contracts.DietPlan;
 using GymForge.Contracts.PlanGeneration;
 using GymForge.Contracts.Workout;
 using GymForge.Contracts.WorkoutPlan;
+using GymForge.Shared.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace GymForge.Application.Modules.PlanGeneration.Services
@@ -18,29 +19,113 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
         private readonly IMemberDietService _memberDietService;
         private readonly ILogger<PlanGenerationService> _logger;
 
-        private static readonly Dictionary<int, (string DayName, string[] Categories)[]> DaySplits = new()
+        private const int MinTrainingDays = 2;
+        private const int MaxTrainingDays = 7;
+        private const int DefaultSessionMinutes = 60;
+        private const int MinutesPerExercise = 10;
+        private const int MinExercisesPerSession = 3;
+        /// <summary>Long sessions get more rest and cardio rather than an ever-growing exercise list.</summary>
+        private const int MaxExercisesPerSession = 10;
+
+        private static readonly string[] WeekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+        private static readonly Dictionary<int, string[]> TrainingWeekDays = new()
         {
-            [3] = new[]
+            [2] = ["Monday", "Thursday"],
+            [3] = ["Monday", "Wednesday", "Friday"],
+            [4] = ["Monday", "Tuesday", "Thursday", "Friday"],
+            [5] = ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"],
+            [6] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            [7] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        };
+
+        private static readonly Dictionary<int, string[][]> DaySplits = new()
+        {
+            [2] =
+            [
+                ["Chest", "Back", "Shoulders"],
+                ["Legs", "Core"]
+            ],
+            [3] =
+            [
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs", "Core"]
+            ],
+            [4] =
+            [
+                ["Chest", "Back", "Shoulders"],
+                ["Legs", "Core"],
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"]
+            ],
+            [5] =
+            [
+                ["Chest", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs"],
+                ["Shoulders", "Core"],
+                ["Cardio", "Core"]
+            ],
+            [6] =
+            [
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs"],
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs", "Core"]
+            ],
+            [7] =
+            [
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs"],
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs", "Core"],
+                ["Cardio", "Core"]
+            ]
+        };
+
+        private static readonly Dictionary<string, Dictionary<string, string>> MealSuggestions = new()
+        {
+            [DietTypes.Veg] = new()
             {
-                ("Day 1 - Push (Chest, Shoulders & Triceps)", new[] { "Chest", "Shoulders", "Triceps" }),
-                ("Day 2 - Pull (Back & Biceps)", new[] { "Back", "Biceps" }),
-                ("Day 3 - Legs & Core", new[] { "Legs", "Core" })
+                ["Breakfast"] = "Poha or oats with milk, a handful of nuts, a serving of fruit",
+                ["Lunch"] = "Paneer or dal, brown rice or roti, mixed vegetables, curd",
+                ["Evening Snack"] = "Greek yogurt or roasted chana, a handful of nuts",
+                ["Dinner"] = "Rajma, chole or tofu, salad, roti or quinoa"
             },
-            [4] = new[]
+            [DietTypes.Eggetarian] = new()
             {
-                ("Day 1 - Upper Body", new[] { "Chest", "Back", "Shoulders" }),
-                ("Day 2 - Lower Body & Core", new[] { "Legs", "Core" }),
-                ("Day 3 - Push (Chest, Shoulders & Triceps)", new[] { "Chest", "Shoulders", "Triceps" }),
-                ("Day 4 - Pull (Back & Biceps)", new[] { "Back", "Biceps" })
+                ["Breakfast"] = "Eggs or an omelette, whole-grain toast, a serving of fruit",
+                ["Lunch"] = "Paneer or dal, brown rice or roti, mixed vegetables, curd",
+                ["Evening Snack"] = "Boiled eggs or Greek yogurt, a handful of nuts",
+                ["Dinner"] = "Egg curry or tofu, salad, roti or quinoa"
             },
-            [5] = new[]
+            [DietTypes.NonVeg] = new()
             {
-                ("Day 1 - Chest & Triceps", new[] { "Chest", "Triceps" }),
-                ("Day 2 - Back & Biceps", new[] { "Back", "Biceps" }),
-                ("Day 3 - Legs", new[] { "Legs" }),
-                ("Day 4 - Shoulders & Core", new[] { "Shoulders", "Core" }),
-                ("Day 5 - Conditioning", new[] { "Cardio", "Core" })
+                ["Breakfast"] = "Eggs or oats, whole-grain toast, a serving of fruit",
+                ["Lunch"] = "Grilled chicken or fish, brown rice or roti, mixed vegetables",
+                ["Evening Snack"] = "Greek yogurt or a protein shake, a handful of nuts",
+                ["Dinner"] = "Grilled fish or chicken, salad, sweet potato or quinoa"
+            },
+            [DietTypes.Vegan] = new()
+            {
+                ["Breakfast"] = "Oats with soy milk, peanut butter, a serving of fruit",
+                ["Lunch"] = "Tofu or dal, brown rice or roti, mixed vegetables",
+                ["Evening Snack"] = "Roasted chana or a plant protein shake, a handful of nuts",
+                ["Dinner"] = "Chole, rajma or tempeh, salad, quinoa or sweet potato"
             }
+        };
+
+        private static readonly Dictionary<string, string> MixedMealSuggestions = new()
+        {
+            ["Breakfast"] = "Oats or eggs, whole-grain toast, a serving of fruit",
+            ["Lunch"] = "Grilled chicken, paneer or tofu, brown rice or roti, mixed vegetables",
+            ["Evening Snack"] = "Greek yogurt or a protein shake, a handful of nuts",
+            ["Dinner"] = "Grilled fish, chicken or legumes, salad, sweet potato or quinoa"
         };
 
         public PlanGenerationService(
@@ -59,17 +144,17 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
             _logger = logger;
         }
 
-        public async Task<StarterPlanResultDto> GenerateStarterPlansAsync(Guid userId, string primaryGoal, string? experienceLevel, decimal heightCm, decimal weightKg, DateTime dob, string gender)
+        public async Task<StarterPlanResultDto> GenerateStarterPlansAsync(Guid userId, StarterPlanProfileDto profile)
         {
-            string goal = NormalizeGoal(primaryGoal);
-            string level = NormalizeLevel(experienceLevel);
-            int age = CalculateAge(dob);
-
-            MacroResult macros = CalculateMacros(heightCm, weightKg, age, gender, goal);
+            string goal = FitnessGoals.Normalize(profile.PrimaryGoal);
+            string level = NormalizeLevel(profile.ExperienceLevel);
+            MacroResult macros = CalculateMacros(profile, goal);
 
             try
             {
-                CreateWorkoutPlanRequest workoutRequest = await BuildWorkoutPlanAsync(level, goal);
+                int trainingDays = ResolveTrainingDays(profile.TrainingDaysPerWeek, level);
+                int sessionMinutes = profile.SessionLengthMinutes is > 0 ? profile.SessionLengthMinutes.Value : DefaultSessionMinutes;
+                CreateWorkoutPlanRequest workoutRequest = await BuildWorkoutPlanAsync(level, goal, trainingDays, sessionMinutes);
                 if (workoutRequest.Days.Any(d => d.Exercises.Count > 0))
                 {
                     WorkoutPlanDto workoutPlan = await _workoutPlanService.CreatePlanAsync(workoutRequest, null, userId);
@@ -87,7 +172,7 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
 
             try
             {
-                CreateDietPlanRequest dietRequest = BuildDietPlan(goal, macros);
+                CreateDietPlanRequest dietRequest = BuildDietPlan(goal, DietTypes.Normalize(profile.DietPreference), macros);
                 DietPlanDto dietPlan = await _dietPlanService.CreatePlanAsync(dietRequest, null, userId);
                 await _memberDietService.AssignDietToMemberAsync(userId, dietPlan.Id, null);
             }
@@ -96,50 +181,65 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
                 _logger.LogError(ex, "Failed to generate starter diet plan for user {UserId}.", userId);
             }
 
-            return new StarterPlanResultDto
-            {
-                TargetCalories = macros.Calories,
-                TargetProtein = (int)Math.Round(macros.ProteinGrams),
-                TargetCarbs = (int)Math.Round(macros.CarbGrams),
-                TargetFats = (int)Math.Round(macros.FatGrams)
-            };
+            return ToResult(macros);
         }
 
-        private async Task<CreateWorkoutPlanRequest> BuildWorkoutPlanAsync(string level, string goal)
+        public StarterPlanResultDto CalculateTargets(StarterPlanProfileDto profile) =>
+            ToResult(CalculateMacros(profile, FitnessGoals.Normalize(profile.PrimaryGoal)));
+
+        private static StarterPlanResultDto ToResult(MacroResult macros) => new()
         {
-            int dayCount = level switch
+            TargetCalories = macros.Calories,
+            TargetProtein = (int)Math.Round(macros.ProteinGrams),
+            TargetCarbs = (int)Math.Round(macros.CarbGrams),
+            TargetFats = (int)Math.Round(macros.FatGrams)
+        };
+
+        private static int ResolveTrainingDays(int? requested, string level)
+        {
+            if (requested.HasValue) return Math.Clamp(requested.Value, MinTrainingDays, MaxTrainingDays);
+            return level switch
             {
                 "Advanced" => 5,
                 "Intermediate" => 4,
                 _ => 3
             };
+        }
 
-            (string DayName, string[] Categories)[] template = DaySplits[dayCount];
+        private async Task<CreateWorkoutPlanRequest> BuildWorkoutPlanAsync(string level, string goal, int trainingDays, int sessionMinutes)
+        {
+            string[][] split = DaySplits[trainingDays];
+            string[] trainingWeekDays = TrainingWeekDays[trainingDays];
             (int Sets, string Reps) setsReps = GetSetsReps(goal);
+            int exercisesPerSession = Math.Clamp(sessionMinutes / MinutesPerExercise, MinExercisesPerSession, MaxExercisesPerSession);
 
             List<CreateWorkoutPlanDayDto> days = new();
-            for (int i = 0; i < template.Length; i++)
+            for (int dayIndex = 0; dayIndex < WeekDays.Length; dayIndex++)
             {
-                (string dayName, string[] categories) = template[i];
-                days.Add(await BuildDayAsync(dayName, i, categories, level, setsReps));
+                string weekDay = WeekDays[dayIndex];
+                int slot = Array.IndexOf(trainingWeekDays, weekDay);
+                days.Add(slot < 0
+                    ? new CreateWorkoutPlanDayDto { DayName = weekDay, DayIndex = dayIndex, IsRestDay = true }
+                    : await BuildDayAsync(weekDay, dayIndex, split[slot], level, setsReps, exercisesPerSession));
             }
 
             return new CreateWorkoutPlanRequest
             {
                 Name = $"{level} Starter Program",
-                Description = $"Auto-generated {dayCount}-day split based on your onboarding profile.",
+                Description = $"Auto-generated {trainingDays}-day weekly plan based on your onboarding profile.",
                 Level = level,
                 Goal = MapGoalToWorkoutGoal(goal),
-                Type = "Split",
+                Type = "Weekly",
                 IsCustom = true,
                 Days = days
             };
         }
 
-        private async Task<CreateWorkoutPlanDayDto> BuildDayAsync(string dayName, int dayIndex, string[] categories, string level, (int Sets, string Reps) setsReps)
+        private async Task<CreateWorkoutPlanDayDto> BuildDayAsync(string dayName, int dayIndex, string[] categories, string level,
+            (int Sets, string Reps) setsReps, int exercisesPerSession)
         {
             List<CreateWorkoutPlanExerciseDto> exercises = new();
-            int perCategoryCount = categories.Length <= 2 ? 3 : 2;
+            int perCategoryCount = Math.Max(1, (int)Math.Round((double)exercisesPerSession / categories.Length));
             int sortOrder = 0;
 
             foreach (string category in categories)
@@ -173,31 +273,34 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
             };
         }
 
-        private static CreateDietPlanRequest BuildDietPlan(string goal, MacroResult macros)
+        private static CreateDietPlanRequest BuildDietPlan(string goal, string? dietType, MacroResult macros)
         {
+            Dictionary<string, string> suggestions = dietType != null ? MealSuggestions[dietType] : MixedMealSuggestions;
             List<CreateDietPlanMealDto> meals = new()
             {
-                BuildMeal("Breakfast", "08:00 AM", 0.25m, macros),
-                BuildMeal("Lunch", "01:00 PM", 0.35m, macros),
-                BuildMeal("Evening Snack", "05:00 PM", 0.10m, macros),
-                BuildMeal("Dinner", "08:00 PM", 0.30m, macros)
+                BuildMeal("Breakfast", "08:00 AM", 0.25m, macros, suggestions),
+                BuildMeal("Lunch", "01:00 PM", 0.35m, macros, suggestions),
+                BuildMeal("Evening Snack", "05:00 PM", 0.10m, macros, suggestions),
+                BuildMeal("Dinner", "08:00 PM", 0.30m, macros, suggestions)
             };
 
+            string suffix = dietType != null ? $" ({DietTypeLabel(dietType)})" : string.Empty;
             return new CreateDietPlanRequest
             {
-                Name = $"{ToTitleCase(goal)} Starter Plan",
+                Name = $"{ToTitleCase(goal)} Starter Plan{suffix}",
                 Description = "Auto-generated based on your onboarding profile.",
                 Protein = macros.ProteinGrams,
                 Carbs = macros.CarbGrams,
                 Fats = macros.FatGrams,
                 Goal = MapGoalToDietGoal(goal),
+                DietType = dietType,
                 IsCustom = true,
                 IsTemplate = false,
                 Meals = meals
             };
         }
 
-        private static CreateDietPlanMealDto BuildMeal(string name, string time, decimal share, MacroResult macros)
+        private static CreateDietPlanMealDto BuildMeal(string name, string time, decimal share, MacroResult macros, Dictionary<string, string> suggestions)
         {
             return new CreateDietPlanMealDto
             {
@@ -207,51 +310,43 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
                 Protein = Math.Round(macros.ProteinGrams * share, 1),
                 Carbs = Math.Round(macros.CarbGrams * share, 1),
                 Fats = Math.Round(macros.FatGrams * share, 1),
-                Items = SuggestItems(name),
+                Items = suggestions.GetValueOrDefault(name, "Balanced meal with protein, complex carbs, and vegetables"),
                 SortOrder = 0
             };
         }
 
-        private static string SuggestItems(string mealName) => mealName switch
+        private static string DietTypeLabel(string dietType) => dietType switch
         {
-            "Breakfast" => "Oats or eggs, whole-grain toast, a serving of fruit",
-            "Lunch" => "Grilled chicken, paneer or tofu, brown rice or roti, mixed vegetables",
-            "Evening Snack" => "Greek yogurt or a protein shake, a handful of nuts",
-            "Dinner" => "Grilled fish, chicken or legumes, salad, sweet potato or quinoa",
-            _ => "Balanced meal with lean protein, complex carbs, and vegetables"
+            DietTypes.Veg => "Veg",
+            DietTypes.Eggetarian => "Eggetarian",
+            DietTypes.Vegan => "Vegan",
+            _ => "Non-veg"
         };
 
         private static (int Sets, string Reps) GetSetsReps(string goal) => goal switch
         {
-            "muscle_gain" => (4, "8-10"),
-            "weight_loss" => (3, "12-15"),
-            "endurance" => (3, "15-20"),
+            FitnessGoals.MuscleGain => (4, "8-10"),
+            FitnessGoals.WeightLoss => (3, "12-15"),
+            FitnessGoals.Endurance => (3, "15-20"),
             _ => (3, "10-12")
         };
 
         private static string MapGoalToWorkoutGoal(string goal) => goal switch
         {
-            "muscle_gain" => "Hypertrophy",
-            "weight_loss" => "Fat Loss",
-            "endurance" => "Endurance",
-            "flexibility" => "Mobility",
+            FitnessGoals.MuscleGain => "Hypertrophy",
+            FitnessGoals.WeightLoss => "Fat Loss",
+            FitnessGoals.Endurance => "Endurance",
+            FitnessGoals.Flexibility => "Mobility",
             _ => "General Fitness"
         };
 
         private static string MapGoalToDietGoal(string goal) => goal switch
         {
-            "muscle_gain" => "Muscle Gain",
-            "weight_loss" => "Weight Loss",
-            "endurance" => "Endurance",
-            "flexibility" => "Maintenance",
+            FitnessGoals.MuscleGain => "Muscle Gain",
+            FitnessGoals.WeightLoss => "Weight Loss",
+            FitnessGoals.Endurance => "Endurance",
             _ => "Maintenance"
         };
-
-        private static string NormalizeGoal(string? goal)
-        {
-            if (string.IsNullOrWhiteSpace(goal)) return "general_fitness";
-            return goal.Trim().ToLowerInvariant();
-        }
 
         private static string NormalizeLevel(string? level)
         {
@@ -279,10 +374,12 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
             return Math.Max(age, 0);
         }
 
-        private static MacroResult CalculateMacros(decimal heightCm, decimal weightKg, int age, string gender, string goal)
+        private static MacroResult CalculateMacros(StarterPlanProfileDto profile, string goal)
         {
-            double h = (double)heightCm;
-            double w = (double)weightKg;
+            double h = (double)profile.HeightCm;
+            double w = (double)profile.WeightKg;
+            int age = CalculateAge(profile.DateOfBirth);
+            string gender = profile.Gender ?? string.Empty;
 
             double bmr = gender.Equals("Male", StringComparison.OrdinalIgnoreCase)
                 ? (10 * w) + (6.25 * h) - (5 * age) + 5
@@ -290,21 +387,20 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
                     ? (10 * w) + (6.25 * h) - (5 * age) - 161
                     : (10 * w) + (6.25 * h) - (5 * age) - 78;
 
-            // Assumes moderate activity (factor 1.55) since onboarding doesn't capture activity level.
-            double tdee = bmr * 1.55;
+            double tdee = bmr * ActivityLevels.Multiplier(profile.ActivityLevel);
 
             double targetCalories = goal switch
             {
-                "weight_loss" => Math.Max(tdee - 500, bmr),
-                "muscle_gain" => tdee + 300,
+                FitnessGoals.WeightLoss => Math.Max(tdee - 500, bmr),
+                FitnessGoals.MuscleGain => tdee + 300,
                 _ => tdee
             };
 
             double proteinFactor = goal switch
             {
-                "muscle_gain" => 2.2,
-                "weight_loss" => 2.0,
-                "endurance" => 1.6,
+                FitnessGoals.MuscleGain => 2.2,
+                FitnessGoals.WeightLoss => 2.0,
+                FitnessGoals.Endurance => 1.6,
                 _ => 1.8
             };
 

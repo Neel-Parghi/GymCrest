@@ -12,6 +12,12 @@ namespace GymForge.Shared.Helpers
         public static DateTime Today => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, India).Date;
 
         /// <summary>
+        /// Today's IST date as a UTC-kind midnight, for date-only columns (e.g. daily routine completions).
+        /// A plain <see cref="Today"/> has no kind, and the UTC value converter would shift it by the server's offset.
+        /// </summary>
+        public static DateTime TodayAsUtcDate => DateTime.SpecifyKind(Today, DateTimeKind.Utc);
+
+        /// <summary>
         /// The IST calendar date of a stored timestamp. Timestamps are stored in UTC, so an IST midnight
         /// (18:30 UTC the day before) maps back to the intended day; plain dates keep their day.
         /// </summary>

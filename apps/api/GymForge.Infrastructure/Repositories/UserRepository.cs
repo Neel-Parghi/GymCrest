@@ -1,8 +1,11 @@
+using GymForge.Application.Modules.Workout.Helpers;
 using GymForge.Contracts.Users;
 using GymForge.Domain.Entities;
 using GymForge.Domain.Interface;
 using GymForge.Infrastructure.Persistence;
+using GymForge.Shared.Constants;
 using GymForge.Shared.Enums;
+using GymForge.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymForge.Infrastructure.Repositories
@@ -34,6 +37,9 @@ namespace GymForge.Infrastructure.Repositories
         private const int RecoveryLookbackDays = 30;
 
         private const int StreakLookbackDays = 400;
+        private const int DefaultMonthlySessionTarget = 20;
+        private const double WeightGoalToleranceKg = 0.5;
+        private const double WeeksPerMonth = 52.0 / 12.0;
 
         public UserRepository(AppDbContext dbContext)
         {
@@ -133,6 +139,23 @@ namespace GymForge.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
+        public async Task<(double? HeightCm, double? WeightKg)> GetLatestBodyMetricsAsync(Guid userId)
+        {
+            double? height = await _dbContext.MemberMeasurements
+                .Where(m => m.UserId == userId && m.Height.HasValue && m.Height > 0)
+                .OrderByDescending(m => m.Date)
+                .Select(m => m.Height)
+                .FirstOrDefaultAsync();
+
+            double? weight = await _dbContext.MemberMeasurements
+                .Where(m => m.UserId == userId && m.Weight.HasValue && m.Weight > 0)
+                .OrderByDescending(m => m.Date)
+                .Select(m => m.Weight)
+                .FirstOrDefaultAsync();
+
+            return (height, weight);
+        }
+
         public async Task<UserDashboardSummaryDto> GetUserDashboardSummaryAsync(Guid userId)
         {
             UserDashboardSummaryDto summary = new UserDashboardSummaryDto();
@@ -147,13 +170,11 @@ namespace GymForge.Infrastructure.Repositories
             summary.UserName = user.FirstName;
             summary.Greeting = DateTime.Now.Hour < 12 ? "Good morning" : (DateTime.Now.Hour < 17 ? "Good afternoon" : "Good evening");
 
-            if (user.Preference != null)
-            {
-                summary.GoalTitle = user.Preference.PrimaryGoal;
-                summary.TargetCalories = user.Preference.TargetCalories ?? 2500;
-                summary.TargetTrainingTime = user.Preference.TargetTrainingTime ?? 60;
-                summary.GoalProgressPct = 0; 
-            }
+            summary.ShowGymBuddy = user.Preference?.ShowGymBuddy ?? true;
+            summary.GoalTitle = FitnessGoals.Normalize(user.Preference?.PrimaryGoal);
+            summary.TargetCalories = user.Preference?.TargetCalories ?? 2500;
+            summary.TargetTrainingTime = user.Preference?.TargetTrainingTime ?? 60;
+            summary.TargetWeight = user.Preference?.TargetWeight;
 
             MemberMeasurement? latestMeasurement = await _dbContext.MemberMeasurements
                 .Where(m => m.UserId == userId)
@@ -171,40 +192,48 @@ namespace GymForge.Infrastructure.Repositories
                     .OrderBy(m => m.Date)
                     .FirstOrDefaultAsync();
 
-                if (firstMeasurement != null && user.Preference?.TargetWeight.HasValue == true && latestMeasurement.Weight.HasValue)
+                // Progress always follows the most recent weigh-in, even when the newest entry has no weight.
+                double? latestWeight = await _dbContext.MemberMeasurements
+                    .Where(m => m.UserId == userId && m.Weight.HasValue)
+                    .OrderByDescending(m => m.Date)
+                    .Select(m => m.Weight)
+                    .FirstOrDefaultAsync();
+
+                if (firstMeasurement != null && user.Preference?.TargetWeight.HasValue == true && latestWeight.HasValue)
                 {
-                    double initialWeight = firstMeasurement.Weight.Value;
-                    double currentWeight = latestMeasurement.Weight.Value;
+                    double initialWeight = firstMeasurement.Weight!.Value;
+                    double currentWeight = latestWeight.Value;
                     double targetWeight = user.Preference.TargetWeight.Value;
 
-                    if (initialWeight != targetWeight)
-                    {
-                        double progress = (targetWeight < initialWeight) 
+                    double progress = Math.Abs(initialWeight - targetWeight) < WeightGoalToleranceKg
+                        // Started at the target: the goal is holding it, so it only counts while the latest weight is close.
+                        ? (Math.Abs(currentWeight - targetWeight) <= WeightGoalToleranceKg ? 100 : 0)
+                        : (targetWeight < initialWeight)
                             ? (initialWeight - currentWeight) / (initialWeight - targetWeight) * 100
                             : (currentWeight - initialWeight) / (targetWeight - initialWeight) * 100;
 
-                        summary.GoalProgressPct = Math.Clamp((int)Math.Round(progress), 0, 100);
-                    }
-                    else
-                    {
-                        summary.GoalProgressPct = 100;
-                    }
+                    summary.GoalProgressPct = Math.Clamp((int)Math.Round(progress), 0, 100);
                 }
             }
 
-            DateTime today = DateTime.UtcNow.Date;
+            DateTime today = AppTimeZone.Today;
             DateTime startOfMonth = new DateTime(today.Year, today.Month, 1);
+            (DateTime monthStartUtc, _) = AppTimeZone.DayBoundsUtc(startOfMonth);
+            (DateTime todayStartUtc, DateTime todayEndUtc) = AppTimeZone.DayBoundsUtc(today);
 
             List<WorkoutSessionLog> monthLogs = await _dbContext.WorkoutSessionLogs
-                .Where(l => l.UserId == userId && l.Date >= startOfMonth && l.Status == "Completed")
+                .Where(l => l.UserId == userId && l.Date >= monthStartUtc && l.Status == "Completed")
                 .ToListAsync();
 
             summary.MonthlySessionCount = monthLogs.Count;
-            summary.MonthlySessionTarget = 20;
+            int? trainingDaysPerWeek = user.Preference?.TrainingDaysPerWeek;
+            summary.MonthlySessionTarget = trainingDaysPerWeek is > 0
+                ? (int)Math.Round(trainingDaysPerWeek.Value * WeeksPerMonth)
+                : DefaultMonthlySessionTarget;
             summary.MonthlyCompletionPct = summary.MonthlySessionTarget > 0 ? (summary.MonthlySessionCount * 100) / summary.MonthlySessionTarget : 0;
 
             var todaySets = await _dbContext.WorkoutSessionLogs
-                .Where(l => l.UserId == userId && l.Date.Date == today && l.Status == "Completed")
+                .Where(l => l.UserId == userId && l.Date >= todayStartUtc && l.Date < todayEndUtc && l.Status == "Completed")
                 .SelectMany(l => l.LoggedExercises)
                 .Where(e => !e.Skipped)
                 .SelectMany(e => e.LoggedSets
@@ -220,10 +249,13 @@ namespace GymForge.Infrastructure.Repositories
             double bodyWeightKg = latestMeasurement?.Weight is double w && w > 0 ? w : DefaultBodyWeightKg;
 
             summary.ActiveTrainingTimeMinutes = (int)Math.Round(cardioMinutes + strengthMinutes);
+            summary.CardioMinutesToday = (int)Math.Round(cardioMinutes);
+            summary.StrengthSetsToday = todaySets.Count(s => !s.IsCardio);
             summary.CaloriesBurnedToday = (int)Math.Round(
                 bodyWeightKg * ((CardioMet * cardioMinutes) + (StrengthMet * strengthMinutes)) / 60.0);
+            summary.TargetCaloriesBurn = (int)Math.Round(bodyWeightKg * StrengthMet * summary.TargetTrainingTime / 60.0);
 
-            (int streak, bool streakAtRisk) = await CalculateWorkoutStreakAsync(userId, today);
+            (int streak, bool streakAtRisk) = await CalculateWorkoutStreakAsync(userId, user.GymId, today);
             summary.WorkoutStreak = streak;
             summary.StreakAtRisk = streakAtRisk;
 
@@ -232,8 +264,9 @@ namespace GymForge.Infrastructure.Repositories
                 .OrderBy(r => r.Order)
                 .ToListAsync();
 
+            DateTime routineDay = AppTimeZone.TodayAsUtcDate;
             DailyRoutineCompletion? todayCompletion = await _dbContext.DailyRoutineCompletions
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.Date == today);
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Date == routineDay);
 
             List<Guid> completedIds = todayCompletion?.CompletedRoutineIds ?? new List<Guid>();
 
@@ -271,8 +304,8 @@ namespace GymForge.Infrastructure.Repositories
             summary.PersonalRecords = topPRs;
 
             // 2. Muscle Recovery & Activation Heatmap
-            DateTime sevenDaysAgo = today.AddDays(-7);
-            DateTime recoveryLookbackStart = today.AddDays(-RecoveryLookbackDays);
+            (DateTime sevenDaysAgo, _) = AppTimeZone.DayBoundsUtc(today.AddDays(-7));
+            (DateTime recoveryLookbackStart, _) = AppTimeZone.DayBoundsUtc(today.AddDays(-RecoveryLookbackDays));
 
             var recentExercises = await _dbContext.WorkoutSessionLogs
                 .Where(l => l.UserId == userId && l.Date >= recoveryLookbackStart && l.Status == "Completed")
@@ -391,98 +424,84 @@ namespace GymForge.Infrastructure.Repositories
 
         private enum DayStatus { Completed, RestDay, Missed, Pending, NoSchedule }
 
-        private async Task<(int Streak, bool StreakAtRisk)> CalculateWorkoutStreakAsync(Guid userId, DateTime today)
+        private async Task<(int Streak, bool StreakAtRisk)> CalculateWorkoutStreakAsync(Guid userId, Guid? gymId, DateTime today)
         {
             DateTime lookbackStart = today.AddDays(-StreakLookbackDays);
+            (DateTime lookbackStartUtc, _) = AppTimeZone.DayBoundsUtc(lookbackStart);
 
             var logs = await _dbContext.WorkoutSessionLogs
-                .Where(l => l.UserId == userId && l.Date >= lookbackStart && l.Date <= today)
+                .Where(l => (l.UserId == userId || (l.Member != null && l.Member.UserId == userId)) && l.Date >= lookbackStartUtc)
                 .Select(l => new { l.Date, l.Status })
                 .ToListAsync();
 
             Dictionary<DateTime, string> logStatusByDate = logs
-                .GroupBy(l => l.Date.Date)
-                .ToDictionary(g => g.Key, g => g.First().Status);
+                .GroupBy(l => AppTimeZone.ToLocalDate(l.Date))
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Any(l => l.Status == "Completed") ? "Completed" : g.Any(l => l.Status == "RestDay") ? "RestDay" : g.First().Status);
 
-            List<MemberPlanAssignment> assignments = await _dbContext.MemberPlanAssignments
+            HashSet<DateTime> holidays = gymId.HasValue
+                ? (await _dbContext.GymHolidays
+                    .Where(h => h.GymId == gymId.Value && h.Date >= lookbackStartUtc)
+                    .Select(h => h.Date)
+                    .ToListAsync())
+                    .Select(AppTimeZone.ToLocalDate)
+                    .ToHashSet()
+                : new HashSet<DateTime>();
+
+            List<MemberPlanAssignment> assignments = (await _dbContext.MemberPlanAssignments
                 .Include(a => a.WorkoutPlan)
                     .ThenInclude(p => p.Days)
                 .Include(a => a.CustomScheduleDays)
-                .Where(a => a.UserId == userId && a.AssignedAt.Date <= today)
+                .Where(a => a.UserId == userId)
+                .ToListAsync())
                 .OrderByDescending(a => a.AssignedAt)
-                .ToListAsync();
+                .ToList();
 
-            DayStatus ResolveDayStatus(DateTime date, bool isToday)
+            DayStatus ResolveDayStatus(DateTime date)
             {
+                bool isToday = date == today;
                 if (logStatusByDate.TryGetValue(date, out string? status))
                 {
                     if (status == "Completed") return DayStatus.Completed;
                     if (status == "RestDay") return DayStatus.RestDay;
-                    return isToday ? DayStatus.Pending : DayStatus.Missed;
                 }
 
-                MemberPlanAssignment? assignment = assignments.FirstOrDefault(a => a.AssignedAt.Date <= date);
-                if (assignment?.WorkoutPlan == null) return DayStatus.NoSchedule;
+                if (holidays.Contains(date)) return DayStatus.RestDay;
 
-                bool isRestDay = ResolveIsRestDay(date, assignment);
-                if (isRestDay) return DayStatus.RestDay;
+                MemberPlanAssignment? assignment = assignments.FirstOrDefault(a => AppTimeZone.ToLocalDate(a.AssignedAt) <= date);
+                if (assignment?.WorkoutPlan == null) return isToday ? DayStatus.Pending : DayStatus.NoSchedule;
+
+                if (!IsTrainingDay(date, assignment)) return DayStatus.RestDay;
                 return isToday ? DayStatus.Pending : DayStatus.Missed;
             }
 
-            DayStatus todayStatus = ResolveDayStatus(today, isToday: true);
+            DayStatus todayStatus = ResolveDayStatus(today);
+            int streak = todayStatus == DayStatus.Completed ? 1 : 0;
 
-            DateTime cursor = (todayStatus == DayStatus.Pending || todayStatus == DayStatus.NoSchedule)
-                ? today.AddDays(-1)
-                : today;
-
-            int streak = 0;
-            int consecutiveRestDays = 0;
-
-            for (int i = 0; i < StreakLookbackDays; i++)
+            for (DateTime cursor = today.AddDays(-1); cursor > lookbackStart; cursor = cursor.AddDays(-1))
             {
-                DayStatus status = ResolveDayStatus(cursor, isToday: false);
-
-                if (status == DayStatus.Completed)
-                {
-                    streak++;
-                    consecutiveRestDays = 0;
-                    cursor = cursor.AddDays(-1);
-                }
-                else if (status == DayStatus.RestDay)
-                {
-                    consecutiveRestDays++;
-                    if (consecutiveRestDays >= 2) break;
-                    cursor = cursor.AddDays(-1);
-                }
-                else
-                {
-                    break; 
-                }
+                DayStatus status = ResolveDayStatus(cursor);
+                if (status == DayStatus.Completed) streak++;
+                else if (status != DayStatus.RestDay) break;
             }
 
-            bool streakAtRisk = todayStatus == DayStatus.Pending && streak > 0;
+            bool hasPlanToday = assignments.Any(a => AppTimeZone.ToLocalDate(a.AssignedAt) <= today);
+            bool streakAtRisk = todayStatus == DayStatus.Pending && hasPlanToday && streak > 0;
             return (streak, streakAtRisk);
         }
 
-        private static bool ResolveIsRestDay(DateTime date, MemberPlanAssignment assignment)
+        private static bool IsTrainingDay(DateTime date, MemberPlanAssignment assignment)
         {
             string weekday = date.DayOfWeek.ToString();
 
             MemberWorkoutScheduleDay? overrideDay = assignment.CustomScheduleDays?
                 .FirstOrDefault(o => string.Equals(o.DayOfWeek, weekday, StringComparison.OrdinalIgnoreCase));
-            if (overrideDay != null) return overrideDay.IsRestDay;
+            if (overrideDay != null) return !overrideDay.IsRestDay;
 
-            List<WorkoutPlanDay> days = assignment.WorkoutPlan.Days.OrderBy(d => d.DayIndex).ToList();
-
-            WorkoutPlanDay? namedDay = days.FirstOrDefault(d =>
-                !string.IsNullOrWhiteSpace(d.DayName) &&
-                d.DayName.Contains(weekday, StringComparison.OrdinalIgnoreCase));
-            if (namedDay != null) return namedDay.IsRestDay;
-
-            int mondayBasedIndex = ((int)date.DayOfWeek + 6) % 7;
-            if (mondayBasedIndex < days.Count) return days[mondayBasedIndex].IsRestDay;
-
-            return true;
+            WorkoutPlanDay? scheduled = WorkoutScheduleResolver.ResolveScheduledDay(
+                assignment.WorkoutPlan.Days, d => d.DayName, d => d.DayIndex, date);
+            return scheduled is { IsRestDay: false };
         }
 
         public async Task<IEnumerable<DailyRoutine>> GetDailyRoutinesAsync(Guid userId)

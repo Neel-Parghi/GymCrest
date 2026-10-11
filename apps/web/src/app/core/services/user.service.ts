@@ -43,7 +43,23 @@ export class UserService extends BaseApiService {
 
   updatePreferences(dto: unknown): Observable<ApiResponse> {
     return this.put<ApiResponse>(API_CONSTANTS.USER.PREFERENCES, dto).pipe(
-      tap(() => this.preferencesCache$ = null)
+      tap(() => {
+        this.preferencesCache$ = null;
+        this.clearCache();
+      })
+    );
+  }
+
+  getSuggestedTargets(goal: string, activityLevel?: string | null): Observable<ApiResponse> {
+    return this.get<ApiResponse>(API_CONSTANTS.USER.SUGGESTED_TARGETS, { goal, activityLevel });
+  }
+
+  regenerateStarterPlans(): Observable<ApiResponse> {
+    return this.post<ApiResponse>(API_CONSTANTS.USER.REGENERATE_STARTER_PLANS, {}).pipe(
+      tap(() => {
+        this.preferencesCache$ = null;
+        this.clearCache();
+      })
     );
   }
 
@@ -99,6 +115,10 @@ export class UserService extends BaseApiService {
 
   completeOnboarding(payload: unknown): Observable<ApiResponse> {
     return this.post<ApiResponse>(API_CONSTANTS.USER.COMPLETE_ONBOARDING, payload);
+  }
+
+  previewOnboardingTargets(profile: unknown): Observable<ApiResponse> {
+    return this.post<ApiResponse>(API_CONSTANTS.USER.ONBOARDING_PREVIEW_TARGETS, profile);
   }
 
   scheduleAccountDeletion(): Observable<ApiResponse> {

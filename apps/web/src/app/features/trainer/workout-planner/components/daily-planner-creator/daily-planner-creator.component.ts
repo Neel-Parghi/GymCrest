@@ -8,6 +8,7 @@ import { NotificationService } from '../../../../../core/services/notification.s
 import { DailyPlanner } from '../../../../../shared/models/workout-plan.model';
 import { CONSTANTS } from '../../../../../core/constants/constants';
 import { AuthApiService } from '../../../../../core/services/auth-api.service';
+import { FIELD_LIMITS } from '../../../../../shared/constants/validation.constants';
 
 @Component({
   selector: 'app-daily-planner-creator',
@@ -17,6 +18,7 @@ import { AuthApiService } from '../../../../../core/services/auth-api.service';
   styleUrl: './daily-planner-creator.component.scss'
 })
 export class DailyPlannerCreatorComponent implements OnInit {
+  readonly limits = FIELD_LIMITS;
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   private authService = inject(AuthApiService);
@@ -149,7 +151,7 @@ export class DailyPlannerCreatorComponent implements OnInit {
         exerciseName: [ex.name || '', [Validators.required]],
         targetSets: [ex.sets || 4, [Validators.required, Validators.min(1), Validators.max(200)]],
         targetReps: [ex.reps || '10-12 Reps', [Validators.required, Validators.maxLength(15)]],
-        notes: [ex.notes || '', [Validators.maxLength(30)]],
+        notes: [ex.notes || '', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
         isCustomName: [!this.getCategoryForExercise(ex.name)]
       }));
     });
@@ -164,7 +166,7 @@ export class DailyPlannerCreatorComponent implements OnInit {
       exerciseName: ['', [Validators.required]],
       targetSets: [4, [Validators.required, Validators.min(1), Validators.max(200)]],
       targetReps: ['10-12 Reps', [Validators.required, Validators.maxLength(15)]],
-      notes: ['', [Validators.maxLength(30)]],
+      notes: ['', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
       // UI-only flag (dropdown vs. free-typed name) - never read in onSubmitDaily's
       // explicit field mapping, so it never reaches the saved payload.
       isCustomName: [false]
@@ -299,7 +301,7 @@ export class DailyPlannerCreatorComponent implements OnInit {
           exerciseName: [ex.name || '', [Validators.required]],
           targetSets: [ex.sets || 4, [Validators.required, Validators.min(1), Validators.max(200)]],
           targetReps: [ex.reps || '10-12', [Validators.required, Validators.maxLength(10)]],
-          notes: [ex.notes || '', [Validators.maxLength(200)]],
+          notes: [ex.notes || '', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
           isCustomName: [!this.getCategoryForExercise(ex.name)]
         }));
       });
