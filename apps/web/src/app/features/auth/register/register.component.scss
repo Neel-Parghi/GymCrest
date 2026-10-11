@@ -1,30 +1,9 @@
 @use 'breakpoints' as bp;
 @import '../auth-shared.scss';
 
-@media (max-width: 767px) {
-  .auth-page-wrapper {
-    background: linear-gradient(rgba(10, 15, 25, 0.55), rgba(10, 15, 25, 0.75)), url('/images/auth-hero.jpg') center/cover no-repeat;
-  }
+@include photo-page-desktop;
+@include photo-page-mobile;
 
-  .auth-header .brand-logo {
-    color: #ffffff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  .auth-footer {
-    background-color: transparent;
-    border-top: none;
-
-    .copyright {
-      color: rgba(255, 255, 255, 0.85);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-  }
-
-  .auth-card {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  }
-}
 
 .role-switch-prompt {
   margin-top: 0;

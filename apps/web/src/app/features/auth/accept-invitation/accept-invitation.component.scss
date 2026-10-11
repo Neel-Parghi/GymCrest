@@ -1,5 +1,8 @@
 @import "../auth-shared.scss";
 
+@include photo-page-desktop;
+@include photo-page-mobile;
+
 .state-container {
   display: flex;
   flex-direction: column;
