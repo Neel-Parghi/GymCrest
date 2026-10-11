@@ -161,7 +161,7 @@ namespace GymForge.Infrastructure.Repositories
             UserDashboardSummaryDto summary = new UserDashboardSummaryDto();
 
             User? user = await _dbContext.Users
-                .Include(u => u.Profile)
+                .AsNoTracking()
                 .Include(u => u.Preference)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -221,11 +221,8 @@ namespace GymForge.Infrastructure.Repositories
             (DateTime monthStartUtc, _) = AppTimeZone.DayBoundsUtc(startOfMonth);
             (DateTime todayStartUtc, DateTime todayEndUtc) = AppTimeZone.DayBoundsUtc(today);
 
-            List<WorkoutSessionLog> monthLogs = await _dbContext.WorkoutSessionLogs
-                .Where(l => l.UserId == userId && l.Date >= monthStartUtc && l.Status == "Completed")
-                .ToListAsync();
-
-            summary.MonthlySessionCount = monthLogs.Count;
+            summary.MonthlySessionCount = await _dbContext.WorkoutSessionLogs
+                .CountAsync(l => l.UserId == userId && l.Date >= monthStartUtc && l.Status == "Completed");
             int? trainingDaysPerWeek = user.Preference?.TrainingDaysPerWeek;
             summary.MonthlySessionTarget = trainingDaysPerWeek is > 0
                 ? (int)Math.Round(trainingDaysPerWeek.Value * WeeksPerMonth)
@@ -260,12 +257,14 @@ namespace GymForge.Infrastructure.Repositories
             summary.StreakAtRisk = streakAtRisk;
 
             List<DailyRoutine> activeRoutines = await _dbContext.DailyRoutines
+                .AsNoTracking()
                 .Where(r => r.UserId == userId && r.IsActive)
                 .OrderBy(r => r.Order)
                 .ToListAsync();
 
             DateTime routineDay = AppTimeZone.TodayAsUtcDate;
             DailyRoutineCompletion? todayCompletion = await _dbContext.DailyRoutineCompletions
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.UserId == userId && c.Date == routineDay);
 
             List<Guid> completedIds = todayCompletion?.CompletedRoutineIds ?? new List<Guid>();
@@ -281,27 +280,40 @@ namespace GymForge.Infrastructure.Repositories
             }).ToList();
 
             // 1. Trophy Room (Personal Records) - All-time max weights per exercise
-            var allTimeSets = await _dbContext.WorkoutSessionLogs
-                .Where(l => l.UserId == userId && l.Status == "Completed")
-                .SelectMany(l => l.LoggedExercises)
-                .SelectMany(e => e.LoggedSets)
-                .Where(s => s.Completed && s.Weight > 0)
-                .Select(s => new { s.LoggedExercise.Name, s.Weight, Date = s.LoggedExercise.WorkoutSessionLog.Date })
+            IQueryable<LoggedSet> completedSets = _dbContext.LoggedSets
+                .Where(s => s.Completed && s.Weight > 0
+                    && s.LoggedExercise.WorkoutSessionLog.UserId == userId
+                    && s.LoggedExercise.WorkoutSessionLog.Status == "Completed");
+
+            var topRecords = await completedSets
+                .GroupBy(s => s.LoggedExercise.Name)
+                .Select(g => new { Name = g.Key, Weight = g.Max(s => s.Weight) })
+                .OrderByDescending(r => r.Weight)
+                .Take(3)
                 .ToListAsync();
 
-            List<PersonalRecordDto> topPRs = allTimeSets
-                .GroupBy(s => s.Name)
-                .Select(g => g.OrderByDescending(s => s.Weight).First())
-                .OrderByDescending(s => s.Weight)
-                .Take(3)
-                .Select(s => new PersonalRecordDto
-                {
-                    Name = s.Name,
-                    Weight = s.Weight + " kg",
-                    Date = s.Date.ToString("MMM yyyy")
-                }).ToList();
+            if (topRecords.Count > 0)
+            {
+                List<string> recordNames = topRecords.Select(r => r.Name).ToList();
+                List<double> recordWeights = topRecords.Select(r => r.Weight).Distinct().ToList();
 
-            summary.PersonalRecords = topPRs;
+                var recordSets = await completedSets
+                    .Where(s => recordNames.Contains(s.LoggedExercise.Name) && recordWeights.Contains(s.Weight))
+                    .Select(s => new { s.LoggedExercise.Name, s.Weight, s.LoggedExercise.WorkoutSessionLog.Date })
+                    .ToListAsync();
+
+                summary.PersonalRecords = topRecords.Select(r => new PersonalRecordDto
+                {
+                    Name = r.Name,
+                    Weight = r.Weight + " kg",
+                    Date = recordSets
+                        .Where(s => s.Name == r.Name && s.Weight == r.Weight)
+                        .Select(s => s.Date)
+                        .DefaultIfEmpty()
+                        .Min()
+                        .ToString("MMM yyyy")
+                }).ToList();
+            }
 
             // 2. Muscle Recovery & Activation Heatmap
             (DateTime sevenDaysAgo, _) = AppTimeZone.DayBoundsUtc(today.AddDays(-7));
@@ -321,9 +333,18 @@ namespace GymForge.Infrastructure.Repositories
             static string NormalizeExerciseName(string name) =>
                 string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim().ToLowerInvariant();
 
-            var masterExercises = await _dbContext.Exercises
-                .Select(e => new { e.Name, e.Category })
-                .ToListAsync();
+            List<string> recentNames = recentExercises
+                .Select(e => NormalizeExerciseName(e.ExerciseName))
+                .Where(n => n.Length > 0)
+                .Distinct()
+                .ToList();
+
+            var masterExercises = recentNames.Count == 0
+                ? []
+                : await _dbContext.Exercises
+                    .Where(e => recentNames.Contains(e.Name.Trim().ToLower()))
+                    .Select(e => new { e.Name, e.Category })
+                    .ToListAsync();
 
             Dictionary<string, string> categoryMap = masterExercises
                 .GroupBy(e => NormalizeExerciseName(e.Name))
@@ -391,33 +412,25 @@ namespace GymForge.Infrastructure.Repositories
             }
 
             // 3. Active Plans
-            MemberPlanAssignment? activeWorkoutPlan = await _dbContext.MemberPlanAssignments
-                .Include(p => p.WorkoutPlan)
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.IsActive);
-
-            if (activeWorkoutPlan != null && activeWorkoutPlan.WorkoutPlan != null)
-            {
-                summary.ActiveWorkoutPlan = new ActivePlanSummaryDto
+            summary.ActiveWorkoutPlan = await _dbContext.MemberPlanAssignments
+                .Where(p => p.UserId == userId && p.IsActive && p.WorkoutPlan != null)
+                .Select(p => new ActivePlanSummaryDto
                 {
-                    PlanId = activeWorkoutPlan.WorkoutPlanId,
-                    Name = activeWorkoutPlan.WorkoutPlan.Name,
-                    Type = activeWorkoutPlan.WorkoutPlan.Level.ToString()
-                };
-            }
+                    PlanId = p.WorkoutPlanId,
+                    Name = p.WorkoutPlan.Name,
+                    Type = p.WorkoutPlan.Level
+                })
+                .FirstOrDefaultAsync();
 
-            MemberDietAssignment? activeDietPlan = await _dbContext.MemberDietAssignments
-                .Include(p => p.DietPlan)
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.IsActive);
-
-            if (activeDietPlan != null && activeDietPlan.DietPlan != null)
-            {
-                summary.ActiveDietPlan = new ActivePlanSummaryDto
+            summary.ActiveDietPlan = await _dbContext.MemberDietAssignments
+                .Where(p => p.UserId == userId && p.IsActive && p.DietPlan != null)
+                .Select(p => new ActivePlanSummaryDto
                 {
-                    PlanId = activeDietPlan.DietPlanId,
-                    Name = activeDietPlan.DietPlan.Name,
-                    Type = activeDietPlan.DietPlan.Goal
-                };
-            }
+                    PlanId = p.DietPlanId,
+                    Name = p.DietPlan.Name,
+                    Type = p.DietPlan.Goal
+                })
+                .FirstOrDefaultAsync();
 
             return summary;
         }
@@ -450,6 +463,7 @@ namespace GymForge.Infrastructure.Repositories
                 : new HashSet<DateTime>();
 
             List<MemberPlanAssignment> assignments = (await _dbContext.MemberPlanAssignments
+                .AsNoTracking()
                 .Include(a => a.WorkoutPlan)
                     .ThenInclude(p => p.Days)
                 .Include(a => a.CustomScheduleDays)
