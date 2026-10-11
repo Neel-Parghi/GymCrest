@@ -47,6 +47,7 @@
 
       <app-member-detail-workout-calendar *ngIf="activeTab === 'workout-calendar'" [workoutHistory]="workoutHistory"
         [activeSplit]="activeSplit" [planAssignments]="planAssignments" [workoutOverrides]="workoutOverrides"
+        [dailyPlans]="dailyPlans"
         (openAssignModal)="openAssignSplitModal()" (changeTab)="setTab($event)"
         (updateOverrides)="onUpdateOverrides($event)" (logDateWorkout)="onLogDateWorkout($event)"
         (editWorkout)="onEditWorkoutSession($event)">
@@ -64,36 +65,12 @@
     </div>
   </main>
 
-  <!-- WORKOUT ASSIGNMENT MODAL OVERLAY -->
-  <div class="modal-overlay" *ngIf="showAssignSplitModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2>Assign Workout Template</h2>
-        <button class="btn-close" (click)="closeAssignSplitModal()"><i class="fa-solid fa-times"></i></button>
-      </div>
-      <div class="modal-body-list">
-        <p class="modal-desc">Select a workout split plan to assign to {{ memberInfo.firstName }}</p>
-
-        <ng-container *ngIf="workoutPlans.length > 0; else noWorkoutPlans">
-          <div class="assign-template-item custom-plan-item" *ngFor="let plan of workoutPlans"
-            (click)="assignWorkoutSplit(plan)">
-            <div class="item-left">
-              <strong>{{ plan.name }}</strong>
-              <span>{{ plan.type }} • Level: {{ plan.level }} • Goal: {{ plan.goal }}</span>
-            </div>
-            <i class="fa-solid fa-chevron-right arrow-icon"></i>
-          </div>
-        </ng-container>
-
-        <ng-template #noWorkoutPlans>
-          <div class="empty-state-p24 empty-state">
-            <i class="empty-icon-lg fa-solid fa-dumbbell"></i>
-            <p>No workout plans created yet. Go to the Workout Planner to create templates.</p>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-  </div>
+  <!-- WORKOUT ASSIGNMENT MODAL -->
+  <app-assign-workout-modal *ngIf="showAssignSplitModal" [plans]="workoutPlans" [activePlanId]="activeSplit?.planId ?? null"
+    [activePlanName]="activeSplit?.planName ?? null" [memberName]="memberInfo.firstName"
+    (assignProgram)="assignWorkoutSplit($event)" (assignDaily)="assignDailyWorkout($event)"
+    (closed)="closeAssignSplitModal()">
+  </app-assign-workout-modal>
 
   <!-- DIET ASSIGNMENT MODAL OVERLAY -->
   <div class="modal-overlay" *ngIf="showAssignDietModal">

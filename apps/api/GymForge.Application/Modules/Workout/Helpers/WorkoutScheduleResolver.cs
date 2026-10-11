@@ -4,8 +4,8 @@ namespace GymForge.Application.Modules.Workout.Helpers
 {
     /// <summary>
     /// Picks the plan day scheduled for a date, mirroring the member app (resolveScheduledDay in the web client):
-    /// weekly plans match the weekday in the day name; abstract splits ("Day 1", "Day 2"…) fall on
-    /// Monday / Wednesday / Friday. Returns null when nothing is scheduled.
+    /// a day named after the weekday wins (weekly plans, and weekday overrides on any plan); otherwise the unnamed
+    /// split days ("Day 1", "Day 2"…) fall on Monday / Wednesday / Friday. Returns null when nothing is scheduled.
     /// </summary>
     public static class WorkoutScheduleResolver
     {
@@ -31,14 +31,12 @@ namespace GymForge.Application.Modules.Workout.Helpers
                 return weekdayMatch;
             }
 
-            bool isWeeklyPlan = ordered.Any(d => Enum.GetNames<DayOfWeek>().Any(name => NameContains(dayName(d), name)));
-            if (isWeeklyPlan)
-            {
-                return null;
-            }
+            List<T> splitDays = ordered
+                .Where(d => !Enum.GetNames<DayOfWeek>().Any(name => NameContains(dayName(d), name)))
+                .ToList();
 
             int slot = Array.IndexOf(SplitDays, date.DayOfWeek);
-            return slot >= 0 && slot < ordered.Count ? ordered[slot] : null;
+            return slot >= 0 && slot < splitDays.Count ? splitDays[slot] : null;
         }
 
         private static bool NameContains(string? dayName, string weekday) =>

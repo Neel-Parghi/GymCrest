@@ -14,6 +14,8 @@ import { PTMemberDetailTrackPerformanceComponent } from './components/member-det
 import { PTMemberDetailWorkoutCalendarComponent } from './components/member-detail-workout-calendar/member-detail-workout-calendar.component';
 import { PTMemberDetailDietChartComponent } from './components/member-detail-diet-chart/member-detail-diet-chart.component';
 import { PTMemberDetailHealthTrackerComponent } from './components/member-detail-health-tracker/member-detail-health-tracker.component';
+import { forkJoin } from 'rxjs';
+import { AssignDailyRequest, AssignWorkoutModalComponent } from '../../../shared/components/assign-workout-modal/assign-workout-modal.component';
 
 @Component({
   selector: 'app-member-detail',
@@ -24,7 +26,8 @@ import { PTMemberDetailHealthTrackerComponent } from './components/member-detail
     PTMemberDetailTrackPerformanceComponent,
     PTMemberDetailWorkoutCalendarComponent,
     PTMemberDetailDietChartComponent,
-    PTMemberDetailHealthTrackerComponent
+    PTMemberDetailHealthTrackerComponent,
+    AssignWorkoutModalComponent
   ],
   templateUrl: './member-detail.component.html',
   styleUrl: './member-detail.component.scss'
@@ -374,6 +377,11 @@ export class PTMemberDetailComponent implements OnInit {
     this.notification.info(CONSTANTS.MEMBER_DETAIL_MODULE.EDIT_WORKOUT_PREFIX + this.loggingDate.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }));
   }
 
+  /** Daily workouts the trainer can put on a member's calendar days. */
+  get dailyPlans(): DailyPlanner[] {
+    return this.workoutPlans.filter((p): p is DailyPlanner => p.type === 'Daily');
+  }
+
   loadWorkoutPlans(): void {
     if (!this.currentUserId) return;
     this.workoutPlanService.getPlans().subscribe({
@@ -502,6 +510,7 @@ export class PTMemberDetailComponent implements OnInit {
         const plan = res?.data;
         if (plan) {
           this.activeSplit = {
+            planId: plan.id,
             planName: plan.name,
             days: (plan.days || []).map((d: any) => ({
               id: d.id,
@@ -619,20 +628,36 @@ export class PTMemberDetailComponent implements OnInit {
       next: (res) => {
         const plans = res as any[];
         this.workoutPlans = (plans || []).filter((p: any) => !p.isCustom && p.createdBy === this.currentUserId);
-        if (this.workoutPlans.length === 0) {
-          this.notification.warning('No workout plans available. Please create a plan first.');
-        } else {
-          this.showAssignSplitModal = true;
-        }
+        this.showAssignSplitModal = true;
       },
       error: () => {
-        this.notification.warning('No workout plans available. Please create a plan first.');
+        this.notification.warning('Failed to load workout plans.');
       }
     });
   }
 
   closeAssignSplitModal(): void {
     this.showAssignSplitModal = false;
+  }
+
+  /** Puts a daily workout on the chosen weekdays as weekly overrides of the member's program. */
+  assignDailyWorkout(request: AssignDailyRequest): void {
+    const dayId = request.plan.dayId;
+    if (!dayId) {
+      this.notification.error('This daily workout has no exercises saved yet.');
+      return;
+    }
+
+    forkJoin(request.weekdays.map(dayOfWeek =>
+      this.memberService.saveRecurringOverride(this.memberId, { dayOfWeek, workoutPlanDayId: dayId, isRestDay: false })
+    )).subscribe({
+      next: () => {
+        this.notification.success(`${request.plan.name} added on ${request.weekdays.join(', ')}.`);
+        this.closeAssignSplitModal();
+        this.loadActivePlanAndWorkoutLogs();
+      },
+      error: () => this.notification.error('Failed to add the daily workout. Please try again.')
+    });
   }
 
   assignWorkoutSplit(plan: WorkoutPlan | string): void {

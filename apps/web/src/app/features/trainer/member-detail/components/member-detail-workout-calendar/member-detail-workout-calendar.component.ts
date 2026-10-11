@@ -6,6 +6,11 @@ import { DropdownComponent } from '../../../../../shared/components/dropdown/dro
 import { DropdownOption } from '../../../../../shared/models/dropdown.model';
 import { CalendarDay } from '../../../../../shared/models/workout-plan.model';
 import { CONSTANTS } from '../../../../../core/constants/constants';
+import { DailyPlanner } from '../../../../../shared/models/workout-plan.model';
+import { resolveScheduledDay } from '../../../../../shared/utils/workout-schedule';
+
+/** Override dropdown values for daily workouts carry the workout's day id after this prefix. */
+const DAILY_OPTION_PREFIX = 'daily:';
 
 @Component({
   selector: 'app-member-detail-workout-calendar',
@@ -22,6 +27,8 @@ export class PTMemberDetailWorkoutCalendarComponent implements OnInit, OnChanges
   @Input() planAssignments: any[] = [];
   @Input() workoutOverrides: { [dateKey: string]: any } = {};
 
+  /** Daily workouts that can be put on a single date or weekday from the override dialog. */
+  @Input() dailyPlans: DailyPlanner[] = [];
   @Output() openAssignModal = new EventEmitter<void>();
   @Output() changeTab = new EventEmitter<string>();
   @Output() updateOverrides = new EventEmitter<{ dateKey: string, workout: any, scope?: 'single' | 'recurring' }>();
@@ -107,9 +114,6 @@ export class PTMemberDetailWorkoutCalendarComponent implements OnInit, OnChanges
 
   createDayObject(date: Date, isCurrentMonth: boolean): any {
     const dateKey = this.getDateKey(date);
-    const dayOfWeek = date.getDay();
-    const daysName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const weekdayName = daysName[dayOfWeek];
 
     const todayStr = this.getDateKey(new Date());
     const isToday = dateKey === todayStr;
@@ -152,17 +156,8 @@ export class PTMemberDetailWorkoutCalendarComponent implements OnInit, OnChanges
     const planToUse = activeAssignment || (!isPast ? this.activeSplit : null);
 
     if (planToUse && planToUse.days) {
-      let templateDay = planToUse.days.find((d: any) => {
-        if (!d.dayName) return false;
-        return d.dayName.toLowerCase().includes(weekdayName.toLowerCase());
-      });
-
-      if (!templateDay && planToUse.days.length > 0) {
-        const mondayBasedIndex = (dayOfWeek + 6) % 7;
-        if (mondayBasedIndex < planToUse.days.length) {
-          templateDay = planToUse.days[mondayBasedIndex];
-        }
-      }
+      // Same weekday rules as the dashboard, reminders and streak.
+      const templateDay = resolveScheduledDay<any>(planToUse.days, comparisonDate);
 
       if (templateDay) {
         scheduledWorkout = {
@@ -281,6 +276,9 @@ export class PTMemberDetailWorkoutCalendarComponent implements OnInit, OnChanges
         options.push({ label: labelText, value: d.id || d.dayName, icon: 'fa-solid fa-dumbbell' });
       });
     }
+    this.dailyPlans.filter(p => p.dayId).forEach(p => {
+      options.push({ label: `Daily · ${p.name}`, value: `${DAILY_OPTION_PREFIX}${p.dayId}`, icon: 'fa-solid fa-calendar-day' });
+    });
     options.push({ label: 'Rest Day', value: 'Rest Day', icon: 'fa-solid fa-bed' });
     options.push({ label: 'Cardio Workout', value: 'Cardio Workout', icon: 'fa-solid fa-person-running' });
 
@@ -328,6 +326,17 @@ export class PTMemberDetailWorkoutCalendarComponent implements OnInit, OnChanges
           { name: 'Stationary Bike', sets: 1, reps: '15 mins', notes: 'Warm down.' }
         ]
       };
+    } else if (selectedOverrideValue?.startsWith(DAILY_OPTION_PREFIX)) {
+      const dayId = selectedOverrideValue.slice(DAILY_OPTION_PREFIX.length);
+      const daily = this.dailyPlans.find(p => p.dayId === dayId);
+      if (daily) {
+        selectedDay = {
+          id: dayId,
+          dayName: daily.name,
+          exercises: daily.exercises,
+          templateDayName: daily.name
+        };
+      }
     } else {
       const match = this.activeSplit?.days.find((d: any) => d.id === selectedOverrideValue)
         || this.activeSplit?.days.find((d: any) => d.dayName === selectedOverrideValue);

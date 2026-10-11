@@ -1,0 +1,100 @@
+<div class="modal-overlay" (click)="closed.emit()">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="assign-workout-title" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 id="assign-workout-title">Assign workout</h2>
+      <button type="button" class="btn-close" (click)="closed.emit()" aria-label="Close">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="modal-tabs">
+      <app-segmented-tabs class="full-width" [tabs]="tabs" [active]="view()" label="Assign" (selected)="setView($event)" />
+    </div>
+
+    <div class="modal-body">
+      @if (view() === 'programs') {
+        <p class="modal-desc">A program sets the whole week. Choosing one replaces {{ ownerPhrase() }} current program.</p>
+
+        @for (group of programGroups(); track group.label) {
+          <div class="group">
+            <div class="group-head">
+              <span class="group-label">{{ group.label }}</span>
+              <span class="group-hint">{{ group.hint }}</span>
+            </div>
+            @for (plan of group.plans; track plan.id) {
+              <button type="button" class="item" [class.current]="plan.id === activePlanId()"
+                [disabled]="plan.id === activePlanId()" (click)="chooseProgram(plan)">
+                <span class="item-text">
+                  <strong>{{ plan.name }}</strong>
+                  <span>{{ programMeta(plan) }}</span>
+                </span>
+                @if (plan.id === activePlanId()) {
+                  <span class="badge">Current</span>
+                } @else {
+                  <i class="fa-solid fa-chevron-right arrow" aria-hidden="true"></i>
+                }
+              </button>
+            }
+          </div>
+        } @empty {
+          <div class="empty">
+            <i class="fa-solid fa-dumbbell" aria-hidden="true"></i>
+            <p>No programs yet. Create a split or weekly plan in the Workout Planner.</p>
+          </div>
+        }
+      } @else {
+        <p class="modal-desc">Repeat a single-session workout on chosen weekdays. It takes the place of {{ ownerPhrase() }} program on those days, every week.</p>
+
+        @if (!activePlanId()) {
+          <div class="notice">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            Assign a program first; daily workouts are added on top of it.
+          </div>
+        }
+
+        @if (dailyPlans().length) {
+          <div class="group" role="radiogroup" aria-label="Daily workout">
+            @for (plan of dailyPlans(); track plan.id) {
+              <button type="button" role="radio" class="item" [class.selected]="selectedDailyId() === plan.id"
+                [attr.aria-checked]="selectedDailyId() === plan.id" (click)="selectedDailyId.set(plan.id ?? null)">
+                <span class="item-text">
+                  <strong>{{ plan.name }}</strong>
+                  <span>{{ dailyMeta(plan) }}</span>
+                </span>
+                <span class="radio" aria-hidden="true"></span>
+              </button>
+            }
+          </div>
+
+          <div class="group">
+            <div class="group-head">
+              <span class="group-label">Repeat every</span>
+            </div>
+            <div class="weekdays" role="group" aria-label="Weekdays">
+              @for (day of weekdays; track day.key) {
+                <button type="button" class="day" [class.selected]="selectedWeekdays().includes(day.key)"
+                  [attr.aria-pressed]="selectedWeekdays().includes(day.key)" (click)="toggleWeekday(day.key)">
+                  {{ day.short }}
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="empty">
+            <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+            <p>No daily workouts yet. Create a daily plan in the Workout Planner.</p>
+          </div>
+        }
+      }
+    </div>
+
+    @if (view() === 'daily' && dailyPlans().length) {
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closed.emit()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="!canAddDaily()" (click)="addDaily()">
+          <i class="fa-solid fa-check" aria-hidden="true"></i> Add to schedule
+        </button>
+      </div>
+    }
+  </div>
+</div>

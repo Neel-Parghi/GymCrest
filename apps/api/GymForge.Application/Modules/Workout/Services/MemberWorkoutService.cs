@@ -37,57 +37,69 @@ namespace GymForge.Application.Modules.Workout.Services
 
             if (assignment.CustomScheduleDays != null && assignment.CustomScheduleDays.Any())
             {
-                List<WorkoutPlanDayDto> finalDays = [];
-                
-                HashSet<Guid> mappedTemplateDayIds = assignment.CustomScheduleDays
-                    .Where(cs => !cs.IsRestDay && cs.WorkoutPlanDayId.HasValue)
-                    .Select(cs => cs.WorkoutPlanDayId!.Value)
-                    .ToHashSet();
-
-                foreach (MemberWorkoutScheduleDay customDay in assignment.CustomScheduleDays)
-                {
-                    if (customDay.IsRestDay)
-                    {
-                        finalDays.Add(new WorkoutPlanDayDto
-                        {
-                            Id = Guid.NewGuid(),
-                            WorkoutPlanId = planDto.Id,
-                            DayName = customDay.DayOfWeek,
-                            IsRestDay = true,
-                            Category = "Rest Day",
-                            Exercises = []
-                        });
-                    }
-                    else if (customDay.WorkoutPlanDayId.HasValue)
-                    {
-                        WorkoutPlanDay? templateDay = plan.Days.FirstOrDefault(d => d.Id == customDay.WorkoutPlanDayId.Value);
-                        if (templateDay != null)
-                        {
-                            WorkoutPlanDayDto mappedDay = _mapper.Map<WorkoutPlanDayDto>(templateDay);
-                            mappedDay.DayName = customDay.DayOfWeek;
-                            finalDays.Add(mappedDay);
-                        }
-                    }
-                }
-
-                foreach (WorkoutPlanDay templateDay in plan.Days)
-                {
-                    if (!mappedTemplateDayIds.Contains(templateDay.Id))
-                    {
-                        bool weekdayIsCustomized = assignment.CustomScheduleDays.Any(cs => 
-                            string.Equals(cs.DayOfWeek, templateDay.DayName, StringComparison.OrdinalIgnoreCase));
-
-                        if (!weekdayIsCustomized)
-                        {
-                            finalDays.Add(_mapper.Map<WorkoutPlanDayDto>(templateDay));
-                        }
-                    }
-                }
-
-                planDto.Days = finalDays;
+                planDto.Days = await BuildScheduledDaysAsync(plan, assignment.CustomScheduleDays);
             }
 
             return planDto;
+        }
+
+        /// <summary>
+        /// The plan's days with the member's weekday overrides applied. An override can point at a day of this plan
+        /// or of another plan (a daily workout put on a weekday), so days outside the plan are loaded as needed.
+        /// </summary>
+        private async Task<List<WorkoutPlanDayDto>> BuildScheduledDaysAsync(WorkoutPlan plan, ICollection<MemberWorkoutScheduleDay> customDays)
+        {
+            Dictionary<Guid, WorkoutPlanDay> daysById = plan.Days.ToDictionary(d => d.Id);
+            List<Guid> outsideDayIds = customDays
+                .Where(cs => !cs.IsRestDay && cs.WorkoutPlanDayId.HasValue && !daysById.ContainsKey(cs.WorkoutPlanDayId.Value))
+                .Select(cs => cs.WorkoutPlanDayId!.Value)
+                .ToList();
+            foreach (WorkoutPlanDay day in await _workoutPlanRepository.GetPlanDaysByIdsAsync(outsideDayIds))
+            {
+                daysById[day.Id] = day;
+            }
+
+            HashSet<Guid> mappedTemplateDayIds = customDays
+                .Where(cs => !cs.IsRestDay && cs.WorkoutPlanDayId.HasValue)
+                .Select(cs => cs.WorkoutPlanDayId!.Value)
+                .ToHashSet();
+
+            List<WorkoutPlanDayDto> finalDays = [];
+            foreach (MemberWorkoutScheduleDay customDay in customDays)
+            {
+                if (customDay.IsRestDay)
+                {
+                    finalDays.Add(new WorkoutPlanDayDto
+                    {
+                        Id = Guid.NewGuid(),
+                        WorkoutPlanId = plan.Id,
+                        DayName = customDay.DayOfWeek,
+                        IsRestDay = true,
+                        Category = "Rest Day",
+                        Exercises = []
+                    });
+                }
+                else if (customDay.WorkoutPlanDayId.HasValue && daysById.TryGetValue(customDay.WorkoutPlanDayId.Value, out WorkoutPlanDay? templateDay))
+                {
+                    WorkoutPlanDayDto mappedDay = _mapper.Map<WorkoutPlanDayDto>(templateDay);
+                    mappedDay.DayName = customDay.DayOfWeek;
+                    finalDays.Add(mappedDay);
+                }
+            }
+
+            foreach (WorkoutPlanDay templateDay in plan.Days)
+            {
+                if (mappedTemplateDayIds.Contains(templateDay.Id)) continue;
+
+                bool weekdayIsCustomized = customDays.Any(cs =>
+                    string.Equals(cs.DayOfWeek, templateDay.DayName, StringComparison.OrdinalIgnoreCase));
+                if (!weekdayIsCustomized)
+                {
+                    finalDays.Add(_mapper.Map<WorkoutPlanDayDto>(templateDay));
+                }
+            }
+
+            return finalDays;
         }
 
         public async Task<bool> AssignPlanToMemberAsync(Guid memberId, Guid planId, Guid? gymId)
@@ -243,53 +255,7 @@ namespace GymForge.Application.Modules.Workout.Services
 
                     if (assignment.CustomScheduleDays != null && assignment.CustomScheduleDays.Any())
                     {
-                        List<WorkoutPlanDayDto> finalDays = [];
-                        HashSet<Guid> mappedTemplateDayIds = assignment.CustomScheduleDays
-                            .Where(cs => !cs.IsRestDay && cs.WorkoutPlanDayId.HasValue)
-                            .Select(cs => cs.WorkoutPlanDayId!.Value)
-                            .ToHashSet();
-
-                        foreach (MemberWorkoutScheduleDay customDay in assignment.CustomScheduleDays)
-                        {
-                            if (customDay.IsRestDay)
-                            {
-                                finalDays.Add(new WorkoutPlanDayDto
-                                {
-                                    Id = Guid.NewGuid(),
-                                    WorkoutPlanId = planDto.Id,
-                                    DayName = customDay.DayOfWeek,
-                                    IsRestDay = true,
-                                    Category = "Rest Day",
-                                    Exercises = []
-                                });
-                            }
-                            else if (customDay.WorkoutPlanDayId.HasValue)
-                            {
-                                WorkoutPlanDay? templateDay = assignment.WorkoutPlan.Days.FirstOrDefault(d => d.Id == customDay.WorkoutPlanDayId.Value);
-                                if (templateDay != null)
-                                {
-                                    WorkoutPlanDayDto mappedDay = _mapper.Map<WorkoutPlanDayDto>(templateDay);
-                                    mappedDay.DayName = customDay.DayOfWeek;
-                                    finalDays.Add(mappedDay);
-                                }
-                            }
-                        }
-
-                        foreach (WorkoutPlanDay templateDay in assignment.WorkoutPlan.Days)
-                        {
-                            if (!mappedTemplateDayIds.Contains(templateDay.Id))
-                            {
-                                bool weekdayIsCustomized = assignment.CustomScheduleDays.Any(cs => 
-                                    string.Equals(cs.DayOfWeek, templateDay.DayName, StringComparison.OrdinalIgnoreCase));
-
-                                if (!weekdayIsCustomized)
-                                {
-                                    finalDays.Add(_mapper.Map<WorkoutPlanDayDto>(templateDay));
-                                }
-                            }
-                        }
-
-                        planDto.Days = finalDays;
+                        planDto.Days = await BuildScheduledDaysAsync(assignment.WorkoutPlan, assignment.CustomScheduleDays);
                     }
 
                     dto.WorkoutPlan = planDto;

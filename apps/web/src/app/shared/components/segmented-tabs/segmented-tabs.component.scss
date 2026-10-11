@@ -4,6 +4,11 @@
   display: block;
 }
 
+// Opt-in for tight containers such as dialogs: <app-segmented-tabs class="full-width">.
+:host(.full-width) .segmented {
+  max-width: none;
+}
+
 .segmented {
   display: grid;
   grid-template-columns: repeat(var(--tab-count, 2), minmax(0, 1fr));

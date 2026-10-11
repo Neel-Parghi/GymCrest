@@ -52,6 +52,8 @@ export interface WeeklyPlanner extends BaseWorkoutPlan {
 
 export interface DailyPlanner extends BaseWorkoutPlan {
   type: 'Daily';
+  /** Id of the plan's single workout day; what a weekday or date override points at. */
+  dayId?: string;
   targetCategory: string;
   exercises: PlannerExercise[];
 }
