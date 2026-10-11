@@ -13,6 +13,8 @@ namespace GymForge.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private const int DefaultDeletionGracePeriodHours = 24;
+
         private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)
@@ -143,7 +145,10 @@ namespace GymForge.Api.Controllers
 
         [Authorize]
         [HttpDelete("request-deletion")]
-        public async Task<IActionResult> RequestAccountDeletion([FromServices] IBackgroundJobClient backgroundJobs)
+        public async Task<IActionResult> RequestAccountDeletion(
+            [FromServices] IBackgroundJobClient backgroundJobs,
+            [FromServices] AccountDeletionJob deletionJob,
+            [FromServices] IConfiguration config)
         {
             string? userIdStr = User.FindFirst("userId")?.Value;
             if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId))
@@ -153,13 +158,24 @@ namespace GymForge.Api.Controllers
 
             try
             {
+                int gracePeriodHours = config.GetValue("AccountDeletion:GracePeriodHours", DefaultDeletionGracePeriodHours);
+                if (gracePeriodHours <= 0)
+                {
+                    await deletionJob.ExecuteAsync(userId);
+                    return Ok(new { message = "Your account has been deleted.", deleted = true });
+                }
+
                 // 1. Mark the user's account with DeletionRequestedOn
                 await _authService.RequestAccountDeletionAsync(userId);
 
-                // 2. Schedule the job to run exactly 24 hours from now
-                backgroundJobs.Schedule<AccountDeletionJob>(job => job.ExecuteAsync(userId), TimeSpan.FromHours(24));
+                // 2. Schedule the job to run once the grace period ends
+                backgroundJobs.Schedule<AccountDeletionJob>(job => job.ExecuteAsync(userId), TimeSpan.FromHours(gracePeriodHours));
 
-                return Accepted(new { message = "Your account deletion has been scheduled and will be completed in 24 hours." });
+                return Accepted(new
+                {
+                    message = $"Your account deletion has been scheduled and will be completed in {gracePeriodHours} hours.",
+                    deleted = false
+                });
             }
             catch (Exception ex)
             {

@@ -93,6 +93,13 @@ namespace GymForge.Infrastructure.Repositories
                                     .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<List<GymMember>> GetAllByUserIdAsync(Guid userId)
+        {
+            return await _dbContext.GymMembers
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<GymMember?> GetByUserIdAsync(Guid userId)
         {
             return await _dbContext.GymMembers
