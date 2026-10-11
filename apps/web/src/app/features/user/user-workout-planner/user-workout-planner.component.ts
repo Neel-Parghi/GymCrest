@@ -10,10 +10,13 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { MemberService } from '../../../core/services/member.service';
 import { ActivePlanView, WorkoutSessionLogDto } from '../../../shared/models/workout-plan.model';
 import {
+  PLANNED_STATUS,
   exerciseSetCount,
+  loggedState,
   resolveScheduledDay,
   startOfWeek,
-  toDateKey
+  toDateKey,
+  weekRange
 } from '../../../shared/utils/workout-schedule';
 import { CtaKind, DayExercise, TrainingDay, TrainingView } from '../../../core/models/user-training.model';
 
@@ -64,7 +67,7 @@ export class UserWorkoutPlannerComponent implements OnInit {
 
   readonly week = computed<TrainingDay[]>(() => {
     const plan = this.plan();
-    const loggedByDate = new Map(this.logs().map(l => [toDateKey(new Date(l.date)), l.status]));
+    const logByDate = new Map(this.logs().map(l => [toDateKey(new Date(l.date)), l]));
     const todayKey = toDateKey(this.today);
     const monday = startOfWeek(this.today);
 
@@ -72,9 +75,11 @@ export class UserWorkoutPlannerComponent implements OnInit {
       const date = new Date(monday);
       date.setDate(monday.getDate() + i);
       const key = toDateKey(date);
-      const scheduled = plan?.days?.length ? resolveScheduledDay(plan.days, date) : null;
+      const log = logByDate.get(key);
+      // A day planned from the calendar replaces the plan's usual day for that date.
+      const planned = log?.status === PLANNED_STATUS ? plan?.days?.find(d => d.dayName === log.dayName) : undefined;
+      const scheduled = planned ?? (plan?.days?.length ? resolveScheduledDay(plan.days, date) : null);
       const day = scheduled && !scheduled.isRestDay ? scheduled : null;
-      const status = loggedByDate.get(key);
 
       return {
         date,
@@ -82,7 +87,7 @@ export class UserWorkoutPlannerComponent implements OnInit {
         tag: day ? (day.category?.split(',')[0].trim() || day.dayName) : 'Rest',
         isToday: key === todayKey,
         isFuture: key > todayKey,
-        logged: status ? (status === 'RestDay' ? 'rest' : 'done') : null
+        logged: loggedState(log?.status)
       };
     });
   });
@@ -117,7 +122,8 @@ export class UserWorkoutPlannerComponent implements OnInit {
   }
 
   private loadPlan(userId: string): void {
-    this.memberService.getTrainingOverview(userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({ plan, logs }) => {
+    // The planner shows the current week, so only this week's logs are fetched.
+    this.memberService.getTrainingOverview(userId, weekRange(this.today)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({ plan, logs }) => {
       this.plan.set(plan?.days?.length ? plan : null);
       this.logs.set(logs);
       this.loading.set(false);

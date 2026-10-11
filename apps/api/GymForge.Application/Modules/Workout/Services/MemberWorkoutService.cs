@@ -3,6 +3,7 @@ using GymForge.Application.Modules.Workout.Interface;
 using GymForge.Contracts.WorkoutPlan;
 using GymForge.Domain.Entities;
 using GymForge.Domain.Interface;
+using GymForge.Shared.Helpers;
 
 namespace GymForge.Application.Modules.Workout.Services
 {
@@ -134,9 +135,13 @@ namespace GymForge.Application.Modules.Workout.Services
             return true;
         }
 
-        public async Task<IEnumerable<WorkoutSessionLogDto>> GetWorkoutLogsForMemberAsync(Guid memberId)
+        public async Task<IEnumerable<WorkoutSessionLogDto>> GetWorkoutLogsForMemberAsync(Guid memberId, DateTime? from = null, DateTime? to = null)
         {
-            IEnumerable<WorkoutSessionLog> logs = await _memberWorkoutRepository.GetWorkoutLogsAsync(memberId);
+            // Log dates are stored in UTC, so an IST calendar range becomes UTC day bounds.
+            DateTime? startUtc = from.HasValue ? AppTimeZone.DayBoundsUtc(from.Value).StartUtc : null;
+            DateTime? endUtc = to.HasValue ? AppTimeZone.DayBoundsUtc(to.Value).EndUtc : null;
+
+            IEnumerable<WorkoutSessionLog> logs = await _memberWorkoutRepository.GetWorkoutLogsAsync(memberId, startUtc, endUtc);
             return _mapper.Map<IEnumerable<WorkoutSessionLogDto>>(logs);
         }
 

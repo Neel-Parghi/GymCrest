@@ -169,6 +169,12 @@ export interface MemberPlanAssignmentDto {
   workoutPlan: WorkoutPlanDto;
 }
 
+/** Inclusive date range as YYYY-MM-DD keys. */
+export interface DateRange {
+  from: string;
+  to: string;
+}
+
 export interface WorkoutSessionLogDto {
   id: string;
   memberId: string;

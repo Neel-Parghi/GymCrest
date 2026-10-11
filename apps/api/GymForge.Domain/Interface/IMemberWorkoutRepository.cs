@@ -8,7 +8,8 @@ namespace GymForge.Domain.Interface
         
         Task AddPlanAssignmentAsync(MemberPlanAssignment assignment);
         
-        Task<IEnumerable<WorkoutSessionLog>> GetWorkoutLogsAsync(Guid memberOrUserId);
+        /// <summary>Logs with exercises and sets, newest first; optionally limited to [startUtc, endUtc).</summary>
+        Task<IEnumerable<WorkoutSessionLog>> GetWorkoutLogsAsync(Guid memberOrUserId, DateTime? startUtc = null, DateTime? endUtc = null);
         
         Task AddWorkoutSessionLogAsync(WorkoutSessionLog log);
         

@@ -1,4 +1,4 @@
-import { SchedulableDay } from '../models/workout-plan.model';
+import { DateRange, SchedulableDay } from '../models/workout-plan.model';
 
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -22,6 +22,25 @@ export function toDateKey(date: Date): string {
   const dd = String(date.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
 }
+
+/** Monday–Sunday of the week containing `date`, as YYYY-MM-DD keys. */
+export function weekRange(date: Date): DateRange {
+  const monday = startOfWeek(date);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { from: toDateKey(monday), to: toDateKey(sunday) };
+}
+
+/**
+ * How a session log counts for its day. "Planned" logs are one-off schedule overrides
+ * saved ahead of time, so they are not a completed session.
+ */
+export function loggedState(status: string | undefined): 'done' | 'rest' | null {
+  if (!status || status === PLANNED_STATUS) return null;
+  return status === 'RestDay' ? 'rest' : 'done';
+}
+
+export const PLANNED_STATUS = 'Planned';
 
 const SPLIT_WEEKDAYS = ['Monday', 'Wednesday', 'Friday'];
 

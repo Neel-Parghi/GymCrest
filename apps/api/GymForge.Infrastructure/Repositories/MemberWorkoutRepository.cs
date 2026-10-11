@@ -37,12 +37,17 @@ namespace GymForge.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<WorkoutSessionLog>> GetWorkoutLogsAsync(Guid memberOrUserId)
+        public async Task<IEnumerable<WorkoutSessionLog>> GetWorkoutLogsAsync(Guid memberOrUserId, DateTime? startUtc = null, DateTime? endUtc = null)
         {
-            return await _dbContext.WorkoutSessionLogs
+            IQueryable<WorkoutSessionLog> query = _dbContext.WorkoutSessionLogs
+                .Where(l => l.MemberId == memberOrUserId || l.UserId == memberOrUserId || (l.Member != null && l.Member.UserId == memberOrUserId));
+
+            if (startUtc.HasValue) query = query.Where(l => l.Date >= startUtc.Value);
+            if (endUtc.HasValue) query = query.Where(l => l.Date < endUtc.Value);
+
+            return await query
                 .Include(l => l.LoggedExercises)
                     .ThenInclude(e => e.LoggedSets)
-                .Where(l => l.MemberId == memberOrUserId || l.UserId == memberOrUserId || (l.Member != null && l.Member.UserId == memberOrUserId))
                 .OrderByDescending(l => l.Date)
                 .ToListAsync();
         }
