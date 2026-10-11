@@ -17,11 +17,12 @@ import { TourService } from '../../core/services/tour.service';
 import { UserBottomNavComponent } from '../user-bottom-nav/user-bottom-nav.component';
 import { forkJoin, of } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
+import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-logo.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LoadingComponent, UserBottomNavComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LoadingComponent, UserBottomNavComponent, BrandLogoComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })

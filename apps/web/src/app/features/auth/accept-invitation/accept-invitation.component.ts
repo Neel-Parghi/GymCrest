@@ -6,11 +6,12 @@ import { newPasswordValidators, existingPasswordValidators } from '../../../shar
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
 
 @Component({
   selector: 'app-accept-invitation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, BrandLogoComponent],
   templateUrl: './accept-invitation.component.html',
   styleUrls: ['./accept-invitation.component.scss']
 })

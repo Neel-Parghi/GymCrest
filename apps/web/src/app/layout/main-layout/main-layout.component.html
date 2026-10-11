@@ -10,7 +10,7 @@
         <div class="brand-container" [routerLink]="dashboardRoute">
 
           @if (!isSidebarCollapsed) {
-          <img src="/images/logo.svg" alt="GymForge Logo" class="brand-logo">
+          <app-brand-logo class="brand-logo" />
           <div class="brand-text">
             <span class="brand-subtext">{{roleName}} Portal</span>
           </div>
@@ -98,7 +98,7 @@
 
         <!-- Mobile brand logo (User role only, since it has no sidebar/hamburger to show it) -->
         <a class="mobile-user-brand" *ngIf="isUserRole && (isTabletOrBelow$ | async)" [routerLink]="dashboardRoute">
-          <img src="/images/logo.svg" alt="GymForge Logo" class="mobile-brand-logo">
+          <app-brand-logo class="mobile-brand-logo" />
         </a>
 
         <!-- Location Switcher Dropdown (Only for Gym Owners) -->
