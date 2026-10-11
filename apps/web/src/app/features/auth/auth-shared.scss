@@ -110,6 +110,13 @@
       opacity: 0.1;
     }
 
+    .bottom-shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 15, 25, 0.75) 0%, rgba(10, 15, 25, 0) 55%);
+    }
+
+
     .hero-content {
       position: absolute;
       bottom: 40px;
