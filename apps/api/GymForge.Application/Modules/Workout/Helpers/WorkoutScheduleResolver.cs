@@ -11,22 +11,27 @@ namespace GymForge.Application.Modules.Workout.Helpers
     {
         private static readonly DayOfWeek[] SplitDays = [DayOfWeek.Monday, DayOfWeek.Wednesday, DayOfWeek.Friday];
 
-        public static WorkoutPlanDayDto? ResolveScheduledDay(IEnumerable<WorkoutPlanDayDto>? days, DateTime date)
+        public static WorkoutPlanDayDto? ResolveScheduledDay(IEnumerable<WorkoutPlanDayDto>? days, DateTime date) =>
+            ResolveScheduledDay(days, d => d.DayName, d => d.DayIndex, date);
+
+        /// <inheritdoc cref="WorkoutScheduleResolver"/>
+        public static T? ResolveScheduledDay<T>(IEnumerable<T>? days, Func<T, string?> dayName, Func<T, int> dayIndex, DateTime date)
+            where T : class
         {
-            List<WorkoutPlanDayDto> ordered = days?.OrderBy(d => d.DayIndex).ToList() ?? [];
+            List<T> ordered = days?.OrderBy(dayIndex).ToList() ?? [];
             if (ordered.Count == 0)
             {
                 return null;
             }
 
             string weekday = date.DayOfWeek.ToString();
-            WorkoutPlanDayDto? weekdayMatch = ordered.FirstOrDefault(d => NameContains(d, weekday));
+            T? weekdayMatch = ordered.FirstOrDefault(d => NameContains(dayName(d), weekday));
             if (weekdayMatch != null)
             {
                 return weekdayMatch;
             }
 
-            bool isWeeklyPlan = ordered.Any(d => Enum.GetNames<DayOfWeek>().Any(name => NameContains(d, name)));
+            bool isWeeklyPlan = ordered.Any(d => Enum.GetNames<DayOfWeek>().Any(name => NameContains(dayName(d), name)));
             if (isWeeklyPlan)
             {
                 return null;
@@ -36,7 +41,7 @@ namespace GymForge.Application.Modules.Workout.Helpers
             return slot >= 0 && slot < ordered.Count ? ordered[slot] : null;
         }
 
-        private static bool NameContains(WorkoutPlanDayDto day, string weekday) =>
-            day.DayName?.Contains(weekday, StringComparison.OrdinalIgnoreCase) == true;
+        private static bool NameContains(string? dayName, string weekday) =>
+            dayName?.Contains(weekday, StringComparison.OrdinalIgnoreCase) == true;
     }
 }
