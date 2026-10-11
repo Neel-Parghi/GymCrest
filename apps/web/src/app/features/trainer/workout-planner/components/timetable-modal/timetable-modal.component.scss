@@ -253,24 +253,21 @@
       }
     }
 
+    // Day name on top, muscle groups underneath, so long targets ("Triceps + Chest + Shoulders") wrap cleanly.
     .tab-content-text {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       align-items: flex-start;
-      justify-content: space-between;
+      gap: 4px;
       flex: 1;
-
-      @include bp.mobile {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
+      min-width: 0;
+      text-align: left;
     }
 
     @media (max-width: 768px) {
       flex: 0 0 auto;
-      min-width: 96px;
-      max-width: 130px;
+      min-width: 110px;
+      max-width: 170px;
       padding: 10px 12px;
     }
 
@@ -288,10 +285,13 @@
     .tab-subtitle-target {
       font-size: 0.72rem;
       font-weight: 500;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
       padding: 2px 6px;
       border-radius: 4px;
 
       &.workout {
+        padding: 0;
         // background: rgba(var(--accent-rgb), 0.05);
         color: var(--accent-color);
       }
@@ -301,13 +301,15 @@
         color: var(--slate-400);
       }
 
+      // Up to two lines on phones, so "Triceps + Chest + Shoulders" stays readable.
       @include bp.mobile {
-        font-size: 0.66rem;
+        font-size: 0.68rem;
         padding: 1px 0;
         max-width: 100%;
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
       }
     }
 
@@ -418,6 +420,14 @@
   // max-height: 380px;
   overflow-y: auto;
 
+  // On phones the rows are cards already; framing them in another box doubles the borders.
+  @include bp.mobile {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
   /* Custom smooth scrollbars */
   &::-webkit-scrollbar {
     width: 6px;
@@ -453,116 +463,6 @@
 
   .exercise-note-row {
     display: none;
-  }
-
-  @include bp.mobile {
-    thead {
-      display: none;
-    }
-
-    tbody {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .exercise-timetable-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffffff;
-      border: 1px solid var(--slate-200);
-      border-radius: 14px;
-      padding: 10px 12px;
-
-      &:has(+ .exercise-note-row) {
-        border-radius: 14px 14px 0 0;
-        border-bottom: none;
-      }
-    }
-
-    td {
-      padding: 0;
-      border-bottom: none;
-      min-width: 0;
-    }
-
-    .col-drag-cell {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-    }
-
-    .ex-name-val {
-      flex: 1;
-      min-width: 0;
-      font-size: 0.9rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .ex-sets-reps-mobile {
-      display: block;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--slate-500);
-    }
-
-    .ex-sets-val,
-    .ex-reps-val {
-      display: none;
-    }
-
-    .ex-notes-val {
-      flex-shrink: 0;
-
-      .notes-text-desktop {
-        display: none;
-      }
-    }
-
-    .btn-note-info {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      background: var(--slate-100);
-      color: var(--slate-400);
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &.active {
-        background: rgba(var(--accent-rgb), 0.1);
-        color: var(--accent-color);
-      }
-    }
-
-    .exercise-note-row {
-      display: table-row;
-
-      .note-row-cell {
-        padding: 10px 14px !important;
-        background: var(--slate-50);
-        border: 1px solid var(--slate-200);
-        border-top: none;
-        border-radius: 0 0 14px 14px;
-        margin-top: -8px;
-        font-size: 0.82rem;
-        font-style: italic;
-        color: var(--text-muted);
-
-        i {
-          color: var(--accent-color);
-          margin-right: 6px;
-          font-style: normal;
-        }
-      }
-    }
   }
 
   th {
@@ -658,6 +558,123 @@
     .ex-notes-val {
       font-size: 0.84rem;
       color: var(--text-muted);
+    }
+  }
+
+  // Phones: each row becomes a card. Kept after the desktop cell rules so it wins over their padding and borders.
+  @include bp.mobile {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .exercise-timetable-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 14px;
+      padding: 10px 12px;
+
+      &:has(+ .exercise-note-row) {
+        border-radius: 14px 14px 0 0;
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 0;
+      border-bottom: none;
+      min-width: 0;
+    }
+
+    .col-drag-cell {
+      padding: 0 !important; // the desktop rule forces 16px padding
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .ex-name-val {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ex-sets-reps-mobile {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--slate-500);
+    }
+
+    .ex-sets-val,
+    .ex-reps-val {
+      display: none;
+    }
+
+    .ex-notes-val {
+      flex-shrink: 0;
+
+      .notes-text-desktop {
+        display: none;
+      }
+    }
+
+    .btn-note-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: var(--slate-100);
+      color: var(--slate-400);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.active {
+        background: rgba(var(--accent-rgb), 0.1);
+        color: var(--accent-color);
+      }
+    }
+
+    // The open note hangs off the bottom of its card as one piece (the -9px cancels the list gap and border).
+    .exercise-note-row {
+      display: block;
+      margin-top: -9px;
+
+      .note-row-cell {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 14px 12px !important;
+        background: rgba(var(--accent-rgb), 0.06);
+        border: 1px solid var(--slate-200);
+        border-top: 1px dashed var(--slate-200);
+        border-radius: 0 0 14px 14px;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        color: var(--text-main);
+        overflow-wrap: anywhere;
+
+        i {
+          margin-top: 2px;
+          color: var(--accent-color);
+        }
+      }
     }
   }
 }
