@@ -307,7 +307,7 @@
         <div class="weight-goal">
           <div class="weight-goal-text">
             <span>Target weight <strong>{{ wg.target | number:'1.0-1' }} kg</strong></span>
-            <span>{{ wg.pct }}% of the way</span>
+            <span>{{ wg.pct >= 100 ? 'Goal reached' : wg.pct + '% of the way' }}</span>
           </div>
           <div class="track sm"><span class="fill" [style.width.%]="wg.pct"></span></div>
         </div>

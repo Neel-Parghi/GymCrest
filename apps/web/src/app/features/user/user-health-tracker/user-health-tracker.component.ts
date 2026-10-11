@@ -4,6 +4,7 @@ import { PTMemberDetailHealthTrackerComponent } from '../../trainer/member-detai
 import { StaffService } from '../../../core/services/staff.service';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-user-health-tracker',
@@ -16,6 +17,7 @@ export class UserHealthTrackerComponent implements OnInit {
   private staffService = inject(StaffService);
   private authService = inject(AuthApiService);
   private notification = inject(NotificationService);
+  private userService = inject(UserService);
 
   userId = '';
   measurements: any[] = [];
@@ -73,6 +75,8 @@ export class UserHealthTrackerComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.notification.success('Health progress logged successfully.');
+        // The dashboard caches its summary; drop it so weight and goal progress show the new entry.
+        this.userService.clearCache();
         this.loadMeasurementsLogs();
         this.isSubmittingProgress = false;
       },

@@ -38,6 +38,7 @@ namespace GymForge.Infrastructure.Repositories
 
         private const int StreakLookbackDays = 400;
         private const int DefaultMonthlySessionTarget = 20;
+        private const double WeightGoalToleranceKg = 0.5;
         private const double WeeksPerMonth = 52.0 / 12.0;
 
         public UserRepository(AppDbContext dbContext)
@@ -191,24 +192,27 @@ namespace GymForge.Infrastructure.Repositories
                     .OrderBy(m => m.Date)
                     .FirstOrDefaultAsync();
 
-                if (firstMeasurement != null && user.Preference?.TargetWeight.HasValue == true && latestMeasurement.Weight.HasValue)
+                // Progress always follows the most recent weigh-in, even when the newest entry has no weight.
+                double? latestWeight = await _dbContext.MemberMeasurements
+                    .Where(m => m.UserId == userId && m.Weight.HasValue)
+                    .OrderByDescending(m => m.Date)
+                    .Select(m => m.Weight)
+                    .FirstOrDefaultAsync();
+
+                if (firstMeasurement != null && user.Preference?.TargetWeight.HasValue == true && latestWeight.HasValue)
                 {
-                    double initialWeight = firstMeasurement.Weight.Value;
-                    double currentWeight = latestMeasurement.Weight.Value;
+                    double initialWeight = firstMeasurement.Weight!.Value;
+                    double currentWeight = latestWeight.Value;
                     double targetWeight = user.Preference.TargetWeight.Value;
 
-                    if (initialWeight != targetWeight)
-                    {
-                        double progress = (targetWeight < initialWeight) 
+                    double progress = Math.Abs(initialWeight - targetWeight) < WeightGoalToleranceKg
+                        // Started at the target: the goal is holding it, so it only counts while the latest weight is close.
+                        ? (Math.Abs(currentWeight - targetWeight) <= WeightGoalToleranceKg ? 100 : 0)
+                        : (targetWeight < initialWeight)
                             ? (initialWeight - currentWeight) / (initialWeight - targetWeight) * 100
                             : (currentWeight - initialWeight) / (targetWeight - initialWeight) * 100;
 
-                        summary.GoalProgressPct = Math.Clamp((int)Math.Round(progress), 0, 100);
-                    }
-                    else
-                    {
-                        summary.GoalProgressPct = 100;
-                    }
+                    summary.GoalProgressPct = Math.Clamp((int)Math.Round(progress), 0, 100);
                 }
             }
 
