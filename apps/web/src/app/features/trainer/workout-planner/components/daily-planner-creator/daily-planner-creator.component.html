@@ -159,8 +159,7 @@
                           placeholder="e.g. 10-12 reps" maxlength="15">
                       </td>
                       <td>
-                        <input type="text" formControlName="notes" class="table-input" placeholder="Coaching cues..."
-                          maxlength="30">
+                        <input type="text" formControlName="notes" class="table-input" placeholder="Coaching cues..." [maxlength]="limits.EXERCISE_NOTES">
                       </td>
                       <td>
                         <button type="button" class="row-btn-delete" (click)="removeDailyExercise(exIdx)"

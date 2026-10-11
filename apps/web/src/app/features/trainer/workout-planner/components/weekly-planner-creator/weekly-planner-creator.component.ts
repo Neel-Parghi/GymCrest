@@ -9,6 +9,7 @@ import { ConfirmationPopupComponent } from '../../../../../shared/components/con
 import { WeeklyPlanner } from '../../../../../shared/models/workout-plan.model';
 import { CONSTANTS } from '../../../../../core/constants/constants';
 import { AuthApiService } from '../../../../../core/services/auth-api.service';
+import { FIELD_LIMITS } from '../../../../../shared/constants/validation.constants';
 
 @Component({
   selector: 'app-weekly-planner-creator',
@@ -18,6 +19,7 @@ import { AuthApiService } from '../../../../../core/services/auth-api.service';
   styleUrl: './weekly-planner-creator.component.scss'
 })
 export class WeeklyPlannerCreatorComponent implements OnInit {
+  readonly limits = FIELD_LIMITS;
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   private authService = inject(AuthApiService);
@@ -167,7 +169,7 @@ export class WeeklyPlannerCreatorComponent implements OnInit {
             exerciseName: [ex.name || '', [Validators.required]],
             targetSets: [ex.sets || 3, [Validators.required, Validators.min(1), Validators.max(200)]],
             targetReps: [ex.reps || '10-12 Reps', [Validators.required, Validators.maxLength(15)]],
-            notes: [ex.notes || '', [Validators.maxLength(30)]],
+            notes: [ex.notes || '', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
             isCustomName: [!this.getCategoryForExercise(ex.name)]
           }))
         )
@@ -185,7 +187,7 @@ export class WeeklyPlannerCreatorComponent implements OnInit {
               exerciseName: [av[0]?.name || '', [Validators.required]],
               targetSets: [4, [Validators.required, Validators.min(1)]],
               targetReps: ['10-12', [Validators.required]],
-              notes: [''],
+              notes: ['', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
               isCustomName: [false]
             }));
           }
@@ -210,7 +212,7 @@ export class WeeklyPlannerCreatorComponent implements OnInit {
           exerciseName: ['', [Validators.required]],
           targetSets: [4, [Validators.required, Validators.min(1), Validators.max(200)]],
           targetReps: ['10-12', [Validators.required, Validators.maxLength(10)]],
-          notes: ['', [Validators.maxLength(10)]],
+          notes: ['', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
           isCustomName: [false]
         })
       ])
@@ -228,7 +230,7 @@ export class WeeklyPlannerCreatorComponent implements OnInit {
             exerciseName: ['', [Validators.required]],
             targetSets: [4, [Validators.required, Validators.min(1)]],
             targetReps: ['10-12', [Validators.required]],
-            notes: [''],
+            notes: ['', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
             isCustomName: [false]
           }));
         }
@@ -253,7 +255,7 @@ export class WeeklyPlannerCreatorComponent implements OnInit {
       exerciseName: ['', [Validators.required]],
       targetSets: [4, [Validators.required, Validators.min(1), Validators.max(200)]],
       targetReps: ['10-12', [Validators.required, Validators.maxLength(10)]],
-      notes: ['', [Validators.maxLength(10)]],
+      notes: ['', [Validators.maxLength(FIELD_LIMITS.EXERCISE_NOTES)]],
       isCustomName: [false]
     });
 
