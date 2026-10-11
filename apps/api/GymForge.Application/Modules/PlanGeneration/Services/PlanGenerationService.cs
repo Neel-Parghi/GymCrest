@@ -20,9 +20,12 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
         private readonly ILogger<PlanGenerationService> _logger;
 
         private const int MinTrainingDays = 2;
-        private const int MaxTrainingDays = 6;
+        private const int MaxTrainingDays = 7;
         private const int DefaultSessionMinutes = 60;
         private const int MinutesPerExercise = 10;
+        private const int MinExercisesPerSession = 3;
+        /// <summary>Long sessions get more rest and cardio rather than an ever-growing exercise list.</summary>
+        private const int MaxExercisesPerSession = 10;
 
         private static readonly string[] WeekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -32,7 +35,8 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
             [3] = ["Monday", "Wednesday", "Friday"],
             [4] = ["Monday", "Tuesday", "Thursday", "Friday"],
             [5] = ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"],
-            [6] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+            [6] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            [7] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         };
 
         private static readonly Dictionary<int, string[][]> DaySplits = new()
@@ -71,6 +75,16 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
                 ["Chest", "Shoulders", "Triceps"],
                 ["Back", "Biceps"],
                 ["Legs", "Core"]
+            ],
+            [7] =
+            [
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs"],
+                ["Chest", "Shoulders", "Triceps"],
+                ["Back", "Biceps"],
+                ["Legs", "Core"],
+                ["Cardio", "Core"]
             ]
         };
 
@@ -197,7 +211,7 @@ namespace GymForge.Application.Modules.PlanGeneration.Services
             string[][] split = DaySplits[trainingDays];
             string[] trainingWeekDays = TrainingWeekDays[trainingDays];
             (int Sets, string Reps) setsReps = GetSetsReps(goal);
-            int exercisesPerSession = Math.Clamp(sessionMinutes / MinutesPerExercise, 3, 8);
+            int exercisesPerSession = Math.Clamp(sessionMinutes / MinutesPerExercise, MinExercisesPerSession, MaxExercisesPerSession);
 
             List<CreateWorkoutPlanDayDto> days = new();
             for (int dayIndex = 0; dayIndex < WeekDays.Length; dayIndex++)

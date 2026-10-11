@@ -21,6 +21,15 @@ const DRAFT_KEY = 'gymForge_userWizardDraft_v2';
 const LEGACY_DRAFT_KEY = 'gymForge_userWizardDraft';
 const STEP_COUNT = 4;
 const DEFAULT_SESSION_MINUTES = 60;
+const MIN_TRAINING_DAYS = 2;
+const MAX_TRAINING_DAYS = 7;
+const MIN_SESSION_MINUTES = 30;
+const MAX_SESSION_MINUTES = 180;
+/** Starter plan sizing; mirrors PlanGenerationService in the API. */
+const MINUTES_PER_EXERCISE = 10;
+const MIN_EXERCISES = 3;
+const MAX_EXERCISES = 10;
+
 const LIMITATIONS_MAX_LENGTH = 300;
 
 type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
@@ -82,16 +91,19 @@ export class UserWizardComponent implements OnInit {
     { id: 'general_fitness', label: 'General Fitness', icon: 'fi-rr-heart-pulse', desc: 'Stay active and healthy', image: '/images/goals/general_fitness.png' }
   ];
 
-  readonly experienceLevels: { id: ExperienceLevel; label: string; desc: string; days: number }[] = [
-    { id: 'Beginner', label: 'Beginner', desc: 'New to structured training', days: 3 },
-    { id: 'Intermediate', label: 'Intermediate', desc: 'Training consistently for a while', days: 4 },
-    { id: 'Advanced', label: 'Advanced', desc: 'Experienced with structured programs', days: 5 }
+  readonly experienceLevels: { id: ExperienceLevel; label: string; desc: string; icon: string; days: number }[] = [
+    { id: 'Beginner', label: 'Beginner', desc: 'New to structured training', icon: 'fa-solid fa-seedling', days: 3 },
+    { id: 'Intermediate', label: 'Intermediate', desc: 'Training consistently for a while', icon: 'fa-solid fa-dumbbell', days: 4 },
+    { id: 'Advanced', label: 'Advanced', desc: 'Experienced with structured programs', icon: 'fa-solid fa-fire-flame-curved', days: 5 }
   ];
 
   readonly activityLevels = ACTIVITY_LEVELS;
   readonly dietTypes = DIET_TYPES;
-  readonly trainingDayOptions = [2, 3, 4, 5, 6];
-  readonly sessionLengthOptions = [30, 45, 60, 75, 90];
+  readonly minTrainingDays = MIN_TRAINING_DAYS;
+  readonly maxTrainingDays = MAX_TRAINING_DAYS;
+  readonly minSessionMinutes = MIN_SESSION_MINUTES;
+  readonly maxSessionMinutes = MAX_SESSION_MINUTES;
+  readonly sessionScale = [30, 60, 90, 120, 150, 180];
 
   readonly genderOptions = [
     { label: 'Male', value: 'Male' },
@@ -167,6 +179,18 @@ export class UserWizardComponent implements OnInit {
   });
 
   /** What the review step lists, one row per answer, with the step to go back to for changes. */
+  readonly exercisesPerSession = computed(() =>
+    Math.min(Math.max(Math.floor(this.plan().sessionLengthMinutes / MINUTES_PER_EXERCISE), MIN_EXERCISES), MAX_EXERCISES));
+
+  /** "1 hr 30 min" style label for the session slider. */
+  readonly sessionLabel = computed(() => {
+    const minutes = this.plan().sessionLengthMinutes;
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    if (!hours) return { value: `${rest}`, unit: 'min' };
+    return rest ? { value: `${hours}h ${rest}`, unit: 'min' } : { value: `${hours}`, unit: hours === 1 ? 'hour' : 'hours' };
+  });
+
   readonly review = computed(() => {
     const m = this.metrics();
     const p = this.plan();
@@ -224,6 +248,12 @@ export class UserWizardComponent implements OnInit {
     const days = this.planForm.controls.trainingDaysPerWeek;
     if (!days.dirty) days.setValue(this.experienceLevels.find(l => l.id === levelId)?.days ?? 3);
     this.saveDraft();
+  }
+
+  stepTrainingDays(delta: 1 | -1): void {
+    const control = this.planForm.controls.trainingDaysPerWeek;
+    const current = control.value ?? 3;
+    this.selectOption(control, Math.min(Math.max(current + delta, MIN_TRAINING_DAYS), MAX_TRAINING_DAYS));
   }
 
   selectOption<T>(control: FormControl<T>, value: T): void {
@@ -344,14 +374,9 @@ export class UserWizardComponent implements OnInit {
       metricsForm: this.metricsForm.getRawValue(),
       planForm: this.planForm.getRawValue()
     };
-    try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    } catch {
-      // Storage can be full or blocked; the draft is only a convenience.
-    }
   }
 
-  /** Restores answers from a previous visit; returns whether a draft was found. */
   private loadDraft(): boolean {
     const draftStr = localStorage.getItem(DRAFT_KEY);
     if (!draftStr) return false;

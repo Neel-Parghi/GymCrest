@@ -1,5 +1,5 @@
 @if (isSubmitting()) {
-  <app-loading overlay="true" message="Building your plan..."></app-loading>
+  <app-loading overlay="true" message="Setting up your plan and dashboard..."></app-loading>
 }
 <div class="auth-page-wrapper full-screen-wizard">
   <main class="auth-main full-screen">
@@ -10,7 +10,7 @@
           <div class="logo">
             <i class="fi fi-rr-gym"></i> GymForge
           </div>
-          <p class="sidebar-subtitle">Member Setup</p>
+          <p class="sidebar-subtitle">User Setup</p>
         </div>
         <div class="stepper-vertical">
           @for (step of steps; track step.title; let i = $index) {
@@ -61,7 +61,7 @@
                   @for (level of experienceLevels; track level.id) {
                     <button type="button" class="level-card" [class.selected]="selectedExperienceLevel() === level.id"
                       [attr.aria-pressed]="selectedExperienceLevel() === level.id" (click)="selectExperienceLevel(level.id)">
-                      <h4>{{ level.label }}</h4>
+                      <h4><i [class]="level.icon" aria-hidden="true"></i> {{ level.label }}</h4>
                       <p>{{ level.desc }}</p>
                     </button>
                   }
@@ -140,22 +140,41 @@
                 <h2>Your training week</h2>
                 <p class="subtitle">We'll spread your workouts across the week with rest days in between.</p>
 
-                <h3 class="section-heading">Days per week</h3>
-                <div class="chip-select" role="radiogroup" aria-label="Training days per week">
-                  @for (days of trainingDayOptions; track days) {
-                    <button type="button" role="radio" class="chip" [class.selected]="planForm.controls.trainingDaysPerWeek.value === days"
-                      [attr.aria-checked]="planForm.controls.trainingDaysPerWeek.value === days"
-                      (click)="selectOption(planForm.controls.trainingDaysPerWeek, days)">{{ days }} days</button>
-                  }
-                </div>
+                <div class="schedule-grid">
+                  <div class="schedule-card">
+                    <h3 class="section-heading">Days per week</h3>
+                    <div class="day-stepper">
+                      <button type="button" class="step-btn" (click)="stepTrainingDays(-1)" aria-label="Fewer training days"
+                        [disabled]="(planForm.controls.trainingDaysPerWeek.value ?? 0) <= minTrainingDays">
+                        <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                      </button>
+                      <span class="big-value" aria-live="polite">
+                        {{ planForm.controls.trainingDaysPerWeek.value ?? '-' }}<small> days</small>
+                      </span>
+                      <button type="button" class="step-btn" (click)="stepTrainingDays(1)" aria-label="More training days"
+                        [disabled]="(planForm.controls.trainingDaysPerWeek.value ?? 0) >= maxTrainingDays">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <p class="schedule-hint">
+                      @if (planForm.controls.trainingDaysPerWeek.value === maxTrainingDays) {
+                        Every day, with one lighter cardio day
+                      } @else {
+                        {{ 7 - (planForm.controls.trainingDaysPerWeek.value ?? 0) }} rest days a week
+                      }
+                    </p>
+                  </div>
 
-                <h3 class="section-heading">Time per session</h3>
-                <div class="chip-select" role="radiogroup" aria-label="Minutes per session">
-                  @for (minutes of sessionLengthOptions; track minutes) {
-                    <button type="button" role="radio" class="chip" [class.selected]="planForm.controls.sessionLengthMinutes.value === minutes"
-                      [attr.aria-checked]="planForm.controls.sessionLengthMinutes.value === minutes"
-                      (click)="selectOption(planForm.controls.sessionLengthMinutes, minutes)">{{ minutes }} min</button>
-                  }
+                  <div class="schedule-card">
+                    <h3 class="section-heading">Time per session</h3>
+                    <span class="big-value">{{ sessionLabel().value }}<small> {{ sessionLabel().unit }}</small></span>
+                    <input type="range" class="session-slider" formControlName="sessionLengthMinutes" [min]="minSessionMinutes"
+                      [max]="maxSessionMinutes" step="15" aria-label="Minutes per session">
+                    <div class="slider-scale" aria-hidden="true">
+                      @for (mark of sessionScale; track mark) { <span>{{ mark }}</span> }
+                    </div>
+                    <p class="schedule-hint">About {{ exercisesPerSession() }} exercises per session</p>
+                  </div>
                 </div>
 
                 <h3 class="section-heading">What do you eat?</h3>
@@ -236,7 +255,7 @@
                 <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!canContinue()">Continue</button>
               } @else {
                 <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="isSubmitting()">
-                  {{ isSubmitting() ? 'Saving...' : 'Create my plan' }}
+                  {{ isSubmitting() ? 'Setting things up...' : 'Finish setup' }}
                 </button>
               }
             </div>
