@@ -9,12 +9,18 @@
       <!-- Left Side: Visual Value Proposition -->
       <section class="hero-segment">
         <div class="hero-visual-card">
-          <img class="hero-img" src="/images/auth-bg.png" alt="Modern gym interior" />
-          <div class="gradient-overlay"></div>
+          <img class="hero-img" src="/images/auth-hero.jpg" alt="Athlete gripping a loaded barbell" />
+          <div class="bottom-shade"></div>
           <div class="hero-content">
-            <h1 class="hero-title">Forge Your Strength. Master Your Management.</h1>
-            <p class="hero-subtitle">Join 5,000+ elite studios leveraging Gym Forge to build stronger communities and
-              more powerful businesses.</p>
+            @if (selectedRole === 'GymOwner') {
+              <h1 class="hero-title">Run your whole gym in one place.</h1>
+              <p class="hero-subtitle">Manage members, trainers, plans and billing, and give every member an app that
+                keeps them training.</p>
+            } @else {
+              <h1 class="hero-title">Your fitness journey starts here.</h1>
+              <p class="hero-subtitle">Get a workout and diet plan built for your goal, log every session and watch your
+                progress add up.</p>
+            }
           </div>
         </div>
       </section>
