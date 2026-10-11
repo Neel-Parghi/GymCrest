@@ -132,12 +132,12 @@
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
 
       .brand-logo {
         width: auto;
-        height: 32px;
+        height: 18px;
         background: transparent;
         display: block;
         margin: 0;
@@ -147,7 +147,6 @@
       .brand-text {
         display: flex;
         flex-direction: column;
-        padding-left: 8px;
 
         .brand-name {
           font-weight: 700;
@@ -361,7 +360,7 @@
       flex-shrink: 0;
 
       .mobile-brand-logo {
-        height: 28px;
+        height: 16px;
         width: auto;
       }
     }

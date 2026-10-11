@@ -8,7 +8,11 @@ namespace GymForge.Application.Modules.Workout.Interface
         
         Task<bool> AssignPlanToMemberAsync(Guid memberId, Guid planId, Guid? gymId);
         
-        Task<IEnumerable<WorkoutSessionLogDto>> GetWorkoutLogsForMemberAsync(Guid memberId);
+        /// <summary>
+        /// Logged sessions, newest first. <paramref name="from"/> and <paramref name="to"/> are optional,
+        /// inclusive IST calendar dates; leave both empty for the full history.
+        /// </summary>
+        Task<IEnumerable<WorkoutSessionLogDto>> GetWorkoutLogsForMemberAsync(Guid memberId, DateTime? from = null, DateTime? to = null);
         
         Task<WorkoutSessionLogDto> LogWorkoutSessionAsync(Guid memberId, LogWorkoutSessionRequest request, Guid? gymId);
 

@@ -14,7 +14,7 @@ import { AnnouncementService } from '../../../core/services/announcement.service
 import { DietLogDto } from '../../../shared/models/diet-tracking.model';
 import { GymAnnouncementResponse } from '../../../shared/models/announcement.model';
 import { ActivePlanView, WorkoutSessionLogDto } from '../../../shared/models/workout-plan.model';
-import { exerciseSetCount, resolveScheduledDay, startOfWeek, toDateKey } from '../../../shared/utils/workout-schedule';
+import { PLANNED_STATUS, exerciseSetCount, loggedState, resolveScheduledDay, startOfWeek, toDateKey, weekRange } from '../../../shared/utils/workout-schedule';
 import { mealTimeToMinutes } from '../../../shared/utils/meal-time';
 import { NUTRITION_TARGET_FALLBACK, percentOf } from '../../../shared/utils/nutrition';
 import { goalLabel, toGoalId } from '../../../shared/constants/fitness-preferences';
@@ -243,7 +243,8 @@ export class UserDashboardComponent implements OnInit {
   }
 
   private loadTraining(userId: string): void {
-    this.memberService.getTrainingOverview(userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({ plan, logs }) => {
+    // Only this week's logs are needed: the week strip and today's card.
+    this.memberService.getTrainingOverview(userId, weekRange(this.today)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({ plan, logs }) => {
       this.week.set(this.buildWeek(logs));
       const workout = this.buildTodayWorkout(plan, logs);
       this.todayWorkout.set(workout);
@@ -273,9 +274,10 @@ export class UserDashboardComponent implements OnInit {
     const todayKey = toDateKey(this.today);
     const planName = plan?.name ?? '';
     const loggedToday = logs.find(l => toDateKey(new Date(l.date)) === todayKey);
+    const loggedAs = loggedState(loggedToday?.status);
 
-    if (loggedToday) {
-      const isRest = loggedToday.status === 'RestDay';
+    if (loggedToday && loggedAs) {
+      const isRest = loggedAs === 'rest';
       return {
         state: isRest ? 'rest' : 'done',
         planName,
@@ -283,6 +285,20 @@ export class UserDashboardComponent implements OnInit {
         muscles: '',
         exerciseCount: loggedToday.exercisesCompleted ?? 0,
         setCount: loggedToday.totalSets ?? 0
+      };
+    }
+
+    // A workout planned for today from the calendar replaces the plan's usual day.
+    if (loggedToday?.status === PLANNED_STATUS) {
+      const exercises = loggedToday.loggedExercises ?? [];
+      const planDay = plan?.days?.find(d => d.dayName === loggedToday.dayName);
+      return {
+        state: 'ready',
+        planName,
+        title: loggedToday.dayName,
+        muscles: (planDay?.category ?? '').split(',').map(c => c.trim()).filter(Boolean).join(' · '),
+        exerciseCount: exercises.length,
+        setCount: exercises.reduce((sum, ex) => sum + (ex.loggedSets?.length ?? 0), 0)
       };
     }
 
@@ -307,7 +323,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   private buildWeek(logs: WorkoutSessionLogDto[]): WeekDay[] {
-    const statusByDate = new Map(logs.map(l => [toDateKey(new Date(l.date)), l.status]));
+    const statusByDate = new Map(logs.map(l => [toDateKey(new Date(l.date)), loggedState(l.status)]));
     const todayKey = toDateKey(this.today);
     const monday = startOfWeek(this.today);
 
@@ -318,7 +334,7 @@ export class UserDashboardComponent implements OnInit {
       const status = statusByDate.get(key);
 
       let state: WeekDayState;
-      if (status) state = status === 'RestDay' ? 'rest' : 'done';
+      if (status) state = status;
       else if (key === todayKey) state = 'today';
       else state = key < todayKey ? 'missed' : 'upcoming';
 

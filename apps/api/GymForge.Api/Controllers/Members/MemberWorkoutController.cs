@@ -39,10 +39,17 @@ namespace GymForge.Api.Controllers.Members
             return Ok(new { message = "Workout plan assigned successfully." });
         }
 
+        /// <param name="from">Optional first IST date (yyyy-MM-dd), inclusive.</param>
+        /// <param name="to">Optional last IST date (yyyy-MM-dd), inclusive.</param>
         [HttpGet("workout-logs")]
-        public async Task<ActionResult<IEnumerable<WorkoutSessionLogDto>>> GetWorkoutLogs(Guid memberId)
+        public async Task<ActionResult<IEnumerable<WorkoutSessionLogDto>>> GetWorkoutLogs(Guid memberId, [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null)
         {
-            IEnumerable<WorkoutSessionLogDto> logs = await _memberWorkoutService.GetWorkoutLogsForMemberAsync(memberId);
+            if (from.HasValue && to.HasValue && from.Value.Date > to.Value.Date)
+            {
+                return BadRequest("'from' must be on or before 'to'.");
+            }
+
+            IEnumerable<WorkoutSessionLogDto> logs = await _memberWorkoutService.GetWorkoutLogsForMemberAsync(memberId, from, to);
             return Ok(logs);
         }
 

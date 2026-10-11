@@ -4,7 +4,7 @@ import { BaseApiService } from './base-api.service';
 import { API_CONSTANTS } from '../constants/api-constants';
 import { Observable, shareReplay, tap, catchError, of, forkJoin, map } from 'rxjs';
 import { GymMember, MemberDashboardResponse, MemberSubscription, OnboardMemberRequest, RenewSubscriptionRequest } from '../../shared/models/member.model';
-import { ActivePlanView, MemberPlanAssignmentDto, WorkoutSessionLogDto, LogWorkoutSessionRequest, TrainingOverview } from '../../shared/models/workout-plan.model';
+import { ActivePlanView, DateRange, MemberPlanAssignmentDto, WorkoutSessionLogDto, LogWorkoutSessionRequest, TrainingOverview } from '../../shared/models/workout-plan.model';
 import { DietPlanDto, MemberDietAssignmentDto } from '../../shared/models/diet-plan.model';
 import { ApiResponse } from '../../shared/models/api-response.model';
 import { PagedResponse } from '../../shared/models/paged-response.model';
@@ -175,7 +175,7 @@ export class MemberService extends BaseApiService {
       tap(() => {
         this.activePlanCache.delete(memberId);
         this.planAssignmentsCache.delete(memberId);
-        this.workoutLogsCache.delete(memberId);
+        this.clearWorkoutLogsCache(memberId);
       })
     );
   }
@@ -191,34 +191,48 @@ export class MemberService extends BaseApiService {
   }
 
   /** Active plan + logged sessions; either side falls back to empty rather than failing. */
-  getTrainingOverview(memberId: string): Observable<TrainingOverview> {
+  getTrainingOverview(memberId: string, range?: DateRange): Observable<TrainingOverview> {
     return forkJoin({
       // The active-plan endpoint returns the plan itself (name + days), not the assignment wrapper.
       plan: this.getActivePlan(memberId).pipe(
         map(res => (res?.data ?? null) as unknown as ActivePlanView | null),
         catchError(() => of(null))
       ),
-      logs: this.getWorkoutLogs(memberId).pipe(
+      logs: this.getWorkoutLogs(memberId, false, range).pipe(
         map(res => res?.data ?? []),
         catchError(() => of([] as WorkoutSessionLogDto[]))
       )
     });
   }
 
-  getWorkoutLogs(memberId: string, forceRefresh = false): Observable<ApiResponse<WorkoutSessionLogDto[]>> {
-    if (forceRefresh || !this.workoutLogsCache.has(memberId)) {
-      const request$ = this.get<ApiResponse<WorkoutSessionLogDto[]>>(API_CONSTANTS.MEMBERS.WORKOUT_LOGS.replace('{memberId}', memberId)).pipe(
+  /** Logged sessions, newest first. Pass a range to fetch only those dates instead of the full history. */
+  getWorkoutLogs(memberId: string, forceRefresh = false, range?: DateRange): Observable<ApiResponse<WorkoutSessionLogDto[]>> {
+    const key = range ? `${memberId}|${range.from}|${range.to}` : memberId;
+    if (forceRefresh || !this.workoutLogsCache.has(key)) {
+      const request$ = this.get<ApiResponse<WorkoutSessionLogDto[]>>(
+        API_CONSTANTS.MEMBERS.WORKOUT_LOGS.replace('{memberId}', memberId),
+        range ? { from: range.from, to: range.to } : undefined
+      ).pipe(
         shareReplay(1)
       );
-      this.workoutLogsCache.set(memberId, request$);
+      this.workoutLogsCache.set(key, request$);
     }
-    return this.workoutLogsCache.get(memberId)!;
+    return this.workoutLogsCache.get(key)!;
+  }
+
+  /** Drops the member's full-history and date-range log caches. */
+  private clearWorkoutLogsCache(memberId: string): void {
+    for (const key of [...this.workoutLogsCache.keys()]) {
+      if (key === memberId || key.startsWith(`${memberId}|`)) {
+        this.workoutLogsCache.delete(key);
+      }
+    }
   }
 
   logWorkoutSession(memberId: string, payload: LogWorkoutSessionRequest): Observable<ApiResponse<WorkoutSessionLogDto>> {
     return this.post<ApiResponse<WorkoutSessionLogDto>>(API_CONSTANTS.MEMBERS.WORKOUT_LOGS.replace('{memberId}', memberId), payload).pipe(
       tap(() => {
-        this.workoutLogsCache.delete(memberId);
+        this.clearWorkoutLogsCache(memberId);
         this.workoutProgressService.clearCache();
       })
     );
@@ -229,7 +243,7 @@ export class MemberService extends BaseApiService {
       tap(() => {
         this.activePlanCache.delete(memberId);
         this.planAssignmentsCache.delete(memberId);
-        this.workoutLogsCache.delete(memberId);
+        this.clearWorkoutLogsCache(memberId);
       })
     );
   }

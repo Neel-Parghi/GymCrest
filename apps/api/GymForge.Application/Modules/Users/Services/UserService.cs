@@ -286,6 +286,16 @@ namespace GymForge.Application.Modules.Users.Services
             user.Preference ??= new UserPreference { CreatedOn = DateTime.UtcNow };
             
             user.Preference.PrimaryGoal = string.IsNullOrWhiteSpace(dto.PrimaryGoal) ? null : FitnessGoals.Normalize(dto.PrimaryGoal);
+
+            // A new target starts its progress from today's weight. Saving other settings keeps the start.
+            bool targetChanged = dto.TargetWeight.HasValue != user.Preference.TargetWeight.HasValue
+                || (dto.TargetWeight.HasValue && Math.Abs(dto.TargetWeight.Value - user.Preference.TargetWeight!.Value) > 0.01);
+            if (targetChanged)
+            {
+                user.Preference.TargetWeightStart = dto.TargetWeight.HasValue
+                    ? (await _userRepository.GetLatestBodyMetricsAsync(userId)).WeightKg
+                    : null;
+            }
             user.Preference.TargetWeight = dto.TargetWeight;
             user.Preference.TargetCalories = dto.TargetCalories;
             user.Preference.TargetProtein = dto.TargetProtein;
@@ -389,6 +399,8 @@ namespace GymForge.Application.Modules.Users.Services
             if (dto.TargetWeight.HasValue)
             {
                 user.Preference.TargetWeight = (double)dto.TargetWeight.Value;
+                // Onboarding records today's weight below; the goal starts from it.
+                user.Preference.TargetWeightStart = (double)dto.Weight;
             }
             user.Preference.PrimaryGoal = FitnessGoals.Normalize(dto.PrimaryGoal);
             user.Preference.ExperienceLevel = dto.ExperienceLevel;

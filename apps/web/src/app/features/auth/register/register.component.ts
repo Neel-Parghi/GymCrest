@@ -6,13 +6,14 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, BrandLogoComponent]
 })
 export class RegisterComponent {
   readonly limits = FIELD_LIMITS;

@@ -6,11 +6,12 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, BrandLogoComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })

@@ -34,11 +34,8 @@
   }
 
   .brand-logo {
-    font-weight: 900;
-    font-size: 1.1rem;
-    letter-spacing: -0.05em;
+    height: 16px;
     color: var(--on-surface-precision, #1a1c1c);
-    text-transform: uppercase;
   }
 }
 
@@ -372,8 +369,7 @@
   }
 
   .footer-logo {
-    font-size: 0.85rem;
-    font-weight: 700;
+    height: 12px;
     color: #1a1c1c;
 
     @media (max-width: 767px) {
@@ -479,6 +475,7 @@
 
     .auth-header .brand-logo {
       color: #ffffff;
+      --brand-accent: #4a9cc4;
     }
 
 
@@ -511,7 +508,8 @@
 
     .auth-header .brand-logo {
       color: #ffffff;
-      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+      --brand-accent: #4a9cc4;
+      filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.6));
     }
 
     .auth-footer {

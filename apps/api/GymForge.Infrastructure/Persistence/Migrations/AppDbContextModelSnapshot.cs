@@ -2584,6 +2584,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                     b.Property<double?>("TargetWeight")
                         .HasColumnType("double precision");
 
+                    b.Property<double?>("TargetWeightStart")
+                        .HasColumnType("double precision");
+
                     b.Property<int?>("TrainingDaysPerWeek")
                         .HasColumnType("integer");
 
