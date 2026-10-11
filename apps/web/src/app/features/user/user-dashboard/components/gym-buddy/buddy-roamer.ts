@@ -16,8 +16,8 @@ type Spot =
   | { kind: 'card'; card: HTMLElement; dx: number; pose: 'stand' | 'sit' }
   | { kind: 'free'; dx: number; dy: number };
 
-const WANDER_MIN_MS = 10000;
-const WANDER_MAX_MS = 20000;
+const WANDER_MIN_MS = 15000;
+const WANDER_MAX_MS = 25000;
 /** After the member places the buddy, let it stay put for a while. */
 const PLACED_REST_MS = 45000;
 const DRAG_THRESHOLD_PX = 6;
