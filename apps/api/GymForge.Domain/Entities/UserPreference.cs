@@ -8,6 +8,8 @@ namespace GymForge.Domain.Entities
         public string? PrimaryGoal { get; set; }
         public string? ExperienceLevel { get; set; } // Beginner, Intermediate, Advanced
         public double? TargetWeight { get; set; }
+        /// <summary>Weight when the current target was set; goal progress is measured from here.</summary>
+        public double? TargetWeightStart { get; set; }
         public int? TargetCalories { get; set; }
         public int? TargetProtein { get; set; }
         public int? TargetCarbs { get; set; }

@@ -139,16 +139,21 @@ namespace GymForge.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
+        private IQueryable<MemberMeasurement> MeasurementsOf(Guid userId) =>
+            _dbContext.MemberMeasurements
+                .AsNoTracking()
+                .Where(m => m.UserId == userId || (m.Member != null && m.Member.UserId == userId));
+
         public async Task<(double? HeightCm, double? WeightKg)> GetLatestBodyMetricsAsync(Guid userId)
         {
-            double? height = await _dbContext.MemberMeasurements
-                .Where(m => m.UserId == userId && m.Height.HasValue && m.Height > 0)
+            double? height = await MeasurementsOf(userId)
+                .Where(m => m.Height.HasValue && m.Height > 0)
                 .OrderByDescending(m => m.Date)
                 .Select(m => m.Height)
                 .FirstOrDefaultAsync();
 
-            double? weight = await _dbContext.MemberMeasurements
-                .Where(m => m.UserId == userId && m.Weight.HasValue && m.Weight > 0)
+            double? weight = await MeasurementsOf(userId)
+                .Where(m => m.Weight.HasValue && m.Weight > 0)
                 .OrderByDescending(m => m.Date)
                 .Select(m => m.Weight)
                 .FirstOrDefaultAsync();
@@ -176,37 +181,48 @@ namespace GymForge.Infrastructure.Repositories
             summary.TargetTrainingTime = user.Preference?.TargetTrainingTime ?? 60;
             summary.TargetWeight = user.Preference?.TargetWeight;
 
-            MemberMeasurement? latestMeasurement = await _dbContext.MemberMeasurements
-                .Where(m => m.UserId == userId)
+            MemberMeasurement? latestMeasurement = await MeasurementsOf(userId)
                 .OrderByDescending(m => m.Date)
                 .FirstOrDefaultAsync();
 
             if (latestMeasurement != null)
             {
-                summary.CurrentWeight = latestMeasurement.Weight ?? 0;
                 summary.BodyFat = latestMeasurement.BodyFatPercentage ?? 0;
                 summary.BMI = latestMeasurement.BMI ?? 0;
 
-                MemberMeasurement? firstMeasurement = await _dbContext.MemberMeasurements
-                    .Where(m => m.UserId == userId && m.Weight.HasValue)
-                    .OrderBy(m => m.Date)
-                    .FirstOrDefaultAsync();
-
-                // Progress always follows the most recent weigh-in, even when the newest entry has no weight.
-                double? latestWeight = await _dbContext.MemberMeasurements
-                    .Where(m => m.UserId == userId && m.Weight.HasValue)
+                double? latestWeight = await MeasurementsOf(userId)
+                    .Where(m => m.Weight.HasValue && m.Weight > 0)
                     .OrderByDescending(m => m.Date)
                     .Select(m => m.Weight)
                     .FirstOrDefaultAsync();
 
-                if (firstMeasurement != null && user.Preference?.TargetWeight.HasValue == true && latestWeight.HasValue)
+                summary.CurrentWeight = latestWeight ?? 0;
+
+                // Targets saved before the start weight was recorded use the latest weigh-in at their
+                // last save, then the first weigh-in.
+                double? startWeight = user.Preference?.TargetWeightStart;
+                if (!startWeight.HasValue && user.Preference != null)
                 {
-                    double initialWeight = firstMeasurement.Weight!.Value;
+                    DateTime targetSavedAt = user.Preference.ModifiedOn ?? user.Preference.CreatedOn;
+                    startWeight = await MeasurementsOf(userId)
+                        .Where(m => m.Weight.HasValue && m.Weight > 0 && m.Date <= targetSavedAt)
+                        .OrderByDescending(m => m.Date)
+                        .Select(m => m.Weight)
+                        .FirstOrDefaultAsync()
+                        ?? await MeasurementsOf(userId)
+                            .Where(m => m.Weight.HasValue && m.Weight > 0)
+                            .OrderBy(m => m.Date)
+                            .Select(m => m.Weight)
+                            .FirstOrDefaultAsync();
+                }
+
+                if (startWeight.HasValue && user.Preference?.TargetWeight.HasValue == true && latestWeight.HasValue)
+                {
+                    double initialWeight = startWeight.Value;
                     double currentWeight = latestWeight.Value;
                     double targetWeight = user.Preference.TargetWeight.Value;
 
                     double progress = Math.Abs(initialWeight - targetWeight) < WeightGoalToleranceKg
-                        // Started at the target: the goal is holding it, so it only counts while the latest weight is close.
                         ? (Math.Abs(currentWeight - targetWeight) <= WeightGoalToleranceKg ? 100 : 0)
                         : (targetWeight < initialWeight)
                             ? (initialWeight - currentWeight) / (initialWeight - targetWeight) * 100
