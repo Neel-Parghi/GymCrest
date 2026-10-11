@@ -20,6 +20,8 @@ namespace GymForge.Domain.Interface
         Task UpdateUserAsync(User user);
         
         Task<UserDashboardSummaryDto> GetUserDashboardSummaryAsync(Guid userId);
+
+        Task<(double? HeightCm, double? WeightKg)> GetLatestBodyMetricsAsync(Guid userId);
         
         Task<IEnumerable<DailyRoutine>> GetDailyRoutinesAsync(Guid userId);
         

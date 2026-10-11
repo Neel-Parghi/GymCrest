@@ -8,7 +8,9 @@
         <h1>{{ userName() }}</h1>
       </div>
     </div>
-    <app-gym-buddy class="greeting-buddy" [facts]="buddyFacts()" [roamArea]="dash"></app-gym-buddy>
+    @if (showBuddy()) {
+      <app-gym-buddy class="greeting-buddy" [facts]="buddyFacts()" [roamArea]="dash"></app-gym-buddy>
+    }
     <div class="greeting-actions">
       <button type="button" class="btn-secondary" (click)="logMeal()">
         <i class="fa-solid fa-utensils" aria-hidden="true"></i> Log meal
@@ -264,16 +266,16 @@
         </svg>
         <dl class="legend">
           <div class="legend-row">
-            <dt><span class="dot" data-ring="calories"></span>Calories</dt>
-            <dd>{{ activity().calories | number:'1.0-2' }}<small> / {{ activity().calorieTarget | number:'1.0-2' }} kcal</small></dd>
+            <dt><span class="dot" data-ring="calories"></span>Burned</dt>
+            <dd>{{ activity().calories | number:'1.0-0' }}<small> / {{ activity().calorieTarget | number:'1.0-0' }} kcal</small></dd>
           </div>
           <div class="legend-row">
             <dt><span class="dot" data-ring="active"></span>Active</dt>
             <dd>{{ activity().active }}<small> / {{ activity().activeTarget }} min</small></dd>
           </div>
           <div class="legend-row">
-            <dt><span class="dot" data-ring="goal"></span>Goal · {{ goalTitle() }}</dt>
-            <dd>{{ activity().goalPct | number:'1.0-2' }}<small>% complete</small></dd>
+            <dt><span class="dot" data-ring="goal"></span>{{ activity().goal.label }}<small class="goal-tag">{{ goalTitle() }}</small></dt>
+            <dd>{{ activity().goal.value }}@if (activity().goal.unit) {<small> {{ activity().goal.unit }}</small>}</dd>
           </div>
         </dl>
       </div>
@@ -301,6 +303,15 @@
           }
         </div>
       </div>
+      @if (weightGoal(); as wg) {
+        <div class="weight-goal">
+          <div class="weight-goal-text">
+            <span>Target weight <strong>{{ wg.target | number:'1.0-1' }} kg</strong></span>
+            <span>{{ wg.pct }}% of the way</span>
+          </div>
+          <div class="track sm"><span class="fill" [style.width.%]="wg.pct"></span></div>
+        </div>
+      }
     </section>
 
     <section class="card area-routines">

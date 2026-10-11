@@ -39,12 +39,17 @@ export interface MuscleHeatmapZone {
 export interface UserDashboardSummary {
   greeting?: string;
   userName?: string;
+  showGymBuddy: boolean;
   goalTitle?: string | null;
   goalProgressPct: number;
+  targetWeight?: number | null;
   targetCalories: number;
   targetTrainingTime: number;
+  targetCaloriesBurn: number;
   caloriesBurnedToday: number;
   activeTrainingTimeMinutes: number;
+  cardioMinutesToday: number;
+  strengthSetsToday: number;
   workoutStreak: number;
   streakAtRisk: boolean;
   monthlySessionCount: number;
@@ -123,6 +128,13 @@ export interface NutritionToday {
   pct: number;
   macros: MacroProgress[];
   nextMeal: AssignedMealDto | null;
+}
+
+export interface GoalRing {
+  label: string;
+  pct: number;
+  value: string;
+  unit: string;
 }
 
 export interface ActivityRing {

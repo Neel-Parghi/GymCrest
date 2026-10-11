@@ -20,7 +20,7 @@
       <section class="card" [formGroup]="fitnessForm">
         <div class="card-head">
           <h2>Fitness goals</h2>
-          <p>These drive your dashboard rings and nutrition targets.</p>
+          <p>Your goal sets today's goal ring on the dashboard and the targets we suggest below.</p>
         </div>
 
         <div class="goal-grid" role="radiogroup" aria-label="Primary goal">
@@ -32,6 +32,26 @@
               <span class="goal-hint">{{ goal.hint }}</span>
             </button>
           }
+        </div>
+
+        <div class="pref-row">
+          <div class="field">
+            <span id="diet-label">Diet preference</span>
+            <div class="chip-row" role="radiogroup" aria-labelledby="diet-label">
+              @for (diet of dietTypes; track diet.value) {
+                <button type="button" role="radio" class="chip" [class.selected]="fitnessForm.controls.dietPreference.value === diet.value"
+                  [attr.aria-checked]="fitnessForm.controls.dietPreference.value === diet.value" [title]="diet.hint"
+                  (click)="selectDiet(diet.value)">
+                  <i [class]="diet.icon" aria-hidden="true"></i>{{ diet.label }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="field">
+            <span>Activity outside the gym</span>
+            <app-dropdown [options]="activityOptions" formControlName="activityLevel" placeholder="Select activity level"
+              minWidth="100%"></app-dropdown>
+          </div>
         </div>
 
         <div class="field-grid">
@@ -46,7 +66,7 @@
             </div>
           </div>
           <label class="field">
-            <span>Daily calories</span>
+            <span>Burn daily calories</span>
             <span class="input-unit" [class.invalid]="fitnessForm.controls.targetCalories.invalid">
               <input type="number" inputmode="numeric" formControlName="targetCalories" placeholder="e.g. 2200" min="0">
               <span class="unit">kcal</span>
@@ -87,28 +107,70 @@
               Macros add up to <strong>{{ check.kcal }} kcal</strong>{{ check.note }}
             </p>
           }
+
+          @if (suggestion(); as tip) {
+            <div class="suggestion" role="status">
+              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+              <p>
+                Suggested for {{ tip.goal }}: <strong>{{ tip.targetCalories }} kcal</strong> ·
+                {{ tip.targetProtein }} g protein · {{ tip.targetCarbs }} g carbs · {{ tip.targetFats }} g fats
+              </p>
+              <button type="button" class="btn-link" (click)="applySuggestion()">Use these</button>
+            </div>
+          }
+        </div>
+
+        <div class="plan-rebuild">
+          <span class="toggle-text">
+            <span class="toggle-title">Starter plans</span>
+            <span class="toggle-desc">
+              @if (isDirty()) {
+                Save your changes first, then build plans that match them.
+              } @else {
+                Build a fresh workout and diet plan for your goal, diet and schedule.
+              }
+            </span>
+          </span>
+          <button type="button" class="btn-secondary" (click)="rebuildPlans()" [disabled]="isDirty() || isRebuilding()">
+            {{ isRebuilding() ? 'Building…' : 'Build new plans' }}
+          </button>
         </div>
       </section>
 
-      <section class="card" [formGroup]="notificationsForm">
-        <div class="card-head">
-          <h2>Notifications</h2>
-        </div>
-        <label class="toggle-row">
-          <span class="toggle-text">
-            <span class="toggle-title">Email notifications</span>
-            <span class="toggle-desc">Master switch for optional emails from GymForge, like workout reminders.</span>
-          </span>
-          <input type="checkbox" role="switch" class="switch" formControlName="emailNotifications">
-        </label>
-        <label class="toggle-row">
-          <span class="toggle-text">
-            <span class="toggle-title">Workout reminders</span>
-            <span class="toggle-desc">A morning email if you have a workout scheduled today and haven't logged it yet.</span>
-          </span>
-          <input type="checkbox" role="switch" class="switch" formControlName="workoutReminders">
-        </label>
-      </section>
+      <div class="side-stack">
+        <section class="card" [formGroup]="notificationsForm">
+          <div class="card-head">
+            <h2>Notifications</h2>
+          </div>
+          <label class="toggle-row">
+            <span class="toggle-text">
+              <span class="toggle-title">Email notifications</span>
+              <span class="toggle-desc">Master switch for optional emails from GymForge, like workout reminders.</span>
+            </span>
+            <input type="checkbox" role="switch" class="switch" formControlName="emailNotifications">
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-text">
+              <span class="toggle-title">Workout reminders</span>
+              <span class="toggle-desc">A morning email if you have a workout scheduled today and haven't logged it yet.</span>
+            </span>
+            <input type="checkbox" role="switch" class="switch" formControlName="workoutReminders">
+          </label>
+        </section>
+
+        <section class="card" [formGroup]="dashboardForm">
+          <div class="card-head">
+            <h2>Dashboard</h2>
+          </div>
+          <label class="toggle-row">
+            <span class="toggle-text">
+              <span class="toggle-title">Gym buddy</span>
+              <span class="toggle-desc">Show Forgie, the coach who cheers you on from your dashboard.</span>
+            </span>
+            <input type="checkbox" role="switch" class="switch" formControlName="showGymBuddy">
+          </label>
+        </section>
+      </div>
     </div>
 
     <div class="save-bar">

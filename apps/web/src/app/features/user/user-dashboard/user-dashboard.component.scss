@@ -686,6 +686,17 @@
     color: var(--m-muted);
   }
 
+  .goal-tag {
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 0.8;
+
+    &::before {
+      content: '· ';
+    }
+  }
+
   dd {
     margin: 0;
     @include m.display-number;
@@ -956,6 +967,25 @@
 
 .cdk-drag-placeholder {
   opacity: 0.3;
+}
+
+.weight-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.weight-goal-text {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--m-muted);
+
+  strong {
+    color: var(--m-ink);
+  }
 }
 
 .stat-tiles {

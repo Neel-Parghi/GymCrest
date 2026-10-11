@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { catchError, map, of, startWith } from 'rxjs';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { UserService } from '../../../core/services/user.service';
 import { ProfileService } from '../../../core/services/profile.service';
@@ -10,26 +11,70 @@ import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.
 import { DateTimePickerComponent } from '../../../shared/components/date-time-picker/date-time-picker.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ValidationMessage } from '../../../shared/components/validation-message/validation-message.component';
+import {
+  ACTIVITY_LEVELS, ActivityLevel, DIET_TYPES, DietType, FitnessGoalId
+} from '../../../shared/constants/fitness-preferences';
+import { SuggestedTargets } from '../../../core/models/user-settings.model';
+
+const DRAFT_KEY = 'gymForge_userWizardDraft_v2';
+/** Drafts saved by the earlier three-step wizard; their step numbers no longer line up. */
+const LEGACY_DRAFT_KEY = 'gymForge_userWizardDraft';
+const STEP_COUNT = 4;
+const DEFAULT_SESSION_MINUTES = 60;
+const LIMITATIONS_MAX_LENGTH = 300;
+
+type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+
+interface MetricsForm {
+  gender: FormControl<string>;
+  dob: FormControl<Date | string | null>;
+  height: FormControl<number | null>;
+  weight: FormControl<number | null>;
+  targetWeight: FormControl<number | null>;
+  activityLevel: FormControl<ActivityLevel | null>;
+}
+
+interface PlanForm {
+  trainingDaysPerWeek: FormControl<number | null>;
+  sessionLengthMinutes: FormControl<number>;
+  dietPreference: FormControl<DietType | null>;
+  limitations: FormControl<string>;
+}
+
+interface WizardDraft {
+  currentStep: number;
+  selectedGoal: FitnessGoalId | null;
+  selectedExperienceLevel: ExperienceLevel | null;
+  metricsForm: ReturnType<FormGroup<MetricsForm>['getRawValue']>;
+  planForm: ReturnType<FormGroup<PlanForm>['getRawValue']>;
+}
 
 @Component({
   selector: 'app-user-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, DropdownComponent, DateTimePickerComponent, LoadingComponent, ValidationMessage],
+  imports: [ReactiveFormsModule, DropdownComponent, DateTimePickerComponent, LoadingComponent, ValidationMessage],
   templateUrl: './user-wizard.component.html',
-  styleUrls: ['./user-wizard.component.scss']
+  styleUrls: ['./user-wizard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserWizardComponent implements OnInit {
-  currentStep = 1;
-  isSubmitting = false;
+  private authService = inject(AuthApiService);
+  private router = inject(Router);
+  private toastr = inject(ToastrService);
+  private userService = inject(UserService);
+  private profileService = inject(ProfileService);
+  private destroyRef = inject(DestroyRef);
 
-  metricsForm: FormGroup;
-  calculatedAge: number | null = null;
-  calculatedBmi: number | null = null;
-  bmiStatus: 'under' | 'normal' | 'over' | null = null;
-  maxDobDate: Date;
-  minDobDate: Date;
+  readonly limitationsMaxLength = LIMITATIONS_MAX_LENGTH;
 
-  goals = [
+  readonly steps = [
+    { title: 'Goal', desc: 'What you want to achieve' },
+    { title: 'About you', desc: 'Body and daily activity' },
+    { title: 'Training & diet', desc: 'Schedule and food' },
+    { title: 'Review', desc: 'Check your plan' }
+  ];
+
+  readonly goals: { id: FitnessGoalId; label: string; icon: string; desc: string; image: string }[] = [
     { id: 'weight_loss', label: 'Weight Loss', icon: 'fi-rr-fire', desc: 'Burn fat and get leaner', image: '/images/goals/weight_loss.png' },
     { id: 'muscle_gain', label: 'Muscle Gain', icon: 'fi-rr-gym', desc: 'Build size and strength', image: '/images/goals/muscle_gain.png' },
     { id: 'endurance', label: 'Endurance', icon: 'fi-rr-running', desc: 'Improve cardiovascular health', image: '/images/goals/endurance.png' },
@@ -37,202 +82,209 @@ export class UserWizardComponent implements OnInit {
     { id: 'general_fitness', label: 'General Fitness', icon: 'fi-rr-heart-pulse', desc: 'Stay active and healthy', image: '/images/goals/general_fitness.png' }
   ];
 
-  goalOptions = this.goals.map(g => ({ label: g.label, value: g.id }));
-
-  experienceLevels = [
-    { id: 'Beginner', label: 'Beginner', desc: 'New to structured training' },
-    { id: 'Intermediate', label: 'Intermediate', desc: 'Training consistently for a while' },
-    { id: 'Advanced', label: 'Advanced', desc: 'Experienced with structured programs' }
+  readonly experienceLevels: { id: ExperienceLevel; label: string; desc: string; days: number }[] = [
+    { id: 'Beginner', label: 'Beginner', desc: 'New to structured training', days: 3 },
+    { id: 'Intermediate', label: 'Intermediate', desc: 'Training consistently for a while', days: 4 },
+    { id: 'Advanced', label: 'Advanced', desc: 'Experienced with structured programs', days: 5 }
   ];
 
-  genderOptions = [
+  readonly activityLevels = ACTIVITY_LEVELS;
+  readonly dietTypes = DIET_TYPES;
+  readonly trainingDayOptions = [2, 3, 4, 5, 6];
+  readonly sessionLengthOptions = [30, 45, 60, 75, 90];
+
+  readonly genderOptions = [
     { label: 'Male', value: 'Male' },
     { label: 'Female', value: 'Female' },
     { label: 'Other', value: 'Other' }
   ];
 
-  selectedGoal: string | null = null;
-  selectedExperienceLevel: string | null = null;
+  readonly maxDobDate: Date;
+  readonly minDobDate: Date;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthApiService,
-    private router: Router,
-    private toastr: ToastrService,
-    private userService: UserService,
-    private profileService: ProfileService
-  ) {
-    const today = new Date();
-    this.maxDobDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
-    this.minDobDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+  readonly currentStep = signal(1);
+  readonly isSubmitting = signal(false);
+  readonly selectedGoal = signal<FitnessGoalId | null>(null);
+  readonly selectedExperienceLevel = signal<ExperienceLevel | null>(null);
+  /** Targets for the review step; undefined while loading, null when they couldn't be worked out. */
+  readonly previewTargets = signal<SuggestedTargets | null | undefined>(undefined);
 
-    this.metricsForm = this.fb.group({
-      height: ['', [Validators.required, Validators.min(50), Validators.max(300)]],
-      weight: ['', [Validators.required, Validators.min(20), Validators.max(500)]],
-      targetWeight: ['', [Validators.min(20), Validators.max(500)]],
-      dob: ['', [Validators.required]],
-      gender: ['', Validators.required]
-    });
-  }
+  readonly metricsForm = new FormGroup<MetricsForm>({
+    gender: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    dob: new FormControl<Date | string | null>(null, [Validators.required]),
+    height: new FormControl<number | null>(null, [Validators.required, Validators.min(50), Validators.max(300)]),
+    weight: new FormControl<number | null>(null, [Validators.required, Validators.min(20), Validators.max(500)]),
+    targetWeight: new FormControl<number | null>(null, [Validators.min(20), Validators.max(500)]),
+    activityLevel: new FormControl<ActivityLevel | null>(null, [Validators.required])
+  });
 
-  allowNumbersOnly(event: KeyboardEvent) {
-    const charCode = event.which ? event.which : event.keyCode;
-    // Allow numbers (48-57) and period (46) for decimals
-    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-      event.preventDefault();
-    }
-  }
+  readonly planForm = new FormGroup<PlanForm>({
+    trainingDaysPerWeek: new FormControl<number | null>(null, [Validators.required]),
+    sessionLengthMinutes: new FormControl(DEFAULT_SESSION_MINUTES, { nonNullable: true }),
+    dietPreference: new FormControl<DietType | null>(null, [Validators.required]),
+    limitations: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(LIMITATIONS_MAX_LENGTH)] })
+  });
 
-  clampValue(controlName: string, max: number) {
-    const control = this.metricsForm.get(controlName);
-    if (control && control.value !== null && control.value !== '') {
-      if (Number(control.value) > max) {
-        control.setValue(max);
-      }
-    }
-  }
+  private readonly metrics = toSignal(
+    this.metricsForm.valueChanges.pipe(map(() => this.metricsForm.getRawValue()), startWith(this.metricsForm.getRawValue())),
+    { requireSync: true }
+  );
 
-  ngOnInit(): void {
-    this.loadDraft();
-    const user = this.authService.getUserProfile();
+  private readonly plan = toSignal(
+    this.planForm.valueChanges.pipe(map(() => this.planForm.getRawValue()), startWith(this.planForm.getRawValue())),
+    { requireSync: true }
+  );
 
-    if (user && user.currentOnboardingStep) {
-      const draft = localStorage.getItem('gymForge_userWizardDraft');
-      if (!draft && user.currentOnboardingStep > 1) {
-        this.currentStep = user.currentOnboardingStep;
-      }
-    }
-
-    this.metricsForm.valueChanges.subscribe((value) => {
-      this.calculateAge(value.dob);
-      this.calculateBmi(value.height, value.weight);
-      this.saveDraft();
-    });
-  }
-
-  calculateAge(dob: string) {
-    if (!dob) {
-      this.calculatedAge = null;
-      return;
-    }
+  readonly calculatedAge = computed(() => {
+    const dob = this.metrics().dob;
+    if (!dob) return null;
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  });
+
+  readonly bmi = computed(() => {
+    const { height, weight } = this.metrics();
+    if (!height || !weight || height <= 0 || weight <= 0) return null;
+    const heightM = height / 100;
+    const value = parseFloat((weight / (heightM * heightM)).toFixed(1));
+    const status = value < 18.5 ? 'under' : value >= 25 ? 'over' : 'normal';
+    return { value, status };
+  });
+
+  readonly canContinue = computed(() => {
+    this.metrics();
+    this.plan();
+    switch (this.currentStep()) {
+      case 1: return !!this.selectedGoal() && !!this.selectedExperienceLevel();
+      case 2: return this.metricsForm.valid;
+      case 3: return this.planForm.valid;
+      default: return true;
     }
-    this.calculatedAge = age;
+  });
+
+  /** What the review step lists, one row per answer, with the step to go back to for changes. */
+  readonly review = computed(() => {
+    const m = this.metrics();
+    const p = this.plan();
+    const goal = this.goals.find(g => g.id === this.selectedGoal());
+    const level = this.experienceLevels.find(l => l.id === this.selectedExperienceLevel());
+    const activity = this.activityLevels.find(a => a.value === m.activityLevel);
+    const diet = this.dietTypes.find(d => d.value === p.dietPreference);
+    const body = [`${m.height ?? '-'} cm`, `${m.weight ?? '-'} kg`, m.targetWeight ? `target ${m.targetWeight} kg` : null]
+      .filter(Boolean).join(' · ');
+    return [
+      { label: 'Goal', value: `${goal?.label ?? '-'} · ${level?.label ?? '-'}`, step: 1 },
+      { label: 'Body', value: body, step: 2 },
+      { label: 'Daily activity', value: activity?.label ?? '-', step: 2 },
+      { label: 'Training', value: `${p.trainingDaysPerWeek ?? '-'} days a week · ${p.sessionLengthMinutes} min sessions`, step: 3 },
+      { label: 'Diet', value: diet?.label ?? '-', step: 3 },
+      ...(p.limitations.trim() ? [{ label: 'Limitations', value: p.limitations.trim(), step: 3 }] : [])
+    ];
+  });
+
+  constructor() {
+    const today = new Date();
+    this.maxDobDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+    this.minDobDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
   }
 
-  calculateBmi(heightCm: number, weightKg: number) {
-    if (heightCm > 0 && weightKg > 0) {
-      const heightM = heightCm / 100;
-      this.calculatedBmi = parseFloat((weightKg / (heightM * heightM)).toFixed(1));
-
-      if (this.calculatedBmi < 18.5) {
-        this.bmiStatus = 'under';
-      } else if (this.calculatedBmi >= 25) {
-        this.bmiStatus = 'over';
-      } else {
-        this.bmiStatus = 'normal';
-      }
-    } else {
-      this.calculatedBmi = null;
-      this.bmiStatus = null;
+  ngOnInit(): void {
+    localStorage.removeItem(LEGACY_DRAFT_KEY);
+    const hasDraft = this.loadDraft();
+    const user = this.authService.getUserProfile();
+    if (!hasDraft && user?.currentOnboardingStep && user.currentOnboardingStep > 1) {
+      this.goToStep(Math.min(user.currentOnboardingStep, STEP_COUNT));
     }
+
+    this.metricsForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.saveDraft());
+    this.planForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.saveDraft());
   }
 
-  saveDraft() {
-    const draft = {
-      currentStep: this.currentStep,
-      selectedGoal: this.selectedGoal,
-      selectedExperienceLevel: this.selectedExperienceLevel,
-      metricsForm: this.metricsForm.value
-    };
-    localStorage.setItem('gymForge_userWizardDraft', JSON.stringify(draft));
+  allowNumbersOnly(event: KeyboardEvent): void {
+    const isDigit = event.key.length === 1 && /[0-9.]/.test(event.key);
+    if (event.key.length === 1 && !isDigit) event.preventDefault();
   }
 
-  loadDraft() {
-    const draftStr = localStorage.getItem('gymForge_userWizardDraft');
-    if (draftStr) {
-      try {
-        const draft = JSON.parse(draftStr);
-        if (draft.currentStep) this.currentStep = draft.currentStep;
-        if (draft.selectedGoal) this.selectedGoal = draft.selectedGoal;
-        if (draft.selectedExperienceLevel) this.selectedExperienceLevel = draft.selectedExperienceLevel;
-        if (draft.metricsForm) {
-          this.metricsForm.patchValue(draft.metricsForm, { emitEvent: false });
-        }
-      } catch (e) {
-        console.error('Failed to parse wizard draft', e);
-      }
-    }
+  clampValue(control: FormControl<number | null>, max: number): void {
+    if (control.value !== null && Number(control.value) > max) control.setValue(max);
   }
 
-  selectGoal(goalId: string) {
-    this.selectedGoal = goalId;
+  selectGoal(goalId: FitnessGoalId): void {
+    this.selectedGoal.set(goalId);
     this.saveDraft();
   }
 
-  selectExperienceLevel(levelId: string) {
-    this.selectedExperienceLevel = levelId;
+  selectExperienceLevel(levelId: ExperienceLevel): void {
+    this.selectedExperienceLevel.set(levelId);
+    // Suggest a schedule that suits the level until the member picks one themselves.
+    const days = this.planForm.controls.trainingDaysPerWeek;
+    if (!days.dirty) days.setValue(this.experienceLevels.find(l => l.id === levelId)?.days ?? 3);
     this.saveDraft();
   }
 
-  nextStep() {
-    if (this.currentStep === 1) {
-      this.currentStep = 2;
-      this.saveStep(2);
-      this.saveDraft();
-    } else if (this.currentStep === 2) {
-      if (!this.selectedGoal) {
-        this.toastr.warning('Please select a primary goal.');
-        return;
-      }
-      if (!this.selectedExperienceLevel) {
-        this.toastr.warning('Please select your experience level.');
-        return;
-      }
-      this.currentStep = 3;
-      this.saveStep(3);
-      this.saveDraft();
-    }
+  selectOption<T>(control: FormControl<T>, value: T): void {
+    control.markAsDirty();
+    control.setValue(value);
   }
 
-  prevStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-      this.saveDraft();
+  nextStep(): void {
+    if (!this.canContinue()) {
+      if (this.currentStep() === 2) this.metricsForm.markAllAsTouched();
+      if (this.currentStep() === 3) this.planForm.markAllAsTouched();
+      this.toastr.warning('Please complete this step to continue.');
+      return;
     }
+    const next = this.currentStep() + 1;
+    this.goToStep(next);
+    this.userService.saveOnboardingStep(next).subscribe();
   }
 
-  logout() {
-    localStorage.removeItem('gymForge_userWizardDraft');
+  prevStep(): void {
+    if (this.currentStep() > 1) this.goToStep(this.currentStep() - 1);
+  }
+
+  goToStep(step: number): void {
+    this.currentStep.set(step);
+    if (step === STEP_COUNT) this.loadPreviewTargets();
+    this.saveDraft();
+  }
+
+  logout(): void {
+    localStorage.removeItem(DRAFT_KEY);
     this.authService.logout();
   }
 
-  saveStep(step: number) {
-    this.userService.saveOnboardingStep(step).subscribe();
-  }
-
-  submitMetrics() {
-    if (this.metricsForm.invalid || !this.selectedGoal) {
-      this.metricsForm.markAllAsTouched();
+  submit(): void {
+    if (this.metricsForm.invalid || this.planForm.invalid || !this.selectedGoal()) {
+      this.toastr.warning('Some answers are missing. Please go back and complete them.');
       return;
     }
 
-    this.isSubmitting = true;
-
+    this.isSubmitting.set(true);
+    const m = this.metricsForm.getRawValue();
+    const p = this.planForm.getRawValue();
     const payload = {
-      primaryGoal: this.selectedGoal,
-      experienceLevel: this.selectedExperienceLevel,
-      ...this.metricsForm.value
+      primaryGoal: this.selectedGoal(),
+      experienceLevel: this.selectedExperienceLevel(),
+      gender: m.gender,
+      dob: m.dob,
+      height: m.height,
+      weight: m.weight,
+      targetWeight: m.targetWeight || null,
+      activityLevel: m.activityLevel,
+      dietPreference: p.dietPreference,
+      trainingDaysPerWeek: p.trainingDaysPerWeek,
+      sessionLengthMinutes: p.sessionLengthMinutes,
+      limitations: p.limitations.trim() || null
     };
 
     this.userService.completeOnboarding(payload).subscribe({
       next: () => {
-        localStorage.removeItem('gymForge_userWizardDraft');
+        localStorage.removeItem(DRAFT_KEY);
         this.toastr.success('Your profile is set up!');
 
         const navigateToDashboard = () => {
@@ -251,9 +303,72 @@ export class UserWizardComponent implements OnInit {
         });
       },
       error: () => {
-        this.toastr.error('Failed to save metrics');
-        this.isSubmitting = false;
+        this.toastr.error('Failed to save your profile. Please try again.');
+        this.isSubmitting.set(false);
       }
     });
+  }
+
+  private loadPreviewTargets(): void {
+    const m = this.metricsForm.getRawValue();
+    const p = this.planForm.getRawValue();
+    if (!m.height || !m.weight || !m.dob) {
+      this.previewTargets.set(null);
+      return;
+    }
+
+    this.previewTargets.set(undefined);
+    this.userService.previewOnboardingTargets({
+      primaryGoal: this.selectedGoal(),
+      experienceLevel: this.selectedExperienceLevel(),
+      activityLevel: m.activityLevel,
+      dietPreference: p.dietPreference,
+      trainingDaysPerWeek: p.trainingDaysPerWeek,
+      sessionLengthMinutes: p.sessionLengthMinutes,
+      heightCm: m.height,
+      weightKg: m.weight,
+      dateOfBirth: m.dob,
+      gender: m.gender
+    }).pipe(
+      map(res => (res?.data ?? null) as SuggestedTargets | null),
+      catchError(() => of(null)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(targets => this.previewTargets.set(targets));
+  }
+
+  private saveDraft(): void {
+    const draft: WizardDraft = {
+      currentStep: this.currentStep(),
+      selectedGoal: this.selectedGoal(),
+      selectedExperienceLevel: this.selectedExperienceLevel(),
+      metricsForm: this.metricsForm.getRawValue(),
+      planForm: this.planForm.getRawValue()
+    };
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      // Storage can be full or blocked; the draft is only a convenience.
+    }
+  }
+
+  /** Restores answers from a previous visit; returns whether a draft was found. */
+  private loadDraft(): boolean {
+    const draftStr = localStorage.getItem(DRAFT_KEY);
+    if (!draftStr) return false;
+    try {
+      const draft = JSON.parse(draftStr) as Partial<WizardDraft>;
+      if (draft.selectedGoal) this.selectedGoal.set(draft.selectedGoal);
+      if (draft.selectedExperienceLevel) this.selectedExperienceLevel.set(draft.selectedExperienceLevel);
+      if (draft.metricsForm) this.metricsForm.patchValue(draft.metricsForm);
+      if (draft.planForm) {
+        this.planForm.patchValue(draft.planForm);
+        if (draft.planForm.trainingDaysPerWeek) this.planForm.controls.trainingDaysPerWeek.markAsDirty();
+      }
+      if (draft.currentStep) this.goToStep(Math.min(draft.currentStep, STEP_COUNT));
+      return true;
+    } catch (e) {
+      console.error('Failed to parse wizard draft', e);
+      return false;
+    }
   }
 }

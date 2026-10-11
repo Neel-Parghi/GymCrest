@@ -1,4 +1,5 @@
 using GymForge.Contracts.Common;
+using GymForge.Contracts.PlanGeneration;
 using GymForge.Contracts.Users;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Http;
@@ -40,6 +41,12 @@ namespace GymForge.Application.Modules.Users.Interface
         Task SaveOnboardingStepAsync(Guid userId, int step);
 
         Task CompleteUserOnboardingAsync(Guid userId, CompleteUserOnboardingDto dto);
+
+        Task<StarterPlanResultDto?> GetSuggestedTargetsAsync(string? goal, string? activityLevel);
+
+        StarterPlanResultDto PreviewTargets(StarterPlanProfileDto profile);
+
+        Task<StarterPlanResultDto> RegenerateStarterPlansAsync();
 
         Task<UserDashboardSummaryDto> GetUserDashboardSummaryAsync();
         

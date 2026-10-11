@@ -3,6 +3,7 @@ using GymForge.Application.Modules.Diet.Interface;
 using GymForge.Contracts.DietPlan;
 using GymForge.Domain.Entities;
 using GymForge.Domain.Interface;
+using GymForge.Shared.Constants;
 
 namespace GymForge.Application.Modules.Diet.Services
 {
@@ -38,6 +39,7 @@ namespace GymForge.Application.Modules.Diet.Services
             plan.CreatedBy = createdById;
             plan.IsCustom = request.IsCustom;
             plan.IsTemplate = request.IsTemplate;
+            plan.DietType = DietTypes.Normalize(request.DietType);
             plan.Calories = Convert.ToInt32((plan.Protein * 4) + (plan.Carbs * 4) + (plan.Fats * 9));
 
             DietPlan created = await _dietPlanRepository.CreatePlanAsync(plan);
@@ -62,6 +64,7 @@ namespace GymForge.Application.Modules.Diet.Services
             existingPlan.Fats = request.Fats;
             existingPlan.Calories = Convert.ToInt32((request.Protein * 4) + (request.Carbs * 4) + (request.Fats * 9));
             existingPlan.Goal = request.Goal;
+            existingPlan.DietType = DietTypes.Normalize(request.DietType);
             existingPlan.IsCustom = request.IsCustom;
             existingPlan.IsTemplate = request.IsTemplate;
             existingPlan.ModifiedBy = modifiedById;

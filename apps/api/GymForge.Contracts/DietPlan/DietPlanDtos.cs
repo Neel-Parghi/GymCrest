@@ -10,6 +10,7 @@ namespace GymForge.Contracts.DietPlan
         public decimal Fats { get; set; }
         public int Calories { get; set; }
         public string Goal { get; set; } = "Maintenance";
+        public string? DietType { get; set; } // veg, eggetarian, non_veg, vegan;
         public Guid? GymId { get; set; }
         public Guid CreatedBy { get; set; }
         public bool IsCustom { get; set; } = false;
@@ -39,6 +40,7 @@ namespace GymForge.Contracts.DietPlan
         public decimal Carbs { get; set; }
         public decimal Fats { get; set; }
         public string Goal { get; set; } = "Maintenance";
+        public string? DietType { get; set; } // veg, eggetarian, non_veg, vegan;
         public bool IsCustom { get; set; } = false;
         public bool IsTemplate { get; set; } = true;
         public List<CreateDietPlanMealDto> Meals { get; set; } = [];
@@ -53,6 +55,7 @@ namespace GymForge.Contracts.DietPlan
         public decimal Carbs { get; set; }
         public decimal Fats { get; set; }
         public string Goal { get; set; } = "Maintenance";
+        public string? DietType { get; set; } // veg, eggetarian, non_veg, vegan;
         public bool IsCustom { get; set; } = false;
         public bool IsTemplate { get; set; } = true;
         public List<CreateDietPlanMealDto> Meals { get; set; } = [];

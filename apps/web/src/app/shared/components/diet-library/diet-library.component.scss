@@ -77,6 +77,13 @@
   color: var(--m-muted);
 }
 
+.toolbar-link {
+  @include m.reset-button;
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--m-accent);
+}
+
 .catalog {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));

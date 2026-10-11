@@ -8,6 +8,8 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SegmentedTabsComponent } from '../../../shared/components/segmented-tabs/segmented-tabs.component';
 import { SegmentedTab } from '../../../shared/models/segmented-tab.model';
+import { UserService } from '../../../core/services/user.service';
+import { DietType } from '../../../shared/constants/fitness-preferences';
 
 @Component({
   selector: 'app-user-diet-planner',
@@ -22,6 +24,7 @@ export class UserDietPlannerComponent implements OnInit {
   private notification = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private userService = inject(UserService);
 
   readonly tabs: SegmentedTab[] = [
     { id: 'today', label: 'Today' },
@@ -36,9 +39,14 @@ export class UserDietPlannerComponent implements OnInit {
   activeDiet: any = null;
   dietPlans: any[] = [];
   showAssignDietModal = false;
+  dietPreference: DietType | null = null;
 
   ngOnInit() {
     this.viewMode = this.route.snapshot.queryParamMap.get('view') === 'library' ? 'library' : 'active';
+
+    this.userService.getPreferences().subscribe(res => {
+      this.dietPreference = (res?.data as { dietPreference?: DietType | null } | null)?.dietPreference ?? null;
+    });
 
     this.authService.userProfile$.subscribe(profile => {
       if (profile) {

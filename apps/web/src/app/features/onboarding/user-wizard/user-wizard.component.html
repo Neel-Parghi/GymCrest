@@ -1,5 +1,6 @@
-<app-loading *ngIf="isSubmitting" overlay="true" message="Setting up your dashboard..."></app-loading>
-
+@if (isSubmitting()) {
+  <app-loading overlay="true" message="Building your plan..."></app-loading>
+}
 <div class="auth-page-wrapper full-screen-wizard">
   <main class="auth-main full-screen">
     <div class="wizard-layout">
@@ -11,31 +12,19 @@
           </div>
           <p class="sidebar-subtitle">Member Setup</p>
         </div>
-
         <div class="stepper-vertical">
-          <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
-            <div class="step-circle">1</div>
-            <div class="step-content">
-              <div class="step-title">Welcome</div>
-              <div class="step-desc">Get started</div>
+          @for (step of steps; track step.title; let i = $index) {
+            <div class="step-item" [class.active]="currentStep() === i + 1" [class.completed]="currentStep() > i + 1">
+              <div class="step-circle">{{ i + 1 }}</div>
+              <div class="step-content">
+                <div class="step-title">{{ step.title }}</div>
+                <div class="step-desc">{{ step.desc }}</div>
+              </div>
+              @if (i < steps.length - 1) {
+                <div class="step-connector"></div>
+              }
             </div>
-            <div class="step-connector"></div>
-          </div>
-          <div class="step-item" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
-            <div class="step-circle">2</div>
-            <div class="step-content">
-              <div class="step-title">Goals</div>
-              <div class="step-desc">Set your target</div>
-            </div>
-            <div class="step-connector"></div>
-          </div>
-          <div class="step-item" [class.active]="currentStep === 3" [class.completed]="currentStep > 3">
-            <div class="step-circle">3</div>
-            <div class="step-content">
-              <div class="step-title">Metrics</div>
-              <div class="step-desc">Physical details</div>
-            </div>
-          </div>
+          }
         </div>
       </div>
 
@@ -43,165 +32,190 @@
       <div class="wizard-main">
         <div class="wizard-content-wrapper">
           <div class="wizard-content-inner">
+            <span class="step-count">Step {{ currentStep() }} of {{ steps.length }}</span>
 
-            <form [formGroup]="metricsForm" class="onboarding-form">
-
-              <!-- Step 1: Welcome -->
-              @if (currentStep === 1) {
-              <div class="step-pane welcome-pane stunning-welcome">
-                <div class="hero-banner">
-                  <div class="banner-bg"></div>
-                  <div class="banner-content">
-                    <h1>Welcome to GymForge.</h1>
-                    <p>Your transformation begins here.</p>
-                  </div>
-                </div>
-
-                <div class="features-image-grid">
-                  <div class="feature-image-card">
-                    <div class="bg-image bg-muscle-gain"></div>
-                    <div class="gradient-overlay"></div>
-                    <div class="card-content">
-                      <div class="text-content">
-                        <h3>Plan Workout</h3>
-                        <p>Create and customize your daily routines.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="feature-image-card">
-                    <div class="bg-image bg-feature-diet"></div>
-                    <div class="gradient-overlay"></div>
-                    <div class="card-content">
-                      <div class="text-content">
-                        <h3>Diet & Nutrition</h3>
-                        <p>Personalized macros and meal plans.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="feature-image-card">
-                    <div class="bg-image bg-feature-progress"></div>
-                    <div class="gradient-overlay"></div>
-                    <div class="card-content">
-                      <div class="text-content">
-                        <h3>Track Progress</h3>
-                        <p>Monitor your daily gains and stats.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="feature-image-card">
-                    <div class="bg-image bg-general-fitness"></div>
-                    <div class="gradient-overlay"></div>
-                    <div class="card-content">
-                      <div class="text-content">
-                        <h3>Unlock Features</h3>
-                        <p>Check-ins, leaderboards and much more.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              }
-
-              <!-- Step 2: Goals Selection -->
-              @if (currentStep === 2) {
+            <!-- Step 1: Goal & experience -->
+            @if (currentStep() === 1) {
               <div class="step-pane goals-pane">
-                <h2>What is your primary fitness goal?</h2>
-                <p class="subtitle">This helps us tailor your experience and recommendations.</p>
-
+                <h2>Welcome to GymForge. What's your main goal?</h2>
+                <p class="subtitle">We'll build your starter workout and diet plan around it. You can change it later in Settings.</p>
                 <div class="goals-grid-enriched">
                   @for (goal of goals; track goal.id) {
-                  <div class="goal-card-enriched image-card" [class.selected]="selectedGoal === goal.id"
-                    (click)="selectGoal(goal.id)">
-                    <div class="bg-image" [style.backgroundImage]="'url(' + goal.image + ')'"></div>
-                    <div class="gradient-overlay"></div>
-                    <div class="card-content">
-                      <div class="text-content">
-                        <h3><i [class]="goal.icon" class="goal-icon"></i>{{ goal.label }}</h3>
-                        <p>{{ goal.desc }}</p>
+                    <button type="button" class="goal-card-enriched image-card" [class.selected]="selectedGoal() === goal.id"
+                      [attr.aria-pressed]="selectedGoal() === goal.id" (click)="selectGoal(goal.id)">
+                      <div class="bg-image" [style.backgroundImage]="'url(' + goal.image + ')'"></div>
+                      <div class="gradient-overlay"></div>
+                      <div class="card-content">
+                        <div class="text-content">
+                          <h3><i [class]="goal.icon" class="goal-icon"></i>{{ goal.label }}</h3>
+                          <p>{{ goal.desc }}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="selection-ring"></div>
-                  </div>
+                      <div class="selection-ring"></div>
+                    </button>
                   }
                 </div>
-
                 <h2 class="level-heading">What's your experience level?</h2>
-                <p class="subtitle">This helps us build a workout intensity that's right for you.</p>
-
+                <p class="subtitle">This sets how hard your starter program pushes you.</p>
                 <div class="level-selector">
                   @for (level of experienceLevels; track level.id) {
-                  <div class="level-card" [class.selected]="selectedExperienceLevel === level.id"
-                    (click)="selectExperienceLevel(level.id)">
-                    <h4>{{ level.label }}</h4>
-                    <p>{{ level.desc }}</p>
-                  </div>
+                    <button type="button" class="level-card" [class.selected]="selectedExperienceLevel() === level.id"
+                      [attr.aria-pressed]="selectedExperienceLevel() === level.id" (click)="selectExperienceLevel(level.id)">
+                      <h4>{{ level.label }}</h4>
+                      <p>{{ level.desc }}</p>
+                    </button>
                   }
                 </div>
               </div>
-              }
+            }
 
-              <!-- Step 3: Physical Metrics -->
-              @if (currentStep === 3) {
-              <div class="step-pane metrics-pane">
+            <!-- Step 2: About you -->
+            @if (currentStep() === 2) {
+              <div class="step-pane metrics-pane" [formGroup]="metricsForm">
                 <h2>Tell us about yourself</h2>
-                <p class="subtitle">These metrics are kept private and only used to calculate your progress.</p>
-
+                <p class="subtitle">We use these to work out your calorie and macro targets. They stay private.</p>
                 <div class="form-row">
                   <div class="form-group">
                     <label>Gender *</label>
-                    <app-dropdown [options]="genderOptions" formControlName="gender"
-                      placeholder="Select Gender"></app-dropdown>
+                    <app-dropdown [options]="genderOptions" formControlName="gender" placeholder="Select Gender"></app-dropdown>
                   </div>
                   <div class="form-group">
                     <label>Date of Birth *</label>
                     <div class="dob-container">
                       <app-date-time-picker formControlName="dob" [enableTime]="false" [minDate]="minDobDate"
                         [maxDate]="maxDobDate" class="dob-picker"></app-date-time-picker>
-                      <span *ngIf="calculatedAge !== null" class="age-text">Age: {{ calculatedAge }}</span>
+                      @if (calculatedAge() !== null) {
+                        <span class="age-text">Age: {{ calculatedAge() }}</span>
+                      }
                     </div>
                   </div>
                 </div>
-
                 <div class="form-row">
                   <div class="form-group">
                     <label>Height (cm) *</label>
                     <input type="number" formControlName="height" placeholder="e.g. 175" class="form-control" min="50"
-                      max="300" (keypress)="allowNumbersOnly($event)" (input)="clampValue('height', 300)">
-                    <app-validation-message [control]="metricsForm.get('height')"
-                      fieldName="Height"></app-validation-message>
+                      max="300" (keydown)="allowNumbersOnly($event)" (input)="clampValue(metricsForm.controls.height, 300)">
+                    <app-validation-message [control]="metricsForm.controls.height" fieldName="Height"></app-validation-message>
                   </div>
                   <div class="form-group">
                     <label>Current Weight (kg) *</label>
-                    <input type="number" step="0.1" formControlName="weight" placeholder="e.g. 70.5"
-                      class="form-control" min="20" max="500" (keypress)="allowNumbersOnly($event)"
-                      (input)="clampValue('weight', 500)">
-                    <app-validation-message [control]="metricsForm.get('weight')"
-                      fieldName="Weight"></app-validation-message>
+                    <input type="number" step="0.1" formControlName="weight" placeholder="e.g. 70.5" class="form-control"
+                      min="20" max="500" (keydown)="allowNumbersOnly($event)" (input)="clampValue(metricsForm.controls.weight, 500)">
+                    <app-validation-message [control]="metricsForm.controls.weight" fieldName="Weight"></app-validation-message>
                   </div>
                 </div>
-
                 <div class="form-row">
                   <div class="form-group">
                     <label>Target Weight (kg) <em>(Optional)</em></label>
-                    <input type="number" step="0.1" formControlName="targetWeight" placeholder="e.g. 65.5"
-                      class="form-control" min="20" max="500" (keypress)="allowNumbersOnly($event)"
-                      (input)="clampValue('targetWeight', 500)">
-                    <app-validation-message [control]="metricsForm.get('targetWeight')"
-                      fieldName="Target Weight"></app-validation-message>
+                    <input type="number" step="0.1" formControlName="targetWeight" placeholder="e.g. 65.5" class="form-control"
+                      min="20" max="500" (keydown)="allowNumbersOnly($event)" (input)="clampValue(metricsForm.controls.targetWeight, 500)">
+                    <app-validation-message [control]="metricsForm.controls.targetWeight" fieldName="Target Weight"></app-validation-message>
                   </div>
                   <div class="form-group">
                     <label>Estimated BMI</label>
-                    <div class="gender-btn-custom"
-                      [ngClass]="{'bmi-normal': bmiStatus === 'normal', 'bmi-under': bmiStatus === 'under', 'bmi-over': bmiStatus === 'over'}">
-                      <span *ngIf="calculatedBmi !== null">{{ calculatedBmi }}</span>
-                      <span *ngIf="calculatedBmi === null">Enter height & weight</span>
+                    <div class="gender-btn-custom" [class.bmi-normal]="bmi()?.status === 'normal'"
+                      [class.bmi-under]="bmi()?.status === 'under'" [class.bmi-over]="bmi()?.status === 'over'">
+                      {{ bmi()?.value ?? 'Enter height & weight' }}
                     </div>
                   </div>
                 </div>
-              </div>
-              }
-            </form>
 
+                <h3 class="section-heading">How active are you outside the gym?</h3>
+                <div class="level-selector compact">
+                  @for (level of activityLevels; track level.value) {
+                    <button type="button" class="level-card" [class.selected]="metricsForm.controls.activityLevel.value === level.value"
+                      [attr.aria-pressed]="metricsForm.controls.activityLevel.value === level.value"
+                      (click)="selectOption(metricsForm.controls.activityLevel, level.value)">
+                      <h4><i [class]="level.icon" aria-hidden="true"></i> {{ level.label }}</h4>
+                      <p>{{ level.hint }}</p>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Step 3: Training & diet -->
+            @if (currentStep() === 3) {
+              <div class="step-pane plan-pane" [formGroup]="planForm">
+                <h2>Your training week</h2>
+                <p class="subtitle">We'll spread your workouts across the week with rest days in between.</p>
+
+                <h3 class="section-heading">Days per week</h3>
+                <div class="chip-select" role="radiogroup" aria-label="Training days per week">
+                  @for (days of trainingDayOptions; track days) {
+                    <button type="button" role="radio" class="chip" [class.selected]="planForm.controls.trainingDaysPerWeek.value === days"
+                      [attr.aria-checked]="planForm.controls.trainingDaysPerWeek.value === days"
+                      (click)="selectOption(planForm.controls.trainingDaysPerWeek, days)">{{ days }} days</button>
+                  }
+                </div>
+
+                <h3 class="section-heading">Time per session</h3>
+                <div class="chip-select" role="radiogroup" aria-label="Minutes per session">
+                  @for (minutes of sessionLengthOptions; track minutes) {
+                    <button type="button" role="radio" class="chip" [class.selected]="planForm.controls.sessionLengthMinutes.value === minutes"
+                      [attr.aria-checked]="planForm.controls.sessionLengthMinutes.value === minutes"
+                      (click)="selectOption(planForm.controls.sessionLengthMinutes, minutes)">{{ minutes }} min</button>
+                  }
+                </div>
+
+                <h3 class="section-heading">What do you eat?</h3>
+                <div class="level-selector compact">
+                  @for (diet of dietTypes; track diet.value) {
+                    <button type="button" class="level-card" [class.selected]="planForm.controls.dietPreference.value === diet.value"
+                      [attr.aria-pressed]="planForm.controls.dietPreference.value === diet.value"
+                      (click)="selectOption(planForm.controls.dietPreference, diet.value)">
+                      <h4><i [class]="diet.icon" aria-hidden="true"></i> {{ diet.label }}</h4>
+                      <p>{{ diet.hint }}</p>
+                    </button>
+                  }
+                </div>
+
+                <div class="form-row limitations-row">
+                  <div class="form-group">
+                    <label for="limitations">Injuries or limitations <em>(Optional)</em></label>
+                    <textarea id="limitations" formControlName="limitations" class="form-control" rows="2"
+                      [maxlength]="limitationsMaxLength" placeholder="e.g. lower back pain, recovering knee"></textarea>
+                    <app-validation-message [control]="planForm.controls.limitations" fieldName="Limitations"></app-validation-message>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Step 4: Review -->
+            @if (currentStep() === 4) {
+              <div class="step-pane review-pane">
+                <h2>Here's your plan</h2>
+                <p class="subtitle">Check your answers. We'll create your workout and diet plan from them.</p>
+
+                <div class="targets-card">
+                  @if (previewTargets(); as t) {
+                    <div class="target-main">
+                      <span class="target-label">Daily calories</span>
+                      <span class="target-value">{{ t.targetCalories }}<small> kcal</small></span>
+                    </div>
+                    <div class="target-macros">
+                      <span><strong>{{ t.targetProtein }} g</strong> protein</span>
+                      <span><strong>{{ t.targetCarbs }} g</strong> carbs</span>
+                      <span><strong>{{ t.targetFats }} g</strong> fats</span>
+                    </div>
+                  } @else if (previewTargets() === undefined) {
+                    <span class="target-label">Working out your targets…</span>
+                  } @else {
+                    <span class="target-label">We'll work out your calorie and macro targets when you finish.</span>
+                  }
+                </div>
+
+                <dl class="review-list">
+                  @for (row of review(); track row.label) {
+                    <div class="review-row">
+                      <dt>{{ row.label }}</dt>
+                      <dd>{{ row.value }}</dd>
+                      <button type="button" class="btn-edit" (click)="goToStep(row.step)" [attr.aria-label]="'Edit ' + row.label">Edit</button>
+                    </div>
+                  }
+                </dl>
+              </div>
+            }
           </div>
         </div>
 
@@ -209,25 +223,25 @@
         <div class="wizard-footer-static">
           <div class="wizard-footer-inner">
             <div class="footer-left">
-              <button *ngIf="currentStep > 1" type="button" class="btn btn-outline" (click)="prevStep()"
-                [disabled]="isSubmitting">Back</button>
-              <button *ngIf="currentStep === 1" type="button" class="btn btn-text btn-logout-danger" (click)="logout()">
-                <i class="fi fi-rr-sign-out-alt"></i> Back to Login
-              </button>
+              @if (currentStep() > 1) {
+                <button type="button" class="btn btn-outline" (click)="prevStep()" [disabled]="isSubmitting()">Back</button>
+              } @else {
+                <button type="button" class="btn btn-text btn-logout-danger" (click)="logout()">
+                  <i class="fi fi-rr-sign-out-alt"></i> Back to Login
+                </button>
+              }
             </div>
             <div class="footer-right">
-              <button *ngIf="currentStep < 3" type="button" class="btn btn-primary" (click)="nextStep()"
-                [disabled]="currentStep === 2 && (!selectedGoal || !selectedExperienceLevel)">
-                Continue
-              </button>
-              <button *ngIf="currentStep === 3" type="button" class="btn btn-primary" (click)="submitMetrics()"
-                [disabled]="metricsForm.invalid || isSubmitting">
-                {{ isSubmitting ? 'Saving...' : 'Complete Profile' }}
-              </button>
+              @if (currentStep() < steps.length) {
+                <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!canContinue()">Continue</button>
+              } @else {
+                <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="isSubmitting()">
+                  {{ isSubmitting() ? 'Saving...' : 'Create my plan' }}
+                </button>
+              }
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </main>

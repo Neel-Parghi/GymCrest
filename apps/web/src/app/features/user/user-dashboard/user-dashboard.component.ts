@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { DatePipe, DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -17,10 +17,11 @@ import { ActivePlanView, WorkoutSessionLogDto } from '../../../shared/models/wor
 import { exerciseSetCount, resolveScheduledDay, startOfWeek, toDateKey } from '../../../shared/utils/workout-schedule';
 import { mealTimeToMinutes } from '../../../shared/utils/meal-time';
 import { NUTRITION_TARGET_FALLBACK, percentOf } from '../../../shared/utils/nutrition';
+import { goalLabel, toGoalId } from '../../../shared/constants/fitness-preferences';
 import { GymBuddyComponent } from './components/gym-buddy/gym-buddy.component';
 import { recall, remember } from './components/gym-buddy/buddy-memory';
 import {
-  ActivityRing, BuddyEvent, BuddyFacts, DailyRoutineItem, MacroProgress, NutritionToday, RoutineForm, TodayWorkout,
+  ActivityRing, BuddyEvent, BuddyFacts, DailyRoutineItem, GoalRing, MacroProgress, NutritionToday, RoutineForm, TodayWorkout,
   UserDashboardSummary, WeekDay, WeekDayState
 } from '../../../core/models/user-dashboard.model';
 
@@ -29,6 +30,10 @@ const RING_RADII = { calories: 58, active: 44, goal: 30 };
 const ROUTINE_PREVIEW = 5;
 /** From this hour the buddy points out a planned workout that hasn't been logged yet. */
 const NUDGE_FROM_HOUR = 18;
+/** Daily cardio the weight-loss and endurance goal rings aim for. */
+const CARDIO_TARGET_MINUTES = 30;
+/** Sets the muscle-gain ring aims for when there's no planned workout to compare against. */
+const DEFAULT_SET_TARGET = 15;
 
 @Component({
   selector: 'app-user-dashboard',
@@ -56,6 +61,8 @@ export class UserDashboardComponent implements OnInit {
 
   private readonly profile = toSignal(this.authService.userProfile$, { initialValue: null });
   private readonly buddy = viewChild(GymBuddyComponent);
+  /** Reactions that happen before the buddy appears (it waits for the summary) play once it does. */
+  private readonly pendingBuddyEvents: BuddyEvent[] = [];
   private readonly todayKey = toDateKey(this.today);
 
   readonly summary = signal<UserDashboardSummary | null>(null);
@@ -85,30 +92,60 @@ export class UserDashboardComponent implements OnInit {
     return fromProfile || this.userName().charAt(0).toUpperCase();
   });
 
-  readonly goalTitle = computed(() => {
-    const raw = this.summary()?.goalTitle || 'general_fitness';
-    return raw.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  readonly goalTitle = computed(() => goalLabel(this.summary()?.goalTitle));
+
+  /** The buddy appears once the summary has loaded, unless the member turned it off in settings. */
+  readonly showBuddy = computed(() => {
+    const summary = this.summary();
+    return !!summary && summary.showGymBuddy !== false;
+  });
+
+  /**
+   * Today's training step towards the member's goal. Food is left out on purpose: the nutrition card
+   * already tracks calories and protein.
+   */
+  readonly goalRing = computed<GoalRing>(() => {
+    const s = this.summary();
+    switch (toGoalId(s?.goalTitle)) {
+      case 'weight_loss':
+      case 'endurance':
+        return this.goalProgress('Cardio', s?.cardioMinutesToday ?? 0, CARDIO_TARGET_MINUTES, 'min');
+      case 'flexibility': {
+        const routines = this.routines();
+        return routines.length
+          ? this.goalProgress('Routines', this.doneRoutineCount(), routines.length, 'done')
+          : this.setsRing();
+      }
+      default:
+        return this.setsRing();
+    }
   });
 
   readonly activity = computed(() => {
     const s = this.summary();
     const calories = s?.caloriesBurnedToday ?? 0;
-    const calorieTarget = s?.targetCalories || 2500;
+    const calorieTarget = s?.targetCaloriesBurn || 400;
     const active = s?.activeTrainingTimeMinutes ?? 0;
     const activeTarget = s?.targetTrainingTime || 60;
-    const goalPct = s?.goalProgressPct ?? 0;
+    const goal = this.goalRing();
     return {
       calories,
       calorieTarget,
       active,
       activeTarget,
-      goalPct,
+      goal,
       rings: [
         this.ring('calories', percentOf(calories, calorieTarget)),
         this.ring('active', percentOf(active, activeTarget)),
-        this.ring('goal', Math.min(goalPct, 100))
+        this.ring('goal', goal.pct)
       ] as ActivityRing[]
     };
+  });
+
+  /** Long-term weight goal, shown with body composition rather than in today's rings. */
+  readonly weightGoal = computed(() => {
+    const s = this.summary();
+    return s?.targetWeight ? { target: s.targetWeight, pct: Math.min(s.goalProgressPct ?? 0, 100) } : null;
   });
 
   /** Personal records as medal tiles: rank, split weight ("110 kg" → 110 + kg) and a rank icon. */
@@ -165,6 +202,13 @@ export class UserDashboardComponent implements OnInit {
     if (bmi < 30) return { label: 'Overweight', tone: 'warn' };
     return { label: 'Obese', tone: 'bad' };
   });
+
+  constructor() {
+    effect(() => {
+      const buddy = this.buddy();
+      if (buddy) this.pendingBuddyEvents.splice(0).forEach(event => buddy.react(event));
+    });
+  }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId) && sessionStorage.getItem('justFinishedOnboarding') === 'true') {
@@ -307,6 +351,20 @@ export class UserDashboardComponent implements OnInit {
     };
   }
 
+  /** Strength sets done against today's planned workout; a rest day counts as complete. */
+  private setsRing(): GoalRing {
+    const workout = this.todayWorkout();
+    const done = this.summary()?.strengthSetsToday ?? 0;
+    if (workout?.state === 'rest') return { label: 'Sets', pct: 100, value: 'Rest day', unit: '' };
+    if (workout?.state === 'done') return { label: 'Sets', pct: 100, value: `${done}`, unit: 'sets' };
+    const planned = workout?.state === 'ready' && workout.setCount > 0 ? workout.setCount : DEFAULT_SET_TARGET;
+    return this.goalProgress('Sets', done, planned, 'sets');
+  }
+
+  private goalProgress(label: string, value: number, target: number, unit: string): GoalRing {
+    return { label, pct: percentOf(value, target), value: `${Math.round(value)} / ${Math.round(target)}`, unit };
+  }
+
   private ring(key: ActivityRing['key'], pct: number): ActivityRing {
     const radius = RING_RADII[key];
     const circumference = 2 * Math.PI * radius;
@@ -357,7 +415,10 @@ export class UserDashboardComponent implements OnInit {
   // ---------- gym buddy reactions ----------
 
   private buddyReact(event: BuddyEvent): void {
-    if (isPlatformBrowser(this.platformId)) this.buddy()?.react(event);
+    if (!isPlatformBrowser(this.platformId) || this.summary()?.showGymBuddy === false) return;
+    const buddy = this.buddy();
+    if (buddy) buddy.react(event);
+    else this.pendingBuddyEvents.push(event);
   }
 
   /** Per-user key, so two members sharing a browser don't share the buddy's memory. */

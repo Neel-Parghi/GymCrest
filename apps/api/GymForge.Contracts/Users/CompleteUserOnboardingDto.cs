@@ -9,5 +9,10 @@ namespace GymForge.Contracts.Users
         public decimal? TargetWeight { get; set; }
         public DateTime DOB { get; set; }
         public string Gender { get; set; } = string.Empty;
+        public string? ActivityLevel { get; set; }
+        public string? DietPreference { get; set; }
+        public int? TrainingDaysPerWeek { get; set; }
+        public int? SessionLengthMinutes { get; set; }
+        public string? Limitations { get; set; }
     }
 }

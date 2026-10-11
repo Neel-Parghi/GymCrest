@@ -2,6 +2,7 @@ using GymForge.Application.Modules.Gym.Interfaces;
 using GymForge.Application.Modules.Users.Interface;
 using GymForge.Contracts.Common;
 using GymForge.Contracts.Members;
+using GymForge.Contracts.PlanGeneration;
 using GymForge.Contracts.Users;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -94,6 +95,22 @@ namespace GymForge.Api.Controllers.User
             return Ok(new { Message = "Preferences updated successfully" });
         }
 
+        [HttpGet("preferences/suggested-targets")]
+        [Authorize]
+        public async Task<IActionResult> GetSuggestedTargets([FromQuery] string? goal, [FromQuery] string? activityLevel)
+        {
+            StarterPlanResultDto? targets = await _userService.GetSuggestedTargetsAsync(goal, activityLevel);
+            return Ok(targets);
+        }
+
+        [HttpPost("regenerate-starter-plans")]
+        [Authorize(Roles = "Member,User")]
+        public async Task<IActionResult> RegenerateStarterPlans()
+        {
+            StarterPlanResultDto targets = await _userService.RegenerateStarterPlansAsync();
+            return Ok(targets);
+        }
+
         [HttpPost("profile/upload-avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar(IFormFile file)
@@ -161,6 +178,13 @@ namespace GymForge.Api.Controllers.User
         {
             await _userService.SaveOnboardingStepAsync(UserId, step);
             return Ok(new { Message = "Onboarding step saved successfully" });
+        }
+
+        [HttpPost("onboarding/preview-targets")]
+        [Authorize]
+        public IActionResult PreviewOnboardingTargets([FromBody] StarterPlanProfileDto profile)
+        {
+            return Ok(_userService.PreviewTargets(profile));
         }
 
         [HttpPost("complete-user-onboarding")]

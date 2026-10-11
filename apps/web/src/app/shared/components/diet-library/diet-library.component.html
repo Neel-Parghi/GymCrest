@@ -12,7 +12,16 @@
     </header>
   } @else {
     <div class="toolbar">
-      <span class="toolbar-count">{{ dietPlans.length }} template{{ dietPlans.length === 1 ? '' : 's' }}</span>
+      <span class="toolbar-count">
+        {{ dietPlans.length }} template{{ dietPlans.length === 1 ? '' : 's' }}
+        @if (hiddenPlanCount) {
+          @if (showAllDiets) {
+            · <button type="button" class="toolbar-link" (click)="toggleShowAllDiets()">Only {{ preferenceLabel }} plans</button>
+          } @else {
+            for your diet · <button type="button" class="toolbar-link" (click)="toggleShowAllDiets()">Show all ({{ hiddenPlanCount }} more)</button>
+          }
+        }
+      </span>
       <button type="button" class="btn-primary" (click)="openCreateModal()">
         <i class="fa-solid fa-plus" aria-hidden="true"></i> Create diet plan
       </button>
@@ -28,6 +37,9 @@
               <span class="pill energy">{{ diet.calories | number:'1.0-2' }} kcal</span>
               @if (diet.goal) {
                 <span class="pill">{{ diet.goal }}</span>
+              }
+              @if (diet.dietType) {
+                <span class="pill">{{ dietTypeLabel(diet.dietType) }}</span>
               }
               @if ((currentUserId || ownerMode) && activeDietId === diet.id) {
                 <span class="pill good">Active</span>

@@ -14,7 +14,13 @@ namespace GymForge.Domain.Entities
         public int? TargetFats { get; set; }
         public int? TargetTrainingTime { get; set; }
 
+        public string? DietPreference { get; set; }
+        public string? ActivityLevel { get; set; }
+        public int? TrainingDaysPerWeek { get; set; }
+        public string? Limitations { get; set; }
+
         public bool EmailNotificationsEnabled { get; set; } = true;
         public bool WorkoutRemindersEnabled { get; set; } = true;
+        public bool ShowGymBuddy { get; set; } = true;
     }
 }
