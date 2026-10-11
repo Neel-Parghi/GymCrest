@@ -264,8 +264,9 @@ namespace GymForge.Infrastructure.Repositories
                 .OrderBy(r => r.Order)
                 .ToListAsync();
 
+            DateTime routineDay = AppTimeZone.TodayAsUtcDate;
             DailyRoutineCompletion? todayCompletion = await _dbContext.DailyRoutineCompletions
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.Date == today);
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Date == routineDay);
 
             List<Guid> completedIds = todayCompletion?.CompletedRoutineIds ?? new List<Guid>();
 
@@ -303,8 +304,8 @@ namespace GymForge.Infrastructure.Repositories
             summary.PersonalRecords = topPRs;
 
             // 2. Muscle Recovery & Activation Heatmap
-            DateTime sevenDaysAgo = today.AddDays(-7);
-            DateTime recoveryLookbackStart = today.AddDays(-RecoveryLookbackDays);
+            (DateTime sevenDaysAgo, _) = AppTimeZone.DayBoundsUtc(today.AddDays(-7));
+            (DateTime recoveryLookbackStart, _) = AppTimeZone.DayBoundsUtc(today.AddDays(-RecoveryLookbackDays));
 
             var recentExercises = await _dbContext.WorkoutSessionLogs
                 .Where(l => l.UserId == userId && l.Date >= recoveryLookbackStart && l.Status == "Completed")

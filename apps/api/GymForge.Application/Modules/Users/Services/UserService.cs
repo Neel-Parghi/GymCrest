@@ -9,6 +9,7 @@ using GymForge.Domain.Entities;
 using GymForge.Domain.Interface;
 using GymForge.Shared.Constants;
 using GymForge.Shared.Enums;
+using GymForge.Shared.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -519,7 +520,7 @@ namespace GymForge.Application.Modules.Users.Services
         {
             Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
             IEnumerable<DailyRoutine> routines = await _userRepository.GetDailyRoutinesAsync(userId);
-            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, DateTime.UtcNow.Date);
+            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, AppTimeZone.TodayAsUtcDate);
             List<Guid> completedIds = completion?.CompletedRoutineIds ?? new List<Guid>();
 
             return routines.Select(r => new DailyRoutineDto
@@ -591,14 +592,14 @@ namespace GymForge.Application.Modules.Users.Services
         public async Task ToggleDailyRoutineAsync(Guid id)
         {
             Guid userId = _currentUserService.UserId ?? throw new Exception("Unauthorized access.");
-            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, DateTime.UtcNow.Date);
+            DailyRoutineCompletion? completion = await _userRepository.GetDailyRoutineCompletionAsync(userId, AppTimeZone.TodayAsUtcDate);
 
             if (completion == null)
             {
                 completion = new DailyRoutineCompletion
                 {
                     UserId = userId,
-                    Date = DateTime.UtcNow.Date,
+                    Date = AppTimeZone.TodayAsUtcDate,
                     CompletedRoutineIds = new List<Guid> { id },
                     CreatedOn = DateTime.UtcNow
                 };
