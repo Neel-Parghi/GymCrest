@@ -2,6 +2,7 @@ using GymForge.Domain.Entities;
 using GymForge.Shared.Enums;
 using GymForge.Domain.Interface;
 using GymForge.Infrastructure.Persistence;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymForge.Infrastructure.Repositories
@@ -17,54 +18,38 @@ namespace GymForge.Infrastructure.Repositories
 
         public Task<ResourceOwnership?> GetOwnershipAsync(OwnedResource resource, Guid id) => resource switch
         {
-            OwnedResource.Staff => _dbContext.Staff.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(
-                    x.GymId,
-                    _dbContext.Gyms.Where(g => g.Id == x.GymId).Select(g => (Guid?)g.OwnerUserId).FirstOrDefault(),
-                    x.UserId, x.CreatedBy, false))
-                .FirstOrDefaultAsync(),
+            OwnedResource.Staff => FirstAsync(_dbContext.Staff, id,
+                x => new ResourceOwnership(x.GymId, x.Gym.OwnerUserId, x.UserId, x.CreatedBy, false, false)),
             OwnedResource.InventoryItem => GymScopedAsync(_dbContext.InventoryItems, id),
             OwnedResource.SaleTransaction => GymScopedAsync(_dbContext.SaleTransactions, id),
             OwnedResource.Equipment => GymScopedAsync(_dbContext.Equipment, id),
-            // Gym plans are owned by the user who created them (the gym owner), not by a gym.
-            OwnedResource.GymPlan => _dbContext.GymPlans.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(null, x.GymOwnerId, x.GymOwnerId, x.CreatedBy, false, false))
-                .FirstOrDefaultAsync(),
             OwnedResource.Branch => GymScopedAsync(_dbContext.Branches, id),
-            OwnedResource.MaintenanceLog => _dbContext.MaintenanceLogs.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(
-                    x.Equipment.GymId,
-                    _dbContext.Gyms.Where(g => g.Id == x.Equipment.GymId).Select(g => (Guid?)g.OwnerUserId).FirstOrDefault(),
-                    null, x.CreatedBy, false))
-                .FirstOrDefaultAsync(),
-            OwnedResource.WorkoutPlan => _dbContext.WorkoutPlans.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(
-                    x.GymId,
+            OwnedResource.GymPlan => FirstAsync(_dbContext.GymPlans, id,
+                x => new ResourceOwnership(null, x.GymOwnerId, x.GymOwnerId, x.CreatedBy, false, false)),
+            OwnedResource.MaintenanceLog => FirstAsync(_dbContext.MaintenanceLogs, id,
+                x => new ResourceOwnership(x.Equipment.GymId, x.Equipment.Gym.OwnerUserId, null, x.CreatedBy, false, false)),
+            OwnedResource.WorkoutPlan => FirstAsync(_dbContext.WorkoutPlans, id,
+                x => new ResourceOwnership(x.GymId,
                     _dbContext.Gyms.Where(g => g.Id == x.GymId).Select(g => (Guid?)g.OwnerUserId).FirstOrDefault(),
-                    null, x.CreatedBy, x.IsCustom, x.GymId == null && !x.IsCustom))
-                .FirstOrDefaultAsync(),
-            OwnedResource.DietPlan => _dbContext.DietPlans.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(
-                    x.GymId,
+                    null, x.CreatedBy, x.IsCustom, x.GymId == null && !x.IsCustom)),
+            OwnedResource.DietPlan => FirstAsync(_dbContext.DietPlans, id,
+                x => new ResourceOwnership(x.GymId,
                     _dbContext.Gyms.Where(g => g.Id == x.GymId).Select(g => (Guid?)g.OwnerUserId).FirstOrDefault(),
-                    null, x.CreatedBy, x.IsCustom, x.IsTemplate))
-                .FirstOrDefaultAsync(),
-            OwnedResource.DailyRoutine => _dbContext.DailyRoutines.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(null, null, x.UserId, x.CreatedBy, false))
-                .FirstOrDefaultAsync(),
+                    null, x.CreatedBy, x.IsCustom, x.IsTemplate)),
+            OwnedResource.DailyRoutine => FirstAsync(_dbContext.DailyRoutines, id,
+                x => new ResourceOwnership(null, null, x.UserId, x.CreatedBy, false, false)),
             _ => throw new ArgumentOutOfRangeException(nameof(resource), resource, null)
         };
 
         public Task<Guid?> GetGymOwnerUserIdAsync(Guid gymId) =>
             _dbContext.Gyms.AsNoTracking().Where(g => g.Id == gymId).Select(g => (Guid?)g.OwnerUserId).FirstOrDefaultAsync();
 
-        /// <summary>Records with a required GymId column.</summary>
-        private Task<ResourceOwnership?> GymScopedAsync<T>(IQueryable<T> set, Guid id) where T : BaseEntity =>
-            set.AsNoTracking().Where(x => x.Id == id)
-                .Select(x => new ResourceOwnership(
-                    EF.Property<Guid>(x, "GymId"),
-                    _dbContext.Gyms.Where(g => g.Id == EF.Property<Guid>(x, "GymId")).Select(g => (Guid?)g.OwnerUserId).FirstOrDefault(),
-                    null, x.CreatedBy, false))
-                .FirstOrDefaultAsync();
+        private static Task<ResourceOwnership?> FirstAsync<T>(IQueryable<T> set, Guid id,
+            Expression<Func<T, ResourceOwnership?>> projection) where T : BaseEntity =>
+            set.AsNoTracking().Where(x => x.Id == id).Select(projection).FirstOrDefaultAsync();
+
+        private static Task<ResourceOwnership?> GymScopedAsync<T>(IQueryable<T> set, Guid id) where T : BaseEntity =>
+            FirstAsync(set, id, x => new ResourceOwnership(
+                EF.Property<Guid>(x, "GymId"), EF.Property<Gym>(x, "Gym").OwnerUserId, null, x.CreatedBy, false, false));
     }
 }

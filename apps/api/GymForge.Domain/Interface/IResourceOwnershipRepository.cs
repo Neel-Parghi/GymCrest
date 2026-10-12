@@ -4,7 +4,7 @@ namespace GymForge.Domain.Interface
 {
     /// <summary>Who a record belongs to: its gym (and that gym's owner), its own user, and its creator.
     /// IsTemplate marks shared library plans that anyone may read.</summary>
-    public sealed record ResourceOwnership(Guid? GymId, Guid? GymOwnerUserId, Guid? OwnerUserId, Guid CreatedBy, bool IsCustom, bool IsTemplate = false);
+    public sealed record ResourceOwnership(Guid? GymId, Guid? GymOwnerUserId, Guid? OwnerUserId, Guid CreatedBy, bool IsCustom, bool IsTemplate);
 
     public interface IResourceOwnershipRepository
     {
