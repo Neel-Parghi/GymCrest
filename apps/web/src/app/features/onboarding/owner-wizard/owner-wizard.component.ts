@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, NgZone } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, NgZone, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
@@ -56,6 +56,7 @@ export class OwnerWizardComponent implements OnInit {
   private profileService = inject(ProfileService);
   private paymentService = inject(PaymentService);
   private ngZone = inject(NgZone);
+  @ViewChild('scroller') private scroller?: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
     this.initForm();
@@ -269,6 +270,7 @@ export class OwnerWizardComponent implements OnInit {
 
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
+      this.scrollToTop();
       if (this.currentStep === 4) {
         this.loadPlans();
       }
@@ -279,8 +281,14 @@ export class OwnerWizardComponent implements OnInit {
   prevStep() {
     if (this.currentStep > 1) {
       this.currentStep--;
+      this.scrollToTop();
       this.saveDraft();
     }
+  }
+
+  private scrollToTop() {
+    this.scroller?.nativeElement.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }
 
   logout() {
