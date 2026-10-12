@@ -28,7 +28,6 @@ namespace GymForge.Api.Filters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            // JwtBearer maps the token's "email" claim to ClaimTypes.Email; the raw name covers unmapped setups.
             string? email = context.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value
                 ?? context.HttpContext.User.FindFirst("email")?.Value;
 

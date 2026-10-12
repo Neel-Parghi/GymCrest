@@ -5,10 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GymForge.Api.Filters
 {
-    /// <summary>
-    /// Allows a member-scoped action only for that member's own account or staff of the member's gym
-    /// (see <see cref="IMemberAccessService"/>). The member id is read from the given route value.
-    /// </summary>
+
     public class AuthorizeMemberAccessAttribute : TypeFilterAttribute
     {
         public AuthorizeMemberAccessAttribute(string routeKey = "memberId") : base(typeof(AuthorizeMemberAccessFilter))

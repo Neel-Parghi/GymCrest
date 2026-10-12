@@ -14,7 +14,6 @@ namespace GymForge.Application.Modules.Gym.Services
 
         public async Task<bool> CanAccessMemberAsync(Guid memberId, Guid callerUserId, Guid? callerGymId, bool isGymOwner, bool isGymStaff)
         {
-            // Standalone users store their data against their own account id.
             if (memberId == callerUserId)
             {
                 return true;

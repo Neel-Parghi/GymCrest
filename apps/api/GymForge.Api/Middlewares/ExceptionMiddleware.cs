@@ -19,7 +19,6 @@ namespace GymForge.Api.Middlewares
             }
             catch (Exception ex)
             {
-                // Business errors keep their message and 400; unexpected ones are logged and answered generically.
                 bool expected = ClientErrorMessage.IsExpected(ex);
                 if (!expected)
                 {
