@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using GymForge.Application.Modules.Gym.Interfaces;
 using GymForge.Contracts.SaaSPlan;
 using Microsoft.AspNetCore.Mvc;
@@ -28,12 +29,14 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(plan);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost]
         public async Task<IActionResult> AddPlanAsync([FromBody] CreateSaaSPlanDto createPlanDto)
         {
             return Ok(await _saaSPlanService.AddPlanAsync(createPlanDto));
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdateSaaSPlanDto updateSaaSPlanDto)
         {
@@ -43,6 +46,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(updatedPlan);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlanAsync(Guid id)
         {

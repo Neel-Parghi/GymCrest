@@ -92,6 +92,7 @@ namespace GymForge.Infrastructure
             services.AddScoped<IEmailService, Services.BrevoEmailService>();
             services.AddScoped<IGymPlanRepository, GymPlanRepository>();
             services.AddScoped<IGymMemberRepository, GymMemberRepository>();
+            services.AddScoped<IResourceOwnershipRepository, ResourceOwnershipRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IInventoryRepository, InventoryRepository>();

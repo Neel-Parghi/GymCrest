@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
+using GymForge.Api.Filters;
+using GymForge.Api.Middlewares;
 
 namespace GymForge.Api.Controllers
 {
@@ -40,7 +42,7 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -55,7 +57,7 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -70,11 +72,12 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("LoginPolicy")]
         public async Task<IActionResult> Login(LoginRequestDto dto)
         {
             TokenResponseDto response = await _authService.Login(dto);
@@ -91,7 +94,7 @@ namespace GymForge.Api.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -113,7 +116,7 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -128,7 +131,7 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -144,6 +147,7 @@ namespace GymForge.Api.Controllers
         }
 
         [Authorize]
+        [BlockDemoAccount]
         [HttpDelete("request-deletion")]
         public async Task<IActionResult> RequestAccountDeletion(
             [FromServices] IBackgroundJobClient backgroundJobs,
@@ -179,7 +183,7 @@ namespace GymForge.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
     }

@@ -5,6 +5,8 @@ using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GymForge.Api.Filters;
+using GymForge.Api.Middlewares;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -36,7 +38,7 @@ namespace GymForge.Api.Controllers.Gym
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -47,6 +49,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(await _staffService.GetGymStaffAsync(GymId.Value, pagination, SecureBranchId));
         }
 
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetStaffById(Guid id)
         {
@@ -55,6 +58,8 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(staff);
         }
 
+        [Authorize(Roles = "GymOwner,Staff")]
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateStaff(Guid id, [FromBody] AddStaffRequest request)
         {
@@ -70,10 +75,12 @@ namespace GymForge.Api.Controllers.Gym
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
+        [Authorize(Roles = "GymOwner,Staff")]
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteStaff(Guid id)
         {
@@ -95,11 +102,14 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(new { message = "Member deallocated from trainer successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpGet("{id}/members")]
         public async Task<ActionResult> GetAssignedMembers(Guid id)
         {
             return Ok(await _staffService.GetAssignedMembersAsync(id));
         }
+
+        [AuthorizeMemberAccess]
 
         [HttpPost("~/api/members/{memberId}/measurements")]
         public async Task<ActionResult> RecordMeasurement(Guid memberId, [FromBody] AddMeasurementRequest request)
@@ -108,12 +118,15 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(new { message = "Measurement recorded successfully" });
         }
 
+        [AuthorizeMemberAccess]
+
         [HttpGet("~/api/members/{memberId}/measurements")]
         public async Task<ActionResult> GetMemberMeasurements(Guid memberId)
         {
             return Ok(await _staffService.GetMemberMeasurementsAsync(memberId));
         }
 
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpPost("{id}/check-in")]
         public async Task<ActionResult> CheckInStaff(Guid id, [FromBody] StaffCheckInRequest request)
         {
@@ -125,14 +138,15 @@ namespace GymForge.Api.Controllers.Gym
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
+        [AuthorizeResource(OwnedResource.Staff)]
         [HttpPost("{id}/check-out")]
         public async Task<ActionResult> CheckOutStaff(Guid id)
         {
@@ -144,11 +158,11 @@ namespace GymForge.Api.Controllers.Gym
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
 

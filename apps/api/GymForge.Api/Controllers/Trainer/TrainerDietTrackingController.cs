@@ -5,6 +5,7 @@ using GymForge.Contracts.Staff;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using GymForge.Api.Filters;
 
 namespace GymForge.Api.Controllers.Trainer
 {
@@ -42,6 +43,8 @@ namespace GymForge.Api.Controllers.Trainer
             return false;
         }
 
+        [AuthorizeMemberAccess]
+
         [HttpGet("{memberId}/{date}")]
         public async Task<IActionResult> GetMemberDietLog(Guid memberId, DateTime date)
         {
@@ -49,6 +52,8 @@ namespace GymForge.Api.Controllers.Trainer
             DietLogDto log = await _dietTrackingService.GetDietLogAsync(memberId, date);
             return Ok(log);
         }
+
+        [AuthorizeMemberAccess]
 
         [HttpGet("{memberId}/summary/{endDate}")]
         public async Task<IActionResult> GetMemberWeeklySummary(Guid memberId, DateTime endDate)

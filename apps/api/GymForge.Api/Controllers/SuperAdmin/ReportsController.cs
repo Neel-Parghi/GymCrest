@@ -31,7 +31,7 @@ namespace GymForge.Api.Controllers.SuperAdmin
             }
             catch (System.ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ClientErrorMessage.For(ex));
             }
             catch (Exception)
             {

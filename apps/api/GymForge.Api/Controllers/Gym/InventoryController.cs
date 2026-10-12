@@ -5,6 +5,7 @@ using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -45,6 +46,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(result);
         }
 
+        [AuthorizeResource(OwnedResource.InventoryItem)]
         [HttpPut("products/{id}")]
         public async Task<ActionResult<InventoryItemDto>> UpdateProduct(Guid id, [FromBody] CreateProductDto dto)
         {
@@ -53,6 +55,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(result);
         }
 
+        [AuthorizeResource(OwnedResource.InventoryItem)]
         [HttpDelete("products/{id}")]
         public async Task<ActionResult> DeleteProduct(Guid id)
         {
@@ -78,6 +81,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(await _inventoryService.GetSalesHistoryAsync(GymId.Value, pagination, SecureBranchId));
         }
 
+        [AuthorizeResource(OwnedResource.SaleTransaction)]
         [HttpPost("sales/{id}/receipt")]
         public async Task<ActionResult> SendReceipt(Guid id)
         {

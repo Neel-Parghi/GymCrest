@@ -4,6 +4,8 @@ using GymForge.Contracts.Common;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -34,6 +36,8 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(new { message = "Maintenance logged successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.MaintenanceLog)]
+        [AuthorizeResource(OwnedResource.Equipment, "dto.EquipmentId")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateMaintenance(Guid id, [FromBody] LogMaintenanceDto dto)
         {
@@ -43,6 +47,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(new { message = "Maintenance updated successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.Equipment)]
         [HttpGet("equipment/{id}/maintenance")]
         public async Task<ActionResult<List<MaintenanceLogDto>>> GetEquipmentMaintenanceHistory(Guid id)
         {

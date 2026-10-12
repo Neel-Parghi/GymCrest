@@ -6,6 +6,7 @@ using GymForge.Contracts.Gym.Shared;
 using GymForge.Contracts.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -103,6 +104,7 @@ namespace GymForge.Api.Controllers.Gym
         }
 
         [Authorize(Roles = "GymOwner")]
+        [AuthorizeResource(OwnedResource.Branch, "branchId")]
         [HttpPut("branches/{branchId}")]
         public async Task<IActionResult> UpdateMyBranch(Guid branchId, [FromBody] BranchDto branchDto)
         {

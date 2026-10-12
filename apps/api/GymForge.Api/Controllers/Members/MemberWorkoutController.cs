@@ -2,11 +2,13 @@ using GymForge.Application.Modules.Workout.Interface;
 using GymForge.Contracts.WorkoutPlan;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Filters;
 
 namespace GymForge.Api.Controllers.Members
 {
     [Route("api/members/{memberId}")]
     [Authorize(Roles = "GymOwner,Staff,Trainer,User")]
+    [AuthorizeMemberAccess]
     [ApiController]
     public class MemberWorkoutController : BaseApiController
     {

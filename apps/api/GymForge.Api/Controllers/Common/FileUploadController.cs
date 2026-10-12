@@ -9,6 +9,10 @@ namespace GymForge.Api.Controllers.Common
     [Authorize]
     public class FileUploadController : ControllerBase
     {
+        private const long MaxUploadBytes = 5 * 1024 * 1024;
+        private static readonly HashSet<string> AllowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+        private static readonly HashSet<string> AllowedFolders = ["general", "equipment", "logos", "products"];
+
         private readonly IFileStorageService _fileStorageService;
 
         public FileUploadController(IFileStorageService fileStorageService)
@@ -24,6 +28,21 @@ namespace GymForge.Api.Controllers.Common
                 return BadRequest("No file uploaded.");
             }
 
+            if (file.Length > MaxUploadBytes)
+            {
+                return BadRequest("File is too large. The limit is 5 MB.");
+            }
+
+            if (!AllowedExtensions.Contains(Path.GetExtension(file.FileName).ToLowerInvariant()))
+            {
+                return BadRequest("Invalid file type. Only JPG, PNG, GIF and WebP images are allowed.");
+            }
+
+            if (!AllowedFolders.Contains(folder))
+            {
+                return BadRequest("Invalid upload folder.");
+            }
+
             try
             {
                 using Stream stream = file.OpenReadStream();
@@ -31,9 +50,9 @@ namespace GymForge.Api.Controllers.Common
 
                 return Ok(new { url = fileUrl });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, "Upload failed. Please try again.");
             }
         }
     }
