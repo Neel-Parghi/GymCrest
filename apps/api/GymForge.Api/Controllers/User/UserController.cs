@@ -7,6 +7,8 @@ using GymForge.Contracts.Users;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.User
 {
@@ -65,6 +67,7 @@ namespace GymForge.Api.Controllers.User
 
         [HttpPut("profile")]
         [Authorize]
+        [BlockDemoAccount]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto dto)
         {
             await _userService.UpdateMyProfileAsync(dto);
@@ -73,6 +76,7 @@ namespace GymForge.Api.Controllers.User
 
         [HttpPut("change-password")]
         [Authorize]
+        [BlockDemoAccount]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto dto)
         {
             await _userService.ChangeMyPasswordAsync(dto);
@@ -113,6 +117,7 @@ namespace GymForge.Api.Controllers.User
 
         [HttpPost("profile/upload-avatar")]
         [Authorize]
+        [BlockDemoAccount]
         public async Task<IActionResult> UploadAvatar(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -219,6 +224,7 @@ namespace GymForge.Api.Controllers.User
             return Ok(routine);
         }
 
+        [AuthorizeResource(OwnedResource.DailyRoutine)]
         [HttpPut("routines/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateDailyRoutine(Guid id, [FromBody] UpdateDailyRoutineDto dto)
@@ -227,6 +233,7 @@ namespace GymForge.Api.Controllers.User
             return Ok(new { Message = "Routine updated successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.DailyRoutine)]
         [HttpDelete("routines/{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteDailyRoutine(Guid id)
@@ -235,6 +242,7 @@ namespace GymForge.Api.Controllers.User
             return Ok(new { Message = "Routine deleted successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.DailyRoutine)]
         [HttpPatch("routines/{id}/toggle")]
         [Authorize]
         public async Task<IActionResult> ToggleDailyRoutine(Guid id)

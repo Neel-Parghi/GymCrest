@@ -10,8 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-preview.2.25164.1" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.2.25164.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

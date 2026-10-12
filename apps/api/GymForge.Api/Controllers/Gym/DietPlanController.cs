@@ -2,6 +2,9 @@ using GymForge.Application.Modules.Diet.Interface;
 using GymForge.Contracts.DietPlan;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Middlewares;
+using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -25,6 +28,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(plans);
         }
 
+        [AuthorizeResource(OwnedResource.DietPlan)]
         [HttpGet("{id}")]
         public async Task<ActionResult<DietPlanDto>> GetPlanById(Guid id)
         {
@@ -46,6 +50,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(result);
         }
 
+        [AuthorizeResource(OwnedResource.DietPlan)]
         [HttpPut("{id}")]
         public async Task<ActionResult<DietPlanDto>> UpdatePlan(Guid id, [FromBody] UpdateDietPlanRequest request)
         {
@@ -66,10 +71,11 @@ namespace GymForge.Api.Controllers.Gym
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ClientErrorMessage.For(ex));
             }
         }
 
+        [AuthorizeResource(OwnedResource.DietPlan)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePlan(Guid id)
         {

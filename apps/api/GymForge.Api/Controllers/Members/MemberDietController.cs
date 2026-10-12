@@ -2,11 +2,13 @@ using GymForge.Application.Modules.Diet.Interface;
 using GymForge.Contracts.DietPlan;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Filters;
 
 namespace GymForge.Api.Controllers.Members
 {
     [Route("api/members/{memberId}")]
     [Authorize(Roles = "GymOwner,Staff,Trainer,User")]
+    [AuthorizeMemberAccess]
     [ApiController]
     public class MemberDietController : BaseApiController
     {

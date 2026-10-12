@@ -3,6 +3,7 @@ using GymForge.Contracts.Attendance;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Middlewares;
 
 namespace GymForge.Api.Controllers.Attendance
 {
@@ -28,10 +29,10 @@ namespace GymForge.Api.Controllers.Attendance
                 return Ok(result);
             }
             catch (KeyNotFoundException ex) { 
-                return NotFound(new { message = ex.Message }); 
+                return NotFound(new { message = ClientErrorMessage.For(ex) }); 
             }
             catch (InvalidOperationException ex) { 
-                return BadRequest(new { message = ex.Message }); 
+                return BadRequest(new { message = ClientErrorMessage.For(ex) }); 
             }
         }
 
@@ -46,7 +47,7 @@ namespace GymForge.Api.Controllers.Attendance
                 return Ok(result);
             }
             catch (InvalidOperationException ex) { 
-                return BadRequest(new { message = ex.Message }); 
+                return BadRequest(new { message = ClientErrorMessage.For(ex) }); 
             }
         }
 

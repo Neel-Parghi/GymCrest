@@ -93,6 +93,17 @@ namespace GymForge.Infrastructure.Repositories
                                     .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<(Guid GymId, Guid OwnerUserId, Guid? MemberUserId)?> GetGymOwnershipAsync(Guid memberId)
+        {
+            var ownership = await _dbContext.GymMembers
+                .AsNoTracking()
+                .Where(m => m.Id == memberId)
+                .Select(m => new { m.GymId, m.Gym.OwnerUserId, m.UserId })
+                .FirstOrDefaultAsync();
+
+            return ownership == null ? null : (ownership.GymId, ownership.OwnerUserId, ownership.UserId);
+        }
+
         public async Task<List<GymMember>> GetAllByUserIdAsync(Guid userId)
         {
             return await _dbContext.GymMembers

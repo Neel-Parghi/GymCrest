@@ -3,6 +3,7 @@ using GymForge.Contracts.GymPlans;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 namespace GymForge.Api.Controllers.Gym
 {
     [Route("api/gym-plans")]
@@ -24,6 +25,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(await _gymPlanService.GetPlansByOwnerIdAsync(UserId));
         }
 
+        [AuthorizeResource(OwnedResource.GymPlan)]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetGymPlanById(Guid id)
         {
@@ -37,6 +39,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(await _gymPlanService.AddGymPlanAsync(gymPlan));
         }
 
+        [AuthorizeResource(OwnedResource.GymPlan)]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateGymPlanAsync(Guid id, [FromBody] UpdateGymPlanRequest gymPlan)
         {
@@ -46,6 +49,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(await _gymPlanService.UpdateGymPlanAsync(gymPlan));
         }
 
+        [AuthorizeResource(OwnedResource.GymPlan)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteGymPlanAsync(Guid id)
         {
@@ -57,6 +61,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(new { Success = true, Message = "Plan deleted successfully" });
         }
 
+        [AuthorizeResource(OwnedResource.GymPlan)]
         [HttpPost("{id}/promote")]
         public async Task<ActionResult> PromoteGymPlanAsync(Guid id)
         {

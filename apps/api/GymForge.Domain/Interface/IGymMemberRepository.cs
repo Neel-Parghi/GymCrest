@@ -5,7 +5,8 @@ namespace GymForge.Domain.Interface
 {
     public interface IGymMemberRepository
     {
-        Task<GymMember?> GetByIdAsync(Guid id); 
+        Task<GymMember?> GetByIdAsync(Guid id);
+        Task<(Guid GymId, Guid OwnerUserId, Guid? MemberUserId)?> GetGymOwnershipAsync(Guid memberId); 
         Task<GymMember?> GetByUserIdAsync(Guid userId);
         Task<List<GymMember>> GetAllByUserIdAsync(Guid userId);
         Task<IEnumerable<GymMember>> GetAllByGymIdAsync(Guid gymId, Guid? branchId = null); 

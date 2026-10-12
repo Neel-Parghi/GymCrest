@@ -4,6 +4,8 @@ using GymForge.Contracts.Common;
 using GymForge.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GymForge.Api.Filters;
+using GymForge.Shared.Enums;
 
 namespace GymForge.Api.Controllers.Gym
 {
@@ -34,6 +36,7 @@ namespace GymForge.Api.Controllers.Gym
             return Ok(result);
         }
 
+        [AuthorizeResource(OwnedResource.Equipment)]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateEquipment(Guid id, [FromBody] CreateEquipmentDto dto)
         {

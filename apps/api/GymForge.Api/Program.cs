@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.HttpOverrides;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,17 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0
             }));
 
+    options.AddPolicy("LoginPolicy", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
     options.AddPolicy("FoodSearchPolicy", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: httpContext.User.FindFirst("userId")?.Value ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
@@ -128,6 +140,11 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+ForwardedHeadersOptions forwardedHeaders = new() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto };
+forwardedHeaders.KnownIPNetworks.Clear();
+forwardedHeaders.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeaders);
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -143,7 +160,7 @@ app.UseMiddleware<ResponseWrapperMiddleware>();
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = new[] { new HangfireAuthorizationFilter() }
+    Authorization = new[] { new HangfireAuthorizationFilter(app.Configuration, app.Environment) }
 });
 
 if (app.Environment.IsDevelopment())

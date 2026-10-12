@@ -37,11 +37,11 @@ namespace GymForge.Api.Controllers.Members
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
         }
 
@@ -59,6 +59,8 @@ namespace GymForge.Api.Controllers.Members
             return Ok(await _memberService.GetMemberDashboardDataAsync(GymId.Value, SecureBranchId));
         }
 
+        [AuthorizeMemberAccess("id")]
+
         [HttpGet("{id}")]
         public async Task<ActionResult> GetMemberById(Guid id)
         {
@@ -66,6 +68,8 @@ namespace GymForge.Api.Controllers.Members
             if (member == null) return NotFound();
             return Ok(member);
         }
+        
+        [AuthorizeMemberAccess("id")]
         
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateMember(Guid id, [FromBody] OnboardMemberRequest request)
@@ -83,13 +87,15 @@ namespace GymForge.Api.Controllers.Members
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpPatch("{id}/status/toggle")]
         public async Task<ActionResult> ToggleMemberStatus(Guid id)
@@ -98,6 +104,8 @@ namespace GymForge.Api.Controllers.Members
             if (!success) return NotFound();
             return Ok(new { success = true });
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpPatch("{id}/status/freeze")]
         public async Task<ActionResult> FreezeMember(Guid id, [FromBody] FreezeMemberRequest request)
@@ -110,9 +118,11 @@ namespace GymForge.Api.Controllers.Members
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpPatch("{id}/status/unfreeze")]
         public async Task<ActionResult> UnfreezeMember(Guid id)
@@ -121,6 +131,8 @@ namespace GymForge.Api.Controllers.Members
             if (!success) return NotFound();
             return Ok(new { success = true });
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpPost("{id}/subscriptions")]
         public async Task<ActionResult> RenewSubscription(Guid id, [FromBody] RenewSubscriptionRequest request)
@@ -132,13 +144,15 @@ namespace GymForge.Api.Controllers.Members
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ClientErrorMessage.For(ex) });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ClientErrorMessage.For(ex) });
             }
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMember(Guid id)
@@ -147,6 +161,8 @@ namespace GymForge.Api.Controllers.Members
             if (!success) return NotFound();
             return Ok(new { success = true });
         }
+
+        [AuthorizeMemberAccess("id")]
 
         [HttpGet("{id}/subscriptions")]
         public async Task<ActionResult> GetSubscriptionHistory(Guid id)

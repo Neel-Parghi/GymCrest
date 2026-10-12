@@ -32,6 +32,8 @@ namespace GymForge.Application
             services.AddScoped<IPasswordService, PasswordService>();
 
             services.AddScoped<IGymManagementService, GymManagementService>();
+            services.AddScoped<IMemberAccessService, MemberAccessService>();
+            services.AddScoped<IResourceAccessService, ResourceAccessService>();
 
             services.AddScoped<IUserService, UserService>();
 
