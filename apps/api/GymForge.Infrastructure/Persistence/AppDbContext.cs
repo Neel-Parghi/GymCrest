@@ -505,8 +505,8 @@ namespace GymForge.Infrastructure.Persistence
             modelBuilder.Entity<SaaSConfiguration>().HasData(new SaaSConfiguration
             {
                 Id = Guid.Parse("A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D"),
-                PlatformName = "GymForge",
-                BillingEmail = "admin@gymforge.com",
+                PlatformName = "Elevatyon",
+                BillingEmail = "admin@elevatyon.com",
                 TaxPercentage = 18.0m,
                 GracePeriodDays = 7,
                 Currency = "INR",

@@ -28,14 +28,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("https://gymforge-prod.vercel.app", 
+            policy.WithOrigins("https://elevatyon.vercel.app",
+                                "https://gymforge-prod.vercel.app",
                                 "https://gymforge-web.onrender.com",
                                 "http://localhost:4200")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  .SetIsOriginAllowed(origin => 
-                      new Uri(origin).Host == "localhost" || 
+                  .SetIsOriginAllowed(origin =>
+                      new Uri(origin).Host == "localhost" ||
                       origin.EndsWith(".vercel.app") ||
+                      origin == "https://elevatyon.vercel.app" ||
                       origin == "https://gymforge-prod.vercel.app" ||
                       origin == "https://gymforge-web.onrender.com");
         });

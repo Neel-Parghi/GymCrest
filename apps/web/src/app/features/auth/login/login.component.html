@@ -32,7 +32,7 @@
             <div class="form-item">
               <label for="email">Email Address</label>
               <div class="input-wrapper">
-                <input type="email" id="email" formControlName="email" placeholder="name@gymforge.com" [maxlength]="limits.EMAIL" required />
+                <input type="email" id="email" formControlName="email" placeholder="name@example.com" [maxlength]="limits.EMAIL" required />
               </div>
               <small class="form-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
                 <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</span>

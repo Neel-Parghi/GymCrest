@@ -18,9 +18,9 @@
       <!-- Top Meta Brand Block -->
       <div class="invoice-banner-header">
         <div class="brand">
-          <h2 class="name">{{ isSaaSInvoice(invoice) ? 'GYMFORGE SERVICES' : (gymDetails?.gymName || 'GYMFORGE OUTLET')
+          <h2 class="name">{{ isSaaSInvoice(invoice) ? 'ELEVATYON' : (gymDetails?.gymName || 'YOUR GYM')
             }}</h2>
-          <span class="tag">{{ isSaaSInvoice(invoice) ? 'GymForge SaaS Platform Subscriptions' : (gymDetails?.brandName
+          <span class="tag">{{ isSaaSInvoice(invoice) ? 'Elevatyon Platform Subscriptions' : (gymDetails?.brandName
             || 'Premium Health & Strength Hub') }}</span>
         </div>
         <div class="doc-type">
@@ -32,8 +32,8 @@
       <div class="invoice-address-grid">
         <div class="address-col source">
           <span class="section-title">ISSUED BY</span>
-          <h4 class="company-name">{{ isSaaSInvoice(invoice) ? 'GymForge Platform Services Pvt. Ltd.' :
-            (gymDetails?.gymName || 'GymForge Health Club') }}</h4>
+          <h4 class="company-name">{{ isSaaSInvoice(invoice) ? 'Elevatyon' :
+            (gymDetails?.gymName || 'Your Gym') }}</h4>
 
           <ng-container *ngIf="isSaaSInvoice(invoice)">
             <p *ngIf="platformConfig?.billingAddress">{{ platformConfig.billingAddress }}</p>
@@ -57,7 +57,7 @@
           <span class="section-title">BILLED TO</span>
           <h4 class="client-name">{{ isSaaSInvoice(invoice) ? (gymDetails?.gymName || 'GymOwner Club') :
             invoice.memberName }}</h4>
-          <p class="client-email">{{ isSaaSInvoice(invoice) ? (gymDetails?.contactEmail || 'owner@gymforge.com') :
+          <p class="client-email">{{ isSaaSInvoice(invoice) ? (gymDetails?.contactEmail || '—') :
             invoice.email }}</p>
           <p>{{ isSaaSInvoice(invoice) ? ('Gym No: ' + (gymDetails?.id?.slice(0,8) || 'GF-OWNER')) : ('Member No: ' +
             (invoice.membershipNumber || invoice.initials + '-' + invoice.id.slice(-4))) }}</p>
@@ -101,7 +101,7 @@
           <tr>
             <td class="desc-col">
               <strong>{{ isSaaSInvoice(invoice) ? invoice.planName : invoice.itemName }}</strong>
-              <span class="sub-caption">{{ isSaaSInvoice(invoice) ? 'GymForge SaaS Platform Subscription License' :
+              <span class="sub-caption">{{ isSaaSInvoice(invoice) ? 'Elevatyon Platform Subscription License' :
                 'Standard tax-applied Gym transaction' }}</span>
             </td>
             <td class="num">1</td>

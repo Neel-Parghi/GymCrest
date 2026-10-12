@@ -275,7 +275,7 @@ export class MembersListComponent implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `GymForge_Members_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `Elevatyon_Members_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
         this.notificationService.success(CONSTANTS.MEMBERS_MODULE.EXPORT_SUCCESS);

@@ -38,7 +38,7 @@ export class MemberDetailDrawer implements OnChanges, OnInit {
   PaymentStatus = PaymentStatus;
   subscriptionHistory: MemberSubscription[] = [];
   loadingHistory = false;
-  gymName = 'GYMFORGE';
+  gymName = 'YOUR GYM';
 
   ngOnInit(): void {
     this.loadGymName();

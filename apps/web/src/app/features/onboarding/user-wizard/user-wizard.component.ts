@@ -15,8 +15,9 @@ import {
   ACTIVITY_LEVELS, ActivityLevel, DIET_TYPES, DietType, FitnessGoalId
 } from '../../../shared/constants/fitness-preferences';
 import { SuggestedTargets } from '../../../core/models/user-settings.model';
+import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
 
-const DRAFT_KEY = 'gymForge_userWizardDraft_v2';
+const DRAFT_KEY = STORAGE_KEYS.USER_WIZARD_DRAFT;
 /** Drafts saved by the earlier three-step wizard; their step numbers no longer line up. */
 const LEGACY_DRAFT_KEY = 'gymForge_userWizardDraft';
 const STEP_COUNT = 4;

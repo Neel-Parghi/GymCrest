@@ -332,7 +332,7 @@ namespace GymForge.Application.Modules.Payments.Services
                 List<Domain.Entities.Plan> plans = await _saaSPlanRepository.GetAllPlansAsync();
                 Domain.Entities.Plan proPlan = plans.FirstOrDefault(p => p.Name.Contains("Pro", StringComparison.OrdinalIgnoreCase)) 
                               ?? plans.FirstOrDefault(p => p.IsActive)
-                              ?? new Domain.Entities.Plan { Name = "GymForge Pro Plan", Price = 4999, MaxBranches = 10, IsTrial = false };
+                              ?? new Domain.Entities.Plan { Name = "Elevatyon Pro Plan", Price = 4999, MaxBranches = 10, IsTrial = false };
 
                 return new GymSubscriptionStatusDto
                 {
@@ -356,7 +356,7 @@ namespace GymForge.Application.Modules.Payments.Services
             {
                 List<Domain.Entities.Plan> plans = await _saaSPlanRepository.GetAllPlansAsync();
                 plan = plans.FirstOrDefault(p => p.IsActive) 
-                       ?? new Domain.Entities.Plan { Name = "GymForge Pro Plan", Price = 4999, MaxBranches = 10 };
+                       ?? new Domain.Entities.Plan { Name = "Elevatyon Pro Plan", Price = 4999, MaxBranches = 10 };
             }
 
             return new GymSubscriptionStatusDto
@@ -449,7 +449,7 @@ namespace GymForge.Application.Modules.Payments.Services
                     decimal amt = t.Amount;
                     string planName = t.Subscription?.Plan?.Name 
                                       ?? plans.FirstOrDefault(p => p.Price == amt)?.Name 
-                                      ?? "GymForge Pro Plan";
+                                      ?? "Elevatyon Pro Plan";
                     return new PaymentTransactionDto
                     {
                         Id = t.Id,

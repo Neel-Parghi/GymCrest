@@ -65,7 +65,7 @@ export class InvoiceDetailModalComponent {
             printFrame.parentNode.removeChild(printFrame);
           }
           window.removeEventListener('message', handlePrintComplete);
-          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'GymForge License'));
+          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'Elevatyon License'));
         }
       };
 
