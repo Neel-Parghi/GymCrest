@@ -2,13 +2,15 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using GymForge.Application.Modules.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 namespace GymForge.Infrastructure.Services
 {
     public class CloudinaryFileStorageService : IFileStorageService
     {
+        private const int MaxDimension = 1200;
+        private const int JpegQuality = 75;
+        private static readonly HashSet<string> CompressedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+
         private readonly Cloudinary _cloudinary;
 
         public CloudinaryFileStorageService(IConfiguration configuration)
@@ -31,60 +33,31 @@ namespace GymForge.Infrastructure.Services
             if (fileStream == null || fileStream.Length == 0)
                 throw new ArgumentException("File stream is empty");
 
-            string[] allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-            string? extension = Path.GetExtension(fileName).ToLowerInvariant();
-            
-            Stream uploadStream = fileStream;
-            MemoryStream? compressedStream = null;
+            string extension = Path.GetExtension(fileName).ToLowerInvariant();
 
-            if (allowedExtensions.Contains(extension))
+            ImageUploadParams uploadParams = new()
             {
-                compressedStream = new MemoryStream();
-                using SixLabors.ImageSharp.Image image = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
-                
-                
-                int maxDimension = 1200;
-                if (image.Width > maxDimension || image.Height > maxDimension)
-                {
-                    image.Mutate(x => x.Resize(new ResizeOptions
-                    {
-                        Size = new SixLabors.ImageSharp.Size(maxDimension, maxDimension),
-                        Mode = ResizeMode.Max
-                    }));
-                }
+                File = new FileDescription(fileName, fileStream),
+                Folder = $"elevatyon/{folder}",
+                PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(fileName)}"
+            };
 
-                SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder encoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder { Quality = 75 };
-                await image.SaveAsync(compressedStream, encoder);
-                compressedStream.Position = 0;
-                uploadStream = compressedStream;
-                fileName = Path.ChangeExtension(fileName, ".jpg");
+            // Photos are shrunk to fit 1200px and stored as JPEG quality 75 by Cloudinary while uploading,
+            // so untrusted images are never decoded on this server. GIFs keep their animation.
+            if (CompressedExtensions.Contains(extension))
+            {
+                uploadParams.Transformation = new Transformation().Width(MaxDimension).Height(MaxDimension).Crop("limit").Quality(JpegQuality);
+                uploadParams.Format = "jpg";
             }
 
-            try
+            ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
             {
-                ImageUploadParams uploadParams = new()
-                {
-                    File = new FileDescription(fileName, uploadStream),
-                    Folder = $"elevatyon/{folder}",
-                    PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(fileName)}"
-                };
-
-                ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-                if (uploadResult.Error != null)
-                {
-                    throw new Exception($"Cloudinary upload failed: {uploadResult.Error.Message}");
-                }
-
-                return uploadResult.SecureUrl.ToString();
+                throw new Exception($"Cloudinary upload failed: {uploadResult.Error.Message}");
             }
-            finally
-            {
-                if (compressedStream != null)
-                {
-                    await compressedStream.DisposeAsync();
-                }
-            }
+
+            return uploadResult.SecureUrl.ToString();
         }
 
         public async Task DeleteFileAsync(string fileUrl)
