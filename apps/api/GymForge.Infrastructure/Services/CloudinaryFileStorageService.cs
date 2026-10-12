@@ -65,7 +65,7 @@ namespace GymForge.Infrastructure.Services
                 ImageUploadParams uploadParams = new()
                 {
                     File = new FileDescription(fileName, uploadStream),
-                    Folder = $"gymforge/{folder}",
+                    Folder = $"elevatyon/{folder}",
                     PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(fileName)}"
                 };
 

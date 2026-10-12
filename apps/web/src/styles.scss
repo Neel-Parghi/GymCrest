@@ -6,7 +6,7 @@
 
 :root {
   /* ==========================================================================
-     GYM FORGE DESIGN SYSTEM - COLOR PALETTE
+     ELEVATYON DESIGN SYSTEM - COLOR PALETTE
      ========================================================================== */
 
   /* Brand Colors */
@@ -712,9 +712,9 @@ app-date-time-picker.ng-invalid.ng-touched>div {
 }
 
 /* ==========================================================================
-   GYMFORGE DRIVER.JS TOUR OVERRIDES
+   ELEVATYON DRIVER.JS TOUR OVERRIDES
    ========================================================================== */
-.gymforge-tour-popover {
+.elevatyon-tour-popover {
   background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
@@ -886,7 +886,7 @@ app-date-time-picker.ng-invalid.ng-touched>div {
   }
 }
 
-[data-theme="dark"] .gymforge-tour-popover {
+[data-theme="dark"] .elevatyon-tour-popover {
   background: rgba(30, 41, 59, 0.85) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;

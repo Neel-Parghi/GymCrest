@@ -9,6 +9,7 @@ import { DailyPlanner } from '../../../../../shared/models/workout-plan.model';
 import { CONSTANTS } from '../../../../../core/constants/constants';
 import { AuthApiService } from '../../../../../core/services/auth-api.service';
 import { FIELD_LIMITS } from '../../../../../shared/constants/validation.constants';
+import { STORAGE_KEYS } from '../../../../../shared/utils/storage-keys';
 
 @Component({
   selector: 'app-daily-planner-creator',
@@ -268,12 +269,12 @@ export class DailyPlannerCreatorComponent implements OnInit {
       exercises: exercisesData
     };
 
-    localStorage.setItem('gymforge_copied_workout_split', JSON.stringify(this.copiedWorkout));
+    localStorage.setItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT, JSON.stringify(this.copiedWorkout));
     this.notification.success(CONSTANTS.WORKOUT_PLANNER_MODULE.DAILY_COPY_SUCCESS);
   }
 
   pasteWorkout(): void {
-    const raw = localStorage.getItem('gymforge_copied_workout_split');
+    const raw = localStorage.getItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT);
     if (!raw) {
       this.notification.warning(CONSTANTS.WORKOUT_PLANNER_MODULE.DAILY_NO_CLIPBOARD);
       return;

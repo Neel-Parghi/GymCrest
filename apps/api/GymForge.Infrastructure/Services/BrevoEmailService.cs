@@ -22,7 +22,7 @@ namespace GymForge.Infrastructure.Services
                 string apiKey = _config["Brevo:RestApiKey"] ?? throw new Exception("Brevo REST API Key (RestApiKey) is missing.");
                 string fromEmail = _config["Brevo:FromEmail"] ?? throw new Exception("Brevo FromEmail is missing.");
                 string fromName = _config["Brevo:FromName"] ?? throw new Exception("Brevo FromName is missing.");
-                string baseUrl = _config["GymForge:BaseUrl"] ?? throw new Exception("GymForge BaseUrl is missing.");
+                string baseUrl = _config["Elevatyon:BaseUrl"] ?? throw new Exception("Elevatyon BaseUrl is missing.");
 
                 string inviteLink = $"{baseUrl}/accept-invitation?token={Uri.EscapeDataString(token)}";
 

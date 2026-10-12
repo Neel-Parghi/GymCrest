@@ -38,7 +38,8 @@ export class AuthApiService extends BaseApiService {
   isDemoUser(): boolean {
     const profile = this.getUserProfile();
     if (!profile) return false;
-    return profile.email === 'demo@gymforge.com' || profile.email === 'demouser@gymforge.com';
+    return ['demo@elevatyon.com', 'demouser@elevatyon.com', 'demo@gymforge.com', 'demouser@gymforge.com']
+      .includes(profile.email?.toLowerCase());
   }
 
   constructor() {

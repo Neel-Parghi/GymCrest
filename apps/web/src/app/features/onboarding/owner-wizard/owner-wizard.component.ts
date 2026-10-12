@@ -17,6 +17,7 @@ import { DateTimePickerComponent } from '../../../shared/components/date-time-pi
 import { TimePickerComponent } from '../../../shared/components/time-picker/time-picker.component';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
+import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
 
 declare var Razorpay: any;
 
@@ -62,7 +63,7 @@ export class OwnerWizardComponent implements OnInit {
     const user = this.authService.getUserProfile();
 
     if (user && user.currentOnboardingStep) {
-      const draft = localStorage.getItem('gymForge_ownerWizardDraft');
+      const draft = localStorage.getItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
       if (draft || user.currentOnboardingStep === 1) {
         this.currentStep = user.currentOnboardingStep;
       } else {
@@ -78,14 +79,14 @@ export class OwnerWizardComponent implements OnInit {
   }
 
   saveDraft() {
-    localStorage.setItem('gymForge_ownerWizardDraft', JSON.stringify({
+    localStorage.setItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT, JSON.stringify({
       form: this.gymForm.value,
       selectedPlanId: this.selectedPlanId
     }));
   }
 
   loadDraft() {
-    const draftStr = localStorage.getItem('gymForge_ownerWizardDraft');
+    const draftStr = localStorage.getItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
     if (draftStr) {
       try {
         const draft = JSON.parse(draftStr);
@@ -283,7 +284,7 @@ export class OwnerWizardComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('gymForge_ownerWizardDraft');
+    localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
     this.authService.logout();
   }
 
@@ -396,8 +397,8 @@ export class OwnerWizardComponent implements OnInit {
       signature: response.razorpay_signature
     }).subscribe({
       next: () => {
-        localStorage.removeItem('gymForge_ownerWizardDraft');
-        this.toastr.success('Welcome to GymForge!');
+        localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
+        this.toastr.success('Welcome to Elevatyon!');
         this.authService.refreshToken().subscribe(() => {
           this.profileService.getProfile(true).subscribe(() => {
             this.router.navigate(['/gym-owner/dashboard']);
