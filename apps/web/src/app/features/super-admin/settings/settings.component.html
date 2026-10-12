@@ -52,7 +52,7 @@
           <div class="pane-icon identity-icon"><i class="fas fa-id-card"></i></div>
           <div class="pane-title-group">
             <h3>Platform Identity</h3>
-            <p>Set up the core brand identity and primary contact touchpoints of the GymForge SaaS platform.</p>
+            <p>Set up the core brand identity and primary contact touchpoints of the Elevatyon platform.</p>
           </div>
         </div>
 
@@ -60,7 +60,7 @@
           <div class="form-group full-width">
             <label for="platformName"><i class="fas fa-building"></i> Platform Name</label>
             <div class="input-wrapper">
-              <input id="platformName" type="text" formControlName="platformName" placeholder="e.g. GymForge" [maxlength]="limits.PLATFORM_NAME">
+              <input id="platformName" type="text" formControlName="platformName" placeholder="e.g. Elevatyon" [maxlength]="limits.PLATFORM_NAME">
             </div>
             <app-validation-message [control]="settingsForm.get('platformName')" fieldName="Platform name"></app-validation-message>
             <span class="field-hint">The public-facing name of the SaaS platform.</span>
@@ -70,7 +70,7 @@
             <div class="form-group">
               <label for="supportEmail"><i class="fas fa-envelope"></i> Support Email</label>
               <div class="input-wrapper">
-                <input id="supportEmail" type="email" formControlName="supportEmail" placeholder="support@gymforge.com" [maxlength]="limits.EMAIL">
+                <input id="supportEmail" type="email" formControlName="supportEmail" placeholder="support@elevatyon.com" [maxlength]="limits.EMAIL">
               </div>
               <app-validation-message [control]="settingsForm.get('supportEmail')" fieldName="Support email"></app-validation-message>
               <span class="field-hint">Used for handling general gym owner inquiries.</span>
@@ -166,7 +166,7 @@
             <div class="form-group">
               <label for="billingEmail"><i class="fas fa-file-invoice-dollar"></i> Billing & Finance Email</label>
               <div class="input-wrapper">
-                <input id="billingEmail" type="email" formControlName="billingEmail" placeholder="billing@gymforge.com" [maxlength]="limits.EMAIL">
+                <input id="billingEmail" type="email" formControlName="billingEmail" placeholder="billing@elevatyon.com" [maxlength]="limits.EMAIL">
               </div>
               <app-validation-message [control]="settingsForm.get('billingEmail')" fieldName="Billing email"></app-validation-message>
               <span class="field-hint">Receives SaaS payment receipts and notifications.</span>
@@ -228,7 +228,7 @@
           <div class="form-group full-width">
             <label for="termsUrl"><i class="fas fa-signature"></i> Terms of Service URL</label>
             <div class="input-wrapper">
-              <input id="termsUrl" type="url" formControlName="termsUrl" placeholder="https://gymforge.com/terms" [maxlength]="limits.URL">
+              <input id="termsUrl" type="url" formControlName="termsUrl" placeholder="https://elevatyon.com/terms" [maxlength]="limits.URL">
             </div>
             <app-validation-message [control]="settingsForm.get('termsUrl')" fieldName="Terms of Service URL"></app-validation-message>
             <span class="field-hint">Weblink to the official SaaS Terms of Service.</span>
@@ -237,7 +237,7 @@
           <div class="form-group full-width">
             <label for="privacyUrl"><i class="fas fa-user-shield"></i> Privacy Policy URL</label>
             <div class="input-wrapper">
-              <input id="privacyUrl" type="url" formControlName="privacyUrl" placeholder="https://gymforge.com/privacy" [maxlength]="limits.URL">
+              <input id="privacyUrl" type="url" formControlName="privacyUrl" placeholder="https://elevatyon.com/privacy" [maxlength]="limits.URL">
             </div>
             <app-validation-message [control]="settingsForm.get('privacyUrl')" fieldName="Privacy Policy URL"></app-validation-message>
             <span class="field-hint">Weblink to the official SaaS Privacy & Security Policy.</span>

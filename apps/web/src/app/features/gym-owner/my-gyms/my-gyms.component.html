@@ -14,7 +14,7 @@
         <input type="file" #logoInput hidden accept="image/*" (change)="onLogoChange($event)" [disabled]="!isEditMode">
       </div>
       <div class="title-block">
-        <h1>{{ gymData?.gymName || 'GymForge Elite Athletics' }}</h1>
+        <h1>{{ gymData?.gymName || 'Your Gym' }}</h1>
         <div class="status-row">
           <span class="badge active-partner">ACTIVE PARTNER</span>
           <span class="since-text">Partner since {{ (gymData?.createdOn | date:'MMM yyyy') || 'Oct 2021' }}</span>

@@ -76,9 +76,9 @@ export class HealthTrackerComponent implements OnInit {
         // Dynamic Fallback: if database is empty, pre-populate mock clients for immediate UI preview
         if (this.assignedMembers.length === 0) {
           this.assignedMembers = [
-            { memberId: 'm-01', firstName: 'Neel', lastName: 'Parghi', email: 'neel@gymforge.com', membershipNumber: 'MEM-87265', assignedSlot: '07:00 AM', assignedDate: new Date(), status: 'Active' },
-            { memberId: 'm-02', firstName: 'Aarav', lastName: 'Mehta', email: 'aarav@gymforge.com', membershipNumber: 'MEM-19028', assignedSlot: '09:00 AM', assignedDate: new Date(), status: 'Active' },
-            { memberId: 'm-03', firstName: 'Rohan', lastName: 'Sharma', email: 'rohan@gymforge.com', membershipNumber: 'MEM-33049', assignedSlot: '11:00 AM', assignedDate: new Date(), status: 'Expired' }
+            { memberId: 'm-01', firstName: 'Neel', lastName: 'Parghi', email: 'neel@example.com', membershipNumber: 'MEM-87265', assignedSlot: '07:00 AM', assignedDate: new Date(), status: 'Active' },
+            { memberId: 'm-02', firstName: 'Aarav', lastName: 'Mehta', email: 'aarav@example.com', membershipNumber: 'MEM-19028', assignedSlot: '09:00 AM', assignedDate: new Date(), status: 'Active' },
+            { memberId: 'm-03', firstName: 'Rohan', lastName: 'Sharma', email: 'rohan@example.com', membershipNumber: 'MEM-33049', assignedSlot: '11:00 AM', assignedDate: new Date(), status: 'Expired' }
           ];
         }
 
@@ -97,9 +97,9 @@ export class HealthTrackerComponent implements OnInit {
       error: (err) => {
         console.error('Error loading assigned members, loading premium mock fallback:', err);
         this.assignedMembers = [
-          { memberId: 'm-01', firstName: 'Neel', lastName: 'Parghi', email: 'neel@gymforge.com', membershipNumber: 'MEM-87265', assignedSlot: '07:00 AM', assignedDate: new Date(), status: 'Active' },
-          { memberId: 'm-02', firstName: 'Aarav', lastName: 'Mehta', email: 'aarav@gymforge.com', membershipNumber: 'MEM-19028', assignedSlot: '09:00 AM', assignedDate: new Date(), status: 'Active' },
-          { memberId: 'm-03', firstName: 'Rohan', lastName: 'Sharma', email: 'rohan@gymforge.com', membershipNumber: 'MEM-33049', assignedSlot: '11:00 AM', assignedDate: new Date(), status: 'Expired' }
+          { memberId: 'm-01', firstName: 'Neel', lastName: 'Parghi', email: 'neel@example.com', membershipNumber: 'MEM-87265', assignedSlot: '07:00 AM', assignedDate: new Date(), status: 'Active' },
+          { memberId: 'm-02', firstName: 'Aarav', lastName: 'Mehta', email: 'aarav@example.com', membershipNumber: 'MEM-19028', assignedSlot: '09:00 AM', assignedDate: new Date(), status: 'Active' },
+          { memberId: 'm-03', firstName: 'Rohan', lastName: 'Sharma', email: 'rohan@example.com', membershipNumber: 'MEM-33049', assignedSlot: '11:00 AM', assignedDate: new Date(), status: 'Expired' }
         ];
         this.isLoadingMembers = false;
 
