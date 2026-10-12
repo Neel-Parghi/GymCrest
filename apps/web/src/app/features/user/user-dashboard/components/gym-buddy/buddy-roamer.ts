@@ -25,6 +25,8 @@ const LONG_PRESS_MS = 320;
 /** How close (px) to a card's top edge a drop has to be to sit on it. */
 const PERCH_SNAP_PX = 32;
 const CARD_EDGE_MARGIN_PX = 24;
+const BUBBLE_MAX_PX = 200;
+const BUBBLE_EDGE_MARGIN_PX = 12;
 
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
@@ -150,8 +152,19 @@ export class BuddyRoamer {
     this.pos = p;
     this.mover.style.transform = p.x || p.y ? `translate(${p.x}px, ${p.y}px)` : '';
     this.mover.classList.toggle('roaming', !!(p.x || p.y));
-    // Keep the speech bubble on screen: flip it to the right when the buddy is near the left edge.
-    if (settle) this.mover.classList.toggle('bubble-right', this.mascot.getBoundingClientRect().left < 230);
+    if (settle) this.fitBubble();
+  }
+
+  // Keep the speech bubble on screen: open it on the roomier side and cap its width to that room.
+  private fitBubble(): void {
+    const r = this.mascot.getBoundingClientRect();
+    const viewport = document.documentElement.clientWidth;
+    const tuck = this.mover.classList.contains('is-3d') ? 16 : -10;
+    const left = r.left + tuck - BUBBLE_EDGE_MARGIN_PX;
+    const right = viewport - r.right + tuck - BUBBLE_EDGE_MARGIN_PX;
+    const toRight = right > left && left < BUBBLE_MAX_PX;
+    this.mover.classList.toggle('bubble-right', toRight);
+    this.mover.style.setProperty('--bubble-room', `${Math.max(Math.floor(toRight ? right : left), 120)}px`);
   }
 
   private setSpot(spot: Spot, pose: BuddyPose): void {

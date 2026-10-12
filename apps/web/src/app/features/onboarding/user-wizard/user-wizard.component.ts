@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -74,6 +74,7 @@ export class UserWizardComponent implements OnInit {
   private userService = inject(UserService);
   private profileService = inject(ProfileService);
   private destroyRef = inject(DestroyRef);
+  private scroller = viewChild<ElementRef<HTMLElement>>('scroller');
 
   readonly limitationsMaxLength = LIMITATIONS_MAX_LENGTH;
 
@@ -280,6 +281,8 @@ export class UserWizardComponent implements OnInit {
 
   goToStep(step: number): void {
     this.currentStep.set(step);
+    this.scroller()?.nativeElement.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
     if (step === STEP_COUNT) this.loadPreviewTargets();
     this.saveDraft();
   }
