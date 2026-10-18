@@ -8,7 +8,7 @@ namespace GymForge.Domain.Interface
     {
         Task SendInvitationEmailAsync(string email, string name, string token);
         Task SendOtpEmailAsync(string email, string name, string otpCode);
-        Task SendPasswordResetLinkEmailAsync(string email, string name, string resetLink);
+        Task SendPasswordResetLinkEmailAsync(string email, string name, string token);
         Task SendReceiptEmailAsync(string email, string name, string transactionId, string amount, string productName, string date);
         Task SendMembershipLinkedEmailAsync(string email, string name, string firstName);
         Task SendPlanExpiredEmailAsync(string email, string ownerName, string gymName, string endDate);

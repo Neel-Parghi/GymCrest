@@ -214,9 +214,7 @@ namespace GymForge.Application.Modules.Auth.Service
             user.Security.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
             
             await _unitOfWork.SaveChangesAsync();
-            
-            string resetLink = $"{dto.ClientUri.TrimEnd('/')}?email={Uri.EscapeDataString(user.Email)}&token={token}";
-            await _emailService.SendPasswordResetLinkEmailAsync(user.Email, user.FirstName, resetLink);
+            await _emailService.SendPasswordResetLinkEmailAsync(user.Email, user.FirstName, token);
         }
 
         public async Task ResetPasswordAsync(ResetPasswordRequestDto dto)

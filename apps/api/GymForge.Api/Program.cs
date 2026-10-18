@@ -35,18 +35,21 @@ string[] allowedOrigins = new[]
     .Distinct(StringComparer.OrdinalIgnoreCase)
     .ToArray();
 
+string? previewOriginSuffix = builder.Configuration["GymCrest:PreviewOriginSuffix"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyHeader()
+            policy.AllowAnyHeader()
                   .AllowAnyMethod()
                   .SetIsOriginAllowed(origin =>
-                      new Uri(origin).Host == "localhost" ||
-                      origin.EndsWith(".vercel.app") ||
-                      allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase));
+                      Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri) &&
+                      (uri.Host == "localhost" ||
+                       allowedOrigins.Contains(origin.TrimEnd('/'), StringComparer.OrdinalIgnoreCase) ||
+                       (!string.IsNullOrWhiteSpace(previewOriginSuffix) && uri.Scheme == Uri.UriSchemeHttps &&
+                        uri.Host.EndsWith(previewOriginSuffix, StringComparison.OrdinalIgnoreCase))));
         });
 });
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
