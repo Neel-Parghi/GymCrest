@@ -41,30 +41,22 @@ namespace GymForge.Application.BackgroundJobs
                 try
                 {
                     SubscriptionRecord? subscription = await _saasPaymentRepository.GetLatestSubscriptionByGymIdAsync(gym.Id);
-                    if (subscription == null) continue;
-
-                    Gym? gymEntity = await _gymRepository.GetGymByIdAsync(gym.Id);
-                    if (gymEntity == null || gymEntity.Owner == null || string.IsNullOrEmpty(gymEntity.Owner.Email)) continue;
+                    if (subscription == null || !subscription.IsActive) continue;
 
                     DateTime endDate = AppTimeZone.ToLocalDate(subscription.EndDate);
 
-                    if (endDate == today.AddDays(-1) && subscription.IsActive)
-                    {
-                        subscription.IsActive = false;
+                    // The plan's last day has passed. Catches up on plans that ended on a night the job didn't run,
+                    // and closes the plan even when the owner can't be emailed.
+                    if (endDate >= today) continue;
 
-                        string ownerName = $"{gymEntity.Owner.FirstName} {gymEntity.Owner.LastName}";
-                        string subject = $"Action Required: GymCrest Pro Plan Expired for {gymEntity.GymName}";
-                        string body = $@"
-                            <p>Hi {ownerName},</p>
-                            <p>Your GymCrest subscription for <strong>{gymEntity.GymName}</strong> has expired on {endDate:MMM dd, yyyy}.</p>
-                            <p>To restore full access for you and your staff, please log in to your dashboard and renew your subscription in the Billing section.</p>
-                            <br/>
-                            <p>Best regards,<br/>The GymCrest Team</p>
-                        ";
+                    subscription.IsActive = false;
 
-                        await _emailService.SendEmailAsync(gymEntity.Owner.Email, ownerName, subject, body);
-                        _logger.LogInformation($"Sent SaaS expiry email to {gymEntity.Owner.Email} for gym {gym.Id}.");
-                    }
+                    Gym? gymEntity = await _gymRepository.GetGymByIdAsync(gym.Id);
+                    if (gymEntity?.Owner == null || string.IsNullOrEmpty(gymEntity.Owner.Email)) continue;
+
+                    string ownerName = $"{gymEntity.Owner.FirstName} {gymEntity.Owner.LastName}";
+                    await _emailService.SendPlanExpiredEmailAsync(gymEntity.Owner.Email, ownerName, gymEntity.GymName, endDate.ToString("MMM dd, yyyy"));
+                    _logger.LogInformation($"Sent SaaS expiry email to {gymEntity.Owner.Email} for gym {gym.Id}.");
                 }
                 catch (Exception ex)
                 {

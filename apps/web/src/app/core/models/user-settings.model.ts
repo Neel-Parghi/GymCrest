@@ -15,7 +15,6 @@ export interface FitnessForm {
 
 export interface NotificationsForm {
   emailNotifications: FormControl<boolean>;
-  workoutReminders: FormControl<boolean>;
 }
 
 export interface DashboardForm {
@@ -34,7 +33,6 @@ export interface UserPreferences {
   targetFats?: number | null;
   targetTrainingTime?: number | null;
   emailNotificationsEnabled?: boolean;
-  workoutRemindersEnabled?: boolean;
   showGymBuddy?: boolean;
 }
 

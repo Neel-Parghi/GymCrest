@@ -272,7 +272,6 @@ namespace GymForge.Application.Modules.Users.Services
                 ActivityLevel = user.Preference?.ActivityLevel,
                 TrainingDaysPerWeek = user.Preference?.TrainingDaysPerWeek,
                 EmailNotificationsEnabled = user.Preference?.EmailNotificationsEnabled ?? true,
-                WorkoutRemindersEnabled = user.Preference?.WorkoutRemindersEnabled ?? true,
                 ShowGymBuddy = user.Preference?.ShowGymBuddy ?? true
             };
         }
@@ -306,7 +305,6 @@ namespace GymForge.Application.Modules.Users.Services
             user.Preference.ActivityLevel = ActivityLevels.Normalize(dto.ActivityLevel) ?? user.Preference.ActivityLevel;
             user.Preference.TrainingDaysPerWeek = dto.TrainingDaysPerWeek ?? user.Preference.TrainingDaysPerWeek;
             user.Preference.EmailNotificationsEnabled = dto.EmailNotificationsEnabled ?? true;
-            user.Preference.WorkoutRemindersEnabled = dto.WorkoutRemindersEnabled ?? true;
             user.Preference.ShowGymBuddy = dto.ShowGymBuddy ?? true;
             user.Preference.ModifiedOn = DateTime.UtcNow;
 

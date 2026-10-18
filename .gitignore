@@ -23,3 +23,6 @@ appsettings.Local.json
 
 # SQL Backups
 *.sql
+
+# Email template drafts (the live versions are Brevo templates)
+docs/email-templates/

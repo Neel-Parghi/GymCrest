@@ -58,8 +58,7 @@ export class UserSettingsComponent implements OnInit {
   });
 
   readonly notificationsForm = new FormGroup<NotificationsForm>({
-    emailNotifications: new FormControl(true, { nonNullable: true }),
-    workoutReminders: new FormControl(true, { nonNullable: true })
+    emailNotifications: new FormControl(true, { nonNullable: true })
   });
 
   readonly dashboardForm = new FormGroup<DashboardForm>({
@@ -148,8 +147,7 @@ export class UserSettingsComponent implements OnInit {
       targetFats: data.targetFats ?? null
     });
     this.notificationsForm.reset({
-      emailNotifications: data.emailNotificationsEnabled ?? true,
-      workoutReminders: data.workoutRemindersEnabled ?? true
+      emailNotifications: data.emailNotificationsEnabled ?? true
     });
     this.dashboardForm.reset({ showGymBuddy: data.showGymBuddy ?? true });
   }
@@ -212,7 +210,6 @@ export class UserSettingsComponent implements OnInit {
     const payload = {
       ...this.fitnessForm.getRawValue(),
       emailNotificationsEnabled: notifications.emailNotifications,
-      workoutRemindersEnabled: notifications.workoutReminders,
       showGymBuddy: this.dashboardForm.getRawValue().showGymBuddy
     };
 

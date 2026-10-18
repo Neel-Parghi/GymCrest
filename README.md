@@ -60,7 +60,7 @@ Log in with either of these accounts to explore the product without signing up:
 
 **Integrations**
 - **Razorpay** - SaaS and member subscription payments
-- **Brevo** - transactional email (SMTP + REST)
+- **Brevo** - transactional email via Brevo templates (wording and design are edited in Brevo; template IDs are set with `Brevo:Templates:*`)
 - **Cloudinary** - image/file storage
 - **USDA FoodData Central** (primary) + **CalorieNinjas** (fallback) - food/nutrition search for diet logging
 

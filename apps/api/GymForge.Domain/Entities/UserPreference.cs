@@ -22,7 +22,6 @@ namespace GymForge.Domain.Entities
         public string? Limitations { get; set; }
 
         public bool EmailNotificationsEnabled { get; set; } = true;
-        public bool WorkoutRemindersEnabled { get; set; } = true;
         public bool ShowGymBuddy { get; set; } = true;
     }
 }

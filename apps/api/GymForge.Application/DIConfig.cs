@@ -97,7 +97,6 @@ namespace GymForge.Application
             
             services.AddScoped<GymForge.Application.BackgroundJobs.SaaSExpiryJob>();
 
-            services.AddScoped<GymForge.Application.BackgroundJobs.WorkoutReminderJob>();
 
             services.AddScoped<GymForge.Application.BackgroundJobs.MemberAutoUnfreezeJob>();
 

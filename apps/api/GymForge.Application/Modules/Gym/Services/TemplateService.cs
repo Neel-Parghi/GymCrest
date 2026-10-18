@@ -131,10 +131,9 @@ namespace GymForge.Application.Modules.Gym.Services
 
             if (!string.IsNullOrEmpty(user.Email))
             {
-                string htmlBody = $"<p>{message.Replace("\n", "<br/>")}</p>";
                 try
                 {
-                    await _emailService.SendEmailAsync(user.Email, userName, "[TEST] " + title, htmlBody);
+                    await _emailService.SendMembershipNoticeEmailAsync(user.Email, userName, gymName, "[TEST] " + title, message);
                 }
                 catch
                 {

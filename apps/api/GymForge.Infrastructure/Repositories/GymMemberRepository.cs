@@ -150,6 +150,7 @@ namespace GymForge.Infrastructure.Repositories
             return await _dbContext.MemberSubscriptions
                 .Include(ms => ms.Member)
                     .ThenInclude(m => m.User)
+                        .ThenInclude(u => u!.Preference)
                 .Include(ms => ms.GymPlan)
                 .Where(ms => ms.Member.GymId == gymId && ms.IsActive)
                 .ToListAsync();
