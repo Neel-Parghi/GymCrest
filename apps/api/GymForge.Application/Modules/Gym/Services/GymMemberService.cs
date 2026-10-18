@@ -102,7 +102,7 @@ namespace GymForge.Application.Modules.Gym.Services
                 await _emailService.SendEmailAsync(
                     existingUser.Email,
                     $"{existingUser.FirstName} {existingUser.LastName}",
-                    "Elevatyon: Gym Membership Linked",
+                    "GymCrest: Gym Membership Linked",
                     $"<p>Hi {existingUser.FirstName},</p><p>A gym has just linked a new membership to your account! You can now log into your User Portal to view your gym membership, plans, and tracker.</p>"
                 );
             }
@@ -269,7 +269,7 @@ namespace GymForge.Application.Modules.Gym.Services
                 await _emailService.SendEmailAsync(
                     existingUser.Email,
                     $"{existingUser.FirstName} {existingUser.LastName}",
-                    "Elevatyon: Gym Membership Linked",
+                    "GymCrest: Gym Membership Linked",
                     $"<p>Hi {existingUser.FirstName},</p><p>A gym has just linked a new membership to your account! You can now log into your User Portal to view your gym membership, plans, and tracker.</p>"
                 );
             }

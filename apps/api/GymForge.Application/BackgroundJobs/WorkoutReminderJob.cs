@@ -81,7 +81,7 @@ namespace GymForge.Application.BackgroundJobs
                     string subject = "Today's workout is waiting for you";
                     string body = $"<p>Hi {firstName},</p>" +
                                    $"<p>You've got <strong>{todayPlan.DayName}</strong> ({todayPlan.Category}) scheduled today. " +
-                                   "Log in to Elevatyon and get it done!</p>" +
+                                   "Log in to GymCrest and get it done!</p>" +
                                    "<p style=\"color:#94a3b8;font-size:12px;\">You're receiving this because Workout Reminders are enabled in your Account Settings. " +
                                    "You can turn them off any time from there.</p>";
 

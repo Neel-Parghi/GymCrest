@@ -53,7 +53,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
                 csv.AppendLine($"{t.Id},{gymName},{t.Amount},{t.Currency},{status},{t.GatewayTransactionId},{reason},{t.CreatedOn:yyyy-MM-dd HH:mm:ss}");
             }
 
-            return (Encoding.UTF8.GetBytes(csv.ToString()), $"Elevatyon_Financials_{DateTime.UtcNow:yyyyMMdd}.csv");
+            return (Encoding.UTF8.GetBytes(csv.ToString()), $"GymCrest_Financials_{DateTime.UtcNow:yyyyMMdd}.csv");
         }
 
         private async Task<(byte[] Content, string FileName)> GenerateGymDirectoryReportAsync()
@@ -71,7 +71,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
                 csv.AppendLine($"{g.GymName.Replace(",", " ")},{g.BrandName?.Replace(",", " ")},{g.Email},{g.Phone},{g.WebsiteUrl},{g.GstNumber},{g.RegistrationNumber},{established},{ownerName},{g.IsVerified},{g.CreatedOn:yyyy-MM-dd}");
             }
 
-            return (Encoding.UTF8.GetBytes(csv.ToString()), $"Elevatyon_Directory_{DateTime.UtcNow:yyyyMMdd}.csv");
+            return (Encoding.UTF8.GetBytes(csv.ToString()), $"GymCrest_Directory_{DateTime.UtcNow:yyyyMMdd}.csv");
         }
 
         private async Task<(byte[] Content, string FileName)> GenerateSnapshotReportAsync()
@@ -85,7 +85,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
             csv.AppendLine($"Subscription Target,{config.SubscriptionTarget},Active,{DateTime.UtcNow:yyyy-MM-dd}");
             csv.AppendLine($"Uptime Threshold,{config.UptimeThreshold}%,Nominal,{DateTime.UtcNow:yyyy-MM-dd}");
 
-            return (Encoding.UTF8.GetBytes(csv.ToString()), $"Elevatyon_Strategy_{DateTime.UtcNow:yyyyMMdd}.csv");
+            return (Encoding.UTF8.GetBytes(csv.ToString()), $"GymCrest_Strategy_{DateTime.UtcNow:yyyyMMdd}.csv");
         }
     }
 }

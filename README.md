@@ -1,6 +1,6 @@
-# Elevatyon
+# GymCrest
 
-**Elevatyon** is a multi-tenant SaaS platform for gym owners, trainers, and members - one system to run a gym's day-to-day operations (memberships, billing, staff payroll, attendance) and give members a real fitness experience (workout & diet planning, progress tracking, nutrition logging).
+**GymCrest** is a multi-tenant SaaS platform for gym owners, trainers, and members - one system to run a gym's day-to-day operations (memberships, billing, staff payroll, attendance) and give members a real fitness experience (workout & diet planning, progress tracking, nutrition logging).
 
 It's built as a monorepo: an Angular web app, a .NET Web API, and a static marketing landing page.
 
@@ -8,14 +8,14 @@ It's built as a monorepo: an Angular web app, a .NET Web API, and a static marke
 
 ## 🚀 Live Demo
 
-**[elevatyon.vercel.app](https://elevatyon.vercel.app/)**
+**[gymcrest.vercel.app](https://gymcrest.vercel.app/)**
 
 Log in with either of these accounts to explore the product without signing up:
 
 | Role | Email | Password | What you'll see |
 |---|---|---|---|
-| **Gym Owner** | `demo@elevatyon.com` | `GymOwner@19` | Full back-office: members, staff, billing, workout/diet libraries, attendance, gym plans |
-| **Member (User)** | `demouser@elevatyon.com` | `DemoUser@19` | Self-service portal: workout & diet planner, progress dashboard, diet tracker, health tracker |
+| **Gym Owner** | `demo@gymcrest.com` | `GymOwner@19` | Full back-office: members, staff, billing, workout/diet libraries, attendance, gym plans |
+| **Member (User)** | `demouser@gymcrest.com` | `DemoUser@19` | Self-service portal: workout & diet planner, progress dashboard, diet tracker, health tracker |
 
 > These are shared demo accounts on a live environment - please don't rely on data you enter persisting, and don't use them for anything sensitive.
 
@@ -25,7 +25,7 @@ Log in with either of these accounts to explore the product without signing up:
 
 ### For Gym Owners & Staff
 - **Member management** - onboarding, subscriptions, plan assignment, attendance, and a self-service member portal with automatic email-based account linking (a member can be added by staff before they ever sign up).
-- **Billing** - two independent billing flows: Elevatyon's own SaaS subscription for the gym owner (Razorpay checkout, trial periods, automatic access cutoff on expiry) and the gym's own member billing (plans with promotional pricing, Razorpay self-checkout, offline/cash entry).
+- **Billing** - two independent billing flows: GymCrest's own SaaS subscription for the gym owner (Razorpay checkout, trial periods, automatic access cutoff on expiry) and the gym's own member billing (plans with promotional pricing, Razorpay self-checkout, offline/cash entry).
 - **Staff & payroll** - role-based staff accounts (Trainer / Staff) with invite-based onboarding, a configurable permission matrix for what Staff can see, PT/Rehab commission tracking, and trainer-linked custom invoices.
 - **Workout & Diet libraries** - trainers build reusable Daily/Weekly/Split workout templates and diet plans with calorie/macro targets; gym owners can view, edit, and assign any trainer's plans to any member from a dedicated Resources section.
 - **Multi-branch support**, gym announcements, and an inventory/equipment tracker.
@@ -112,10 +112,12 @@ Create `apps/api/GymForge.Api/appsettings.Development.json` (gitignored, safe fo
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=elevatyon;Username=postgres;Password=yourpassword"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=gymcrest;Username=postgres;Password=yourpassword"
   }
 }
 ```
+
+`GymCrest:BaseUrl` is the frontend address used in emailed links (invitations) and is also allowed by CORS; set it to `http://localhost:4200` for local development.
 
 Other config sections in `appsettings.json` (`Jwt`, `Brevo`, `Cloudinary`, `Razorpay` keys per gym, `CalorieNinjas`, `UsdaFoodData`) ship with placeholder values - the app runs without them, but the features they back (email, file uploads, payments, food search) will be degraded or disabled until you supply real keys the same way.
 

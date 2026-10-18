@@ -53,13 +53,13 @@ namespace GymForge.Application.BackgroundJobs
                         subscription.IsActive = false;
 
                         string ownerName = $"{gymEntity.Owner.FirstName} {gymEntity.Owner.LastName}";
-                        string subject = $"Action Required: Elevatyon Pro Plan Expired for {gymEntity.GymName}";
+                        string subject = $"Action Required: GymCrest Pro Plan Expired for {gymEntity.GymName}";
                         string body = $@"
                             <p>Hi {ownerName},</p>
-                            <p>Your Elevatyon subscription for <strong>{gymEntity.GymName}</strong> has expired on {endDate:MMM dd, yyyy}.</p>
+                            <p>Your GymCrest subscription for <strong>{gymEntity.GymName}</strong> has expired on {endDate:MMM dd, yyyy}.</p>
                             <p>To restore full access for you and your staff, please log in to your dashboard and renew your subscription in the Billing section.</p>
                             <br/>
-                            <p>Best regards,<br/>The Elevatyon Team</p>
+                            <p>Best regards,<br/>The GymCrest Team</p>
                         ";
 
                         await _emailService.SendEmailAsync(gymEntity.Owner.Email, ownerName, subject, body);
