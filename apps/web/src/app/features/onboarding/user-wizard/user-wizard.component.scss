@@ -33,7 +33,7 @@
   // Same photo as login/register under a navy veil, so sign-up and onboarding feel like one flow.
   background:
     linear-gradient(180deg, rgba(10, 31, 68, 0.94) 0%, rgba(10, 31, 68, 0.82) 100%),
-    url('/images/auth-hero.jpg') center / cover no-repeat;
+    url('/images/auth-hero.webp') center / cover no-repeat;
   color: white;
   padding: 40px 32px;
   display: flex;
@@ -42,7 +42,7 @@
   [data-theme="dark"] & {
     background:
       linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.88) 100%),
-      url('/images/auth-hero.jpg') center / cover no-repeat;
+      url('/images/auth-hero.webp') center / cover no-repeat;
   }
 
   @include bp.mobile {

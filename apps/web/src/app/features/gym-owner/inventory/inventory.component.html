@@ -72,7 +72,7 @@
           <div class="asset-card glass" *ngFor="let eq of equipmentItems"
             (click)="onInventoryAction({ action: 'view', row: eq })">
             <div class="asset-image-wrapper">
-              <img [src]="eq.imageUrl || 'assets/images/placeholder-equipment.png'" [alt]="eq.name" class="asset-image">
+              <img [src]="eq.imageUrl || '/assets/images/placeholder-equipment.svg'" [alt]="eq.name" class="asset-image">
               <div class="asset-status-overlay">
                 <span class="badge" [ngClass]="getBadgeClass(eq.status)">{{eq.status}}</span>
               </div>

@@ -14,8 +14,10 @@
     <div class="printable-tax-invoice-card" id="receipt-content"></div>
 
     <script>
-      // Listen for print requests from the parent Angular component
+      // Listen for print requests from the parent Angular component. Only our own app may send them:
+      // the payload is injected as HTML, so a message from another site must never be trusted.
       window.addEventListener('message', function(event) {
+        if (event.origin !== window.location.origin || event.source !== window.parent) return;
         if (event.data && event.data.type === 'PRINT_INVOICE') {
           // Set invoice title
           document.title = "Invoice " + event.data.invoiceId;
@@ -29,7 +31,7 @@
             window.print();
             
             // Notify parent to clean up the iframe
-            window.parent.postMessage({ type: 'PRINT_COMPLETE' }, '*');
+            window.parent.postMessage({ type: 'PRINT_COMPLETE' }, window.location.origin);
           }, 150);
         }
       });
