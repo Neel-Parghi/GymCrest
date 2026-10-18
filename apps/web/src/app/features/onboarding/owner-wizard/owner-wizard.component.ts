@@ -18,6 +18,7 @@ import { TimePickerComponent } from '../../../shared/components/time-picker/time
 import { CONSTANTS } from '../../../core/constants/constants';
 import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
 import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
+import { take } from 'rxjs';
 
 declare var Razorpay: any;
 
@@ -32,6 +33,7 @@ export class OwnerWizardComponent implements OnInit {
   readonly limits = FIELD_LIMITS;
 
   currentStep = 1;
+  ownerFirstName = '';
   totalSteps = 6;
   collapsedBranches: boolean[] = [];
 
@@ -61,6 +63,7 @@ export class OwnerWizardComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.loadDraft();
+    this.prefillFromAccount();
     const user = this.authService.getUserProfile();
 
     if (user && user.currentOnboardingStep) {
@@ -77,6 +80,26 @@ export class OwnerWizardComponent implements OnInit {
     }
 
     this.gymForm.valueChanges.subscribe(() => this.saveDraft());
+  }
+
+  private prefillFromAccount(): void {
+    const tokenEmail = String(this.authService.decodeToken()?.['email'] ?? '');
+    this.applyAccountDetails(this.authService.getUserProfile()?.email || tokenEmail);
+
+    this.profileService.getProfile().pipe(take(1)).subscribe({
+      next: profile => {
+        this.ownerFirstName = profile?.firstName || '';
+        this.applyAccountDetails(profile?.email, profile?.phone);
+      },
+      error: () => { }
+    });
+  }
+
+  private applyAccountDetails(email?: string, phone?: string): void {
+    const gymInfo = this.gymForm.get('gymInfo');
+
+    if (email) gymInfo?.get('email')?.setValue(email);
+    if (phone && !gymInfo?.get('phone')?.value) gymInfo?.get('phone')?.setValue(phone);
   }
 
   saveDraft() {
@@ -406,7 +429,7 @@ export class OwnerWizardComponent implements OnInit {
     }).subscribe({
       next: () => {
         localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
-        this.toastr.success('Welcome to Elevatyon!');
+        this.toastr.success('Welcome to GymCrest!');
         this.authService.refreshToken().subscribe(() => {
           this.profileService.getProfile(true).subscribe(() => {
             this.router.navigate(['/gym-owner/dashboard']);

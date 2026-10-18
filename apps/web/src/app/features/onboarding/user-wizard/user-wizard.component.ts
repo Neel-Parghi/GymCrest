@@ -69,6 +69,7 @@ interface WizardDraft {
 })
 export class UserWizardComponent implements OnInit {
   private authService = inject(AuthApiService);
+  readonly firstName = toSignal(this.authService.userProfile$.pipe(map(profile => profile?.firstName ?? '')), { initialValue: '' });
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private userService = inject(UserService);
@@ -228,6 +229,8 @@ export class UserWizardComponent implements OnInit {
 
     this.metricsForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.saveDraft());
     this.planForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.saveDraft());
+
+    this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => { } });
   }
 
   allowNumbersOnly(event: KeyboardEvent): void {

@@ -82,7 +82,7 @@
                 <div class="hero-banner">
                   <div class="banner-bg"></div>
                   <div class="banner-content">
-                    <h1>Welcome to Elevatyon.</h1>
+                    <h1>Welcome to GymCrest{{ ownerFirstName ? ', ' + ownerFirstName : '' }}.</h1>
                     <p>Let's get your gym set up and ready for business.</p>
                   </div>
                 </div>
@@ -155,7 +155,9 @@
                   </div>
                   <div class="form-group">
                     <label>Email Address *</label>
-                    <input type="email" formControlName="email" placeholder="contact@gym.com" [maxlength]="limits.EMAIL">
+                    <input type="email" formControlName="email" placeholder="contact@gym.com" [maxlength]="limits.EMAIL" readonly
+                      title="This is the email you signed up with">
+                    <small class="field-note">Your sign-up email</small>
                     <app-validation-message [control]="gymForm.get('gymInfo.email')"
                       fieldName="Email"></app-validation-message>
                   </div>
@@ -442,7 +444,7 @@
   <!-- Footer -->
   <footer class="auth-footer">
     <app-brand-logo class="footer-logo" />
-    <div class="copyright">© 2026 ELEVATYON. ALL RIGHTS RESERVED.</div>
+    <div class="copyright">© 2026 GYMCREST. ALL RIGHTS RESERVED.</div>
     <div class="footer-links">
       <a routerLink="/privacy-policy">Privacy Policy</a>
       <a routerLink="/terms-of-service">Terms of Service</a>
