@@ -33,7 +33,10 @@ export class ForgotPasswordComponent {
   }
 
   sendLink() {
-    if (this.emailForm.invalid) return;
+    if (this.emailForm.invalid) {
+      this.emailForm.markAllAsTouched();
+      return;
+    }
     this.isLoading = true;
     this.submittedEmail = this.emailForm.value.email;
 

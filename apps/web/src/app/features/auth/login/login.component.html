@@ -25,7 +25,7 @@
         <div class="auth-card">
           <div class="card-header">
             <h2 class="card-title">Sign In</h2>
-            <p class="card-subtitle">Welcome back. Please enter your credentials.</p>
+            <p class="card-subtitle">One login for members, trainers and gym owners. We'll take you to the right place.</p>
           </div>
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
@@ -71,14 +71,14 @@
               <a routerLink="/forgot-password" class="label-link">Forgot password?</a>
             </div>
 
-            <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoading">
+            <button type="submit" class="submit-btn" [disabled]="isLoading">
               {{ isLoading ? 'Signing in...' : 'Sign In' }}
               <i class="fa-solid fa-arrow-right arrow-icon" *ngIf="!isLoading"></i>
             </button>
           </form>
 
           <div class="auth-footer-prompt">
-            New to Elevatyon?
+            New to GymCrest?
             <a routerLink="/register">Create an account</a>
           </div>
 
@@ -90,7 +90,7 @@
   <!-- Footer -->
   <footer class="auth-footer">
     <app-brand-logo class="footer-logo" />
-    <div class="copyright">© 2026 <span class="copyright-brand">ELEVATYON. </span>ALL RIGHTS RESERVED.</div>
+    <div class="copyright">© 2026 <span class="copyright-brand">GYMCREST. </span>ALL RIGHTS RESERVED.</div>
     <div class="footer-links">
       <a routerLink="/privacy-policy">Privacy Policy</a>
       <a routerLink="/terms-of-service">Terms of Service</a>

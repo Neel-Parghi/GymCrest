@@ -89,6 +89,8 @@ export class LoginComponent {
           this.isLoading = false;
         },
       });
+    } else {
+      this.loginForm.markAllAsTouched();
     }
   }
 }
