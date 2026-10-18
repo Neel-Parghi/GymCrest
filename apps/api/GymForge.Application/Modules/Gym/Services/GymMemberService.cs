@@ -99,12 +99,10 @@ namespace GymForge.Application.Modules.Gym.Services
 
             if (existingUser != null)
             {
-                await _emailService.SendEmailAsync(
+                await _emailService.SendMembershipLinkedEmailAsync(
                     existingUser.Email,
                     $"{existingUser.FirstName} {existingUser.LastName}",
-                    "GymCrest: Gym Membership Linked",
-                    $"<p>Hi {existingUser.FirstName},</p><p>A gym has just linked a new membership to your account! You can now log into your User Portal to view your gym membership, plans, and tracker.</p>"
-                );
+                    existingUser.FirstName);
             }
 
             return _mapper.Map<GymMemberResponse>(member);
@@ -266,12 +264,10 @@ namespace GymForge.Application.Modules.Gym.Services
 
             if (isNewlyLinked && existingUser != null)
             {
-                await _emailService.SendEmailAsync(
+                await _emailService.SendMembershipLinkedEmailAsync(
                     existingUser.Email,
                     $"{existingUser.FirstName} {existingUser.LastName}",
-                    "GymCrest: Gym Membership Linked",
-                    $"<p>Hi {existingUser.FirstName},</p><p>A gym has just linked a new membership to your account! You can now log into your User Portal to view your gym membership, plans, and tracker.</p>"
-                );
+                    existingUser.FirstName);
             }
 
             return _mapper.Map<GymMemberResponse>(member);

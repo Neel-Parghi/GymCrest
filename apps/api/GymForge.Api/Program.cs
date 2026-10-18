@@ -192,10 +192,6 @@ RecurringJob.AddOrUpdate<GymForge.Application.BackgroundJobs.SaaSExpiryJob>(
     job => job.ExecuteAsync(),
     Cron.Daily(1, 0), istSchedule); // 1:00 AM IST
 
-RecurringJob.AddOrUpdate<GymForge.Application.BackgroundJobs.WorkoutReminderJob>(
-    "daily-workout-reminders",
-    job => job.ExecuteAsync(),
-    Cron.Daily(4, 30), istSchedule); // 4:30 AM IST
 
 RecurringJob.AddOrUpdate<GymForge.Application.BackgroundJobs.MemberAutoUnfreezeJob>(
     "daily-member-auto-unfreeze",

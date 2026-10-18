@@ -14,7 +14,6 @@ namespace GymForge.Contracts.Users
         public int? TrainingDaysPerWeek { get; set; }
 
         public bool? EmailNotificationsEnabled { get; set; }
-        public bool? WorkoutRemindersEnabled { get; set; }
         public bool? ShowGymBuddy { get; set; }
     }
 
