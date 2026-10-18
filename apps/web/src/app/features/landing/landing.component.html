@@ -1,0 +1,570 @@
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav class="navbar">
+  <a class="logo" routerLink="/" aria-label="GymCrest home"><app-brand-logo class="nav-logo" /></a>
+  <div class="nav-links" [class.open]="menuOpen()">
+    <a href="#features" (click)="scrollTo('features', $event)">Features</a>
+    <a href="#members" (click)="scrollTo('members', $event)">For members</a>
+    <a href="#demo" (click)="scrollTo('demo', $event)">Live demo</a>
+    <a href="#pricing" (click)="scrollTo('pricing', $event)">Pricing</a>
+    <a href="#faq" (click)="scrollTo('faq', $event)">FAQ</a>
+    <div class="auth-buttons-mobile">
+      <a routerLink="/login" class="btn btn-outline">Log in</a>
+      <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-primary">Register your gym</a>
+    </div>
+  </div>
+  <div class="auth-buttons">
+    <a routerLink="/login" class="btn btn-outline">Log in</a>
+    <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-primary">Register your gym</a>
+  </div>
+  <button class="nav-toggle" [class.open]="menuOpen()" (click)="toggleMenu()" aria-label="Toggle navigation"
+    [attr.aria-expanded]="menuOpen()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+@if (menuOpen()) {
+  <div class="nav-backdrop" (click)="toggleMenu()"></div>
+}
+
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-pill"><span class="pill-dot"></span> One app for gym owners, trainers &amp; members</div>
+    <div class="hero-copy">
+      @for (message of heroMessages; track $index) {
+        <div class="hero-message" [class.active]="$index === heroIndex()"
+          [attr.aria-hidden]="$index !== heroIndex()">
+          <h1>{{ message.lead }} <span class="highlight">{{ message.highlight }}</span></h1>
+          <p>{{ message.subtext }}</p>
+        </div>
+      }
+    </div>
+    <div class="cta-group">
+      <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-primary btn-large">Register your gym <i class="fas fa-arrow-right"></i></a>
+      <span> or </span>
+      <a routerLink="/register" [queryParams]="{ as: 'member' }" class="btn btn-outline btn-large">I want to log work out</a>
+    </div>
+    <a href="#demo" class="demo-link" (click)="scrollTo('demo', $event)"><i class="fas fa-circle-play"></i> Or try the live demo first</a>
+    <ul class="hero-highlights">
+      <li><i class="fas fa-id-card"></i> Memberships &amp; renewals</li>
+      <li><i class="fas fa-file-invoice"></i> Billing &amp; Razorpay</li>
+      <li><i class="fas fa-calendar-check"></i> Desk check-in</li>
+      <li><i class="fas fa-dumbbell"></i> Workout &amp; diet plans</li>
+    </ul>
+    <ul class="trust-points">
+      <li><i class="fas fa-gift"></i> Free for users</li>
+      <li><i class="fas fa-download"></i> Install as an app</li>
+      <li><i class="fas fa-location-dot"></i> Made in India</li>
+    </ul>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-scenes" aria-hidden="true">
+      <div class="hero-scene" [class.active]="heroIndex() === 0">
+        <div class="mock-window">
+          <div class="browser-bar">
+            <span></span><span></span><span></span>
+            <span class="url">gymcrest.vercel.app/gym-owner/dashboard</span>
+          </div>
+          <div class="app">
+            <aside class="app-side">
+              <div class="app-brand">
+                <app-brand-logo class="app-logo" />
+                <small>Gym owner portal</small>
+                <i class="fas fa-bars app-burger"></i>
+              </div>
+              <div class="app-nav active"><i class="fas fa-house"></i> Dashboard</div>
+              <div class="app-label">Management</div>
+              <div class="app-nav"><i class="fas fa-users"></i> Members</div>
+              <div class="app-nav"><i class="fas fa-calendar-check"></i> Attendance</div>
+              <div class="app-nav"><i class="fas fa-user-tie"></i> Staff &amp; Trainers</div>
+              <div class="app-nav"><i class="fas fa-receipt"></i> Gym Plans</div>
+              <div class="app-nav"><i class="fas fa-bullhorn"></i> Announcements</div>
+              <div class="app-label">Resources</div>
+              <div class="app-nav"><i class="fas fa-boxes-stacked"></i> Inventory</div>
+              <div class="app-nav"><i class="fas fa-building"></i> My Gyms</div>
+              <div class="app-nav"><i class="fas fa-dumbbell"></i> Workout Library</div>
+              <div class="app-nav"><i class="fas fa-utensils"></i> Diet Library</div>
+              <div class="app-label">Finances</div>
+              <div class="app-nav"><i class="fas fa-file-invoice-dollar"></i> Billing &amp; Invoices</div>
+              <div class="app-label">Account</div>
+              <div class="app-nav"><i class="fas fa-user-circle"></i> My Account</div>
+              <div class="app-nav"><i class="fas fa-gear"></i> Settings</div>
+              <div class="app-nav app-logout"><i class="fas fa-right-from-bracket"></i> Logout</div>
+            </aside>
+
+            <div class="app-main">
+              <div class="app-top">
+                <span class="app-location"><i class="fas fa-globe"></i> All Locations (Global)</span>
+                <span class="app-top-icons"><i class="fas fa-bell"></i><span class="app-me">IT</span></span>
+              </div>
+              <div class="app-title">
+                <strong>Gym Overview</strong>
+                <small>Performance metrics and operational overview of your gym.</small>
+              </div>
+
+              <div class="app-stats">
+                <div class="app-stat">
+                  <div class="app-stat-head"><span class="tile blue"><i class="fas fa-wallet"></i></span><span class="badge">+12%</span></div>
+                  <small>Total Revenue</small>
+                  <strong>₹1,24,500</strong>
+                </div>
+                <div class="app-stat">
+                  <div class="app-stat-head"><span class="tile purple"><i class="fas fa-id-card"></i></span><span class="badge">+8% growth</span></div>
+                  <small>Total Members</small>
+                  <strong>248</strong>
+                </div>
+                <div class="app-stat">
+                  <div class="app-stat-head"><span class="tile green"><i class="fas fa-users"></i></span></div>
+                  <small>Today's Attendance</small>
+                  <strong>63</strong>
+                </div>
+                <div class="app-stat">
+                  <div class="app-stat-head"><span class="tile red"><i class="fas fa-box-open"></i></span><span class="badge">Healthy</span></div>
+                  <small>Inventory Status</small>
+                  <strong>42 <em>Products</em></strong>
+                </div>
+              </div>
+
+              <div class="app-row">
+                <div class="app-card">
+                  <strong>Check-in Count</strong>
+                  <small>Member peak hours throughout the day</small>
+                  <div class="chart-bars">
+                    <div class="bar" style="--h: 55%"></div>
+                    <div class="bar" style="--h: 85%"></div>
+                    <div class="bar" style="--h: 48%"></div>
+                    <div class="bar" style="--h: 22%"></div>
+                    <div class="bar" style="--h: 18%"></div>
+                    <div class="bar" style="--h: 40%"></div>
+                    <div class="bar highlight-bar" style="--h: 100%"></div>
+                    <div class="bar" style="--h: 70%"></div>
+                    <div class="bar" style="--h: 30%"></div>
+                  </div>
+                  <div class="chart-axis"><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>10 PM</span></div>
+                </div>
+                <div class="app-card app-distribution">
+                  <strong>Member Distribution</strong>
+                  <small>Active subscriptions by tier</small>
+                  <div class="donut"><span class="donut-ring"></span><span class="donut-label"><b>248</b>Total</span></div>
+                  <div class="legend"><i class="dot-navy"></i> 6 Months Plan <b>58%</b></div>
+                  <div class="legend"><i class="dot-light"></i> 3 Months Plan <b>42%</b></div>
+                </div>
+              </div>
+
+              <div class="app-row">
+                <div class="app-card">
+                  <div class="app-card-head"><strong>Recent Enrollments</strong><span>View All Members</span></div>
+                  <table class="app-table">
+                    <thead><tr><th>Member name</th><th>Date joined</th><th>Tier</th><th>Status</th></tr></thead>
+                    <tbody>
+                      <tr><td><span class="app-avatar">RS</span> Rohan Shah</td><td>Oct 16, 2026</td><td><span class="tier">6 Months</span></td><td><span class="status-pill">Active</span></td></tr>
+                      <tr><td><span class="app-avatar">AP</span> Ananya Patel</td><td>Oct 14, 2026</td><td><span class="tier">3 Months</span></td><td><span class="status-pill">Active</span></td></tr>
+                      <tr><td><span class="app-avatar">KM</span> Karan Mehta</td><td>Oct 11, 2026</td><td><span class="tier">Monthly</span></td><td><span class="status-pill">Active</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="app-card">
+                  <strong>Upcoming Renewals</strong>
+                  <div class="renewal"><b>Vikram Desai</b><span>In 2 days</span></div>
+                  <div class="renewal"><b>Priya Nair</b><span>In 4 days</span></div>
+                  <div class="renewal"><b>Arjun Rao</b><span>In 6 days</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="float-note float-top">
+          <span class="tile green"><i class="fas fa-indian-rupee-sign"></i></span>
+          <div><strong>₹1,500 received</strong><small>Rohan S. renewed · 3 Months Plan</small></div>
+        </div>
+        <div class="float-note float-bottom">
+          <span class="tile amber"><i class="fas fa-bell"></i></span>
+          <div><strong>9 memberships expiring soon</strong><small>Reminders sent automatically</small></div>
+        </div>
+      </div>
+
+      <div class="hero-scene" [class.active]="heroIndex() === 1">
+        <!-- Real screenshots of the member app: desktop layout, and the phone layout on small screens -->
+        <div class="mock-window shot">
+          <div class="browser-bar">
+            <span></span><span></span><span></span>
+            <span class="url">gymcrest.vercel.app/user/dashboard</span>
+          </div>
+          <picture>
+            <source media="(max-width: 700px)" srcset="images/landing/member-dashboard-mobile.webp" width="780" height="1688">
+            <img src="images/landing/member-dashboard.webp" width="1600" height="1000" alt="" decoding="async">
+          </picture>
+        </div>
+
+        <div class="float-note float-top">
+          <span class="tile amber"><i class="fas fa-trophy"></i></span>
+          <div><strong>New personal record</strong><small>Bench press · 80 kg × 5</small></div>
+        </div>
+        <div class="float-note float-bottom">
+          <span class="tile blue"><i class="fas fa-clock"></i></span>
+          <div><strong>Next: Lunch · 1:30 PM</strong><small>Planned meal · 650 kcal</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-switch">
+      <button type="button" [class.active]="heroIndex() === 0" [attr.aria-pressed]="heroIndex() === 0" (click)="selectHero(0)">
+        <i class="fas fa-crown"></i> Gym owner portal
+      </button>
+      <button type="button" [class.active]="heroIndex() === 1" [attr.aria-pressed]="heroIndex() === 1" (click)="selectHero(1)">
+        <i class="fas fa-mobile-screen-button"></i> Member app
+      </button>
+    </div>
+  </div>
+</header>
+
+<section id="why" class="why">
+  <div class="section-header">
+    <div class="eyebrow">Why GymCrest</div>
+    <h2>Retire the register and the spreadsheet.</h2>
+    <p>Most gyms run on notebooks, spreadsheets and WhatsApp. GymCrest puts it all in one place.</p>
+  </div>
+  <div class="compare">
+    <div class="compare-col compare-before">
+      <h3>The usual way</h3>
+      <ul>
+        <li><i class="fas fa-xmark"></i> Membership dates in a register or spreadsheet</li>
+        <li><i class="fas fa-xmark"></i> Chasing renewals one message at a time</li>
+        <li><i class="fas fa-xmark"></i> Cash and online payments tracked in different places</li>
+        <li><i class="fas fa-xmark"></i> Workout plans handed out on paper</li>
+      </ul>
+    </div>
+    <div class="compare-col compare-after">
+      <h3><app-brand-logo class="compare-logo" /></h3>
+      <ul>
+        <li><i class="fas fa-check"></i> Every member, plan and expiry date in one list</li>
+        <li><i class="fas fa-check"></i> "Expiring soon" reminders sent for you</li>
+        <li><i class="fas fa-check"></i> Every payment, invoice and receipt together</li>
+        <li><i class="fas fa-check"></i> Plans members follow and log in their own app</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="features">
+  <div class="section-header">
+    <div class="eyebrow">For gyms</div>
+    <h2>Everything your gym runs on. <br>Nothing it doesn't need.</h2>
+    <p>Built for gym owners, front desks and trainers, with a free app for every member.</p>
+  </div>
+
+  <div class="spotlight">
+    <div class="spotlight-text">
+      <div class="eyebrow">One platform</div>
+      <h3>The right view for every role in your gym.</h3>
+      <p>Owners, staff, trainers and members each get a portal built around their job, all working from the same live
+        data.</p>
+      <ul class="spotlight-list">
+        <li><i class="fas fa-check"></i> Owners see revenue, renewals and expiring memberships at a glance.</li>
+        <li><i class="fas fa-check"></i> Trainers build workout and diet plans with each client's history alongside.</li>
+        <li><i class="fas fa-check"></i> Members get a focused app for workouts, meals and progress.</li>
+      </ul>
+    </div>
+    <div class="spotlight-visual">
+      <div class="role-card">
+        <div class="icon-wrapper navy"><i class="fas fa-crown"></i></div>
+        <div>
+          <h4>Owner</h4>
+          <p>Members, billing, staff and every branch.</p>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="icon-wrapper blue"><i class="fas fa-person-running"></i></div>
+        <div>
+          <h4>Trainer</h4>
+          <p>Assigned clients, plans and session history.</p>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="icon-wrapper green"><i class="fas fa-mobile-screen-button"></i></div>
+        <div>
+          <h4>Member</h4>
+          <p>Workouts, diet, progress and their gym membership.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon-wrapper navy"><i class="fas fa-id-card"></i></div>
+      <h3>Members &amp; memberships</h3>
+      <p>Onboard members, sell plans and packages, and freeze or renew memberships in a couple of clicks.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-wrapper blue"><i class="fas fa-file-invoice"></i></div>
+      <h3>Billing &amp; payments</h3>
+      <p>Members pay online through your own Razorpay account, or record cash at the desk. Invoices and receipts
+        included.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-wrapper green"><i class="fas fa-bell"></i></div>
+      <h3>Renewal reminders</h3>
+      <p>Your own "expiring soon" and "expired" messages go out automatically, in the app and by email.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-wrapper navy"><i class="fas fa-calendar-check"></i></div>
+      <h3>Desk check-in</h3>
+      <p>Verify members at the front desk by card or search, with expired memberships flagged instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-wrapper blue"><i class="fas fa-users-gear"></i></div>
+      <h3>Staff, trainers &amp; branches</h3>
+      <p>Invite your team with the access each role needs, assign trainers, and run several branches from one account.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-wrapper green"><i class="fas fa-boxes-stacked"></i></div>
+      <h3>Inventory &amp; shop</h3>
+      <p>Track equipment and maintenance, manage stock, and sell supplements or merchandise with emailed receipts.</p>
+    </div>
+  </div>
+</section>
+
+<section id="members" class="features members">
+  <div class="spotlight">
+    <div class="spotlight-text">
+      <div class="eyebrow">For members</div>
+      <h3>Your training, in your pocket. Free.</h3>
+      <p>Use GymCrest on your own, or with your gym's membership linked to the same account.</p>
+      <ul class="spotlight-list">
+        <li><i class="fas fa-check"></i> Workout and diet plans built around your goal.</li>
+        <li><i class="fas fa-check"></i> Log every session and meal, with nutrition lookup for your food.</li>
+        <li><i class="fas fa-check"></i> See progress by muscle group, body measurements and health stats.</li>
+        <li><i class="fas fa-check"></i> Your gym's announcements and membership details in one place.</li>
+      </ul>
+      <a routerLink="/register" [queryParams]="{ as: 'member' }" class="btn btn-primary">Create your free account</a>
+    </div>
+    <div class="spotlight-visual">
+      <div class="role-card">
+        <div class="icon-wrapper blue"><i class="fas fa-dumbbell"></i></div>
+        <div>
+          <h4>Workouts</h4>
+          <p>Plan, log and track every set.</p>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="icon-wrapper green"><i class="fas fa-bowl-food"></i></div>
+        <div>
+          <h4>Diet</h4>
+          <p>Meal plans, food log and macros.</p>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="icon-wrapper navy"><i class="fas fa-chart-simple"></i></div>
+        <div>
+          <h4>Progress</h4>
+          <p>Strength, measurements and trends.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="section-header">
+    <div class="eyebrow">How it works</div>
+    <h2>Up and running in an afternoon.</h2>
+    <p>No onboarding calls. Set up your gym, bring in your people and start the same day.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">01</div>
+      <h3>Set up your gym</h3>
+      <p>Add your branches, membership plans and pricing, and connect Razorpay to take payments.</p>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step">
+      <div class="step-number">02</div>
+      <h3>Add members &amp; team</h3>
+      <p>Onboard members and invite staff and trainers. Everyone gets their own login and portal.</p>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step">
+      <div class="step-number">03</div>
+      <h3>Run and grow</h3>
+      <p>Billing, check-ins and renewal reminders work from day one, so you can focus on your members.</p>
+    </div>
+  </div>
+</section>
+
+<section id="demo" class="demo">
+  <div class="section-header">
+    <div class="eyebrow">Live demo</div>
+    <h2>Look around before you sign up.</h2>
+    <p>Open a ready-made demo gym, no account needed. The demo is shared, so please don't enter anything personal.</p>
+  </div>
+  <div class="demo-grid">
+    <div class="demo-card">
+      <div class="icon-wrapper navy"><i class="fas fa-crown"></i></div>
+      <h3>Gym owner demo</h3>
+      <p>See the back office a gym owner uses every day.</p>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> Members, plans &amp; renewals</li>
+        <li><i class="fas fa-check"></i> Billing, invoices &amp; revenue</li>
+        <li><i class="fas fa-check"></i> Staff, trainers &amp; workout libraries</li>
+      </ul>
+      <a routerLink="/login" [queryParams]="{ demo: 'owner' }" class="btn btn-primary btn-full">Open owner demo</a>
+    </div>
+    <div class="demo-card">
+      <div class="icon-wrapper green"><i class="fas fa-dumbbell"></i></div>
+      <h3>Member demo</h3>
+      <p>See the app your members get for free.</p>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> Workout &amp; diet planner</li>
+        <li><i class="fas fa-check"></i> Progress dashboard &amp; records</li>
+        <li><i class="fas fa-check"></i> Health and nutrition tracking</li>
+      </ul>
+      <a routerLink="/login" [queryParams]="{ demo: 'member' }" class="btn btn-outline btn-full">Open member demo</a>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="pricing">
+  <div class="section-header">
+    <div class="eyebrow">Pricing</div>
+    <h2>Free for Users. Simple pricing for gyms.</h2>
+    <p>Every gym plan includes every feature, priced in Indian Rupees with no hidden fees.</p>
+  </div>
+
+  <div class="individual-plan">
+    <div class="individual-plan-text">
+      <div class="individual-plan-badge"><i class="fas fa-gift"></i> Free forever</div>
+      <h3>GymCrest for individuals</h3>
+      <p>Plan workouts, track your diet and watch your progress, free for everyone, whichever gym you train at.</p>
+    </div>
+    <a routerLink="/register" [queryParams]="{ as: 'member' }" class="btn btn-primary btn-large">Create free account</a>
+  </div>
+
+  <div class="pricing-subheader">
+    <h3>Plans for gyms &amp; studios</h3>
+    @if (hasTrial()) {
+      <span class="trial-chip"><i class="fas fa-gift"></i> Free trial available</span>
+    }
+  </div>
+
+  @switch (plansState()) {
+    @case ('loading') {
+      <p class="plans-status"><i class="fas fa-spinner fa-spin"></i> Loading current plans…</p>
+    }
+    @case ('error') {
+      <p class="plans-status">
+        Plans couldn't load right now.
+        <button type="button" class="link-button" (click)="loadPlans()">Try again</button>
+        or <a routerLink="/register" [queryParams]="{ as: 'owner' }">register your gym</a> to see them.
+      </p>
+    }
+    @default {
+      <div class="pricing-grid" [class.pricing-grid-2col]="paidPlans().length === 2"
+        [class.pricing-grid-1col]="paidPlans().length === 1">
+        @for (plan of paidPlans(); track plan.id; let last = $last) {
+          <div class="pricing-card" [class.featured]="last && paidPlans().length > 1">
+            @if (last && paidPlans().length > 1) {
+              <div class="pricing-badge">Best value</div>
+            }
+            <div class="pricing-name">{{ plan.name }}</div>
+            @if (plan.description) {
+              <p class="pricing-desc">{{ plan.description }}</p>
+            }
+            <div class="pricing-price">
+              <span class="currency">&#8377;</span><span class="amount">{{ formatInr(plan.price) }}</span><span
+                class="period">{{ periodLabel(plan) }}</span>
+            </div>
+            <div class="pricing-gst">{{ billingNote(plan) }}</div>
+            <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-full"
+              [class.btn-primary]="last && paidPlans().length > 1" [class.btn-outline]="!(last && paidPlans().length > 1)">
+              Register your gym
+            </a>
+            <ul class="pricing-features">
+              @if (limitsLabel(plan)) {
+                <li><i class="fas fa-check"></i> {{ limitsLabel(plan) }}</li>
+              }
+              <li><i class="fas fa-check"></i> Members, plans &amp; renewals</li>
+              <li><i class="fas fa-check"></i> Billing, invoices &amp; Razorpay payments</li>
+              <li><i class="fas fa-check"></i> Desk check-in &amp; attendance</li>
+              <li><i class="fas fa-check"></i> Staff &amp; trainer accounts</li>
+              <li><i class="fas fa-check"></i> Workout &amp; diet plan builder</li>
+              <li><i class="fas fa-check"></i> Announcements &amp; renewal reminders</li>
+              <li><i class="fas fa-check"></i> Inventory &amp; shop sales</li>
+            </ul>
+          </div>
+        } @empty {
+          <p class="plans-status">Gym plans are being updated. <a routerLink="/register" [queryParams]="{ as: 'owner' }">Register your gym</a> to get started.</p>
+        }
+      </div>
+    }
+  }
+</section>
+
+<section id="faq" class="faq">
+  <div class="section-header">
+    <div class="eyebrow">FAQ</div>
+    <h2>Questions, answered.</h2>
+  </div>
+  <div class="faq-list">
+    @for (faq of faqs; track faq.question) {
+      <details class="faq-item">
+        <summary>{{ faq.question }} <i class="fas fa-chevron-down"></i></summary>
+        <p>{{ faq.answer }}</p>
+      </details>
+    }
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="cta-banner-inner">
+    <h2>Ready to run your gym on GymCrest?</h2>
+    <p>Set up in an afternoon. Your members get the app free.</p>
+    <div class="cta-group cta-center">
+      <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-primary btn-large">Register your gym</a>
+      <a href="#demo" class="btn btn-outline btn-large" (click)="scrollTo('demo', $event)">
+        <i class="fas fa-circle-play"></i> Try the live demo
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <app-brand-logo class="footer-logo" />
+      <p>The all-in-one platform for gym owners, trainers and members.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="#features" (click)="scrollTo('features', $event)">For gyms</a>
+      <a href="#members" (click)="scrollTo('members', $event)">For members</a>
+      <a href="#demo" (click)="scrollTo('demo', $event)">Live demo</a>
+      <a href="#pricing" (click)="scrollTo('pricing', $event)">Pricing</a>
+      <a href="#faq" (click)="scrollTo('faq', $event)">FAQ</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a routerLink="/login">Log in</a>
+      <a routerLink="/register" [queryParams]="{ as: 'owner' }">Register your gym</a>
+      <a routerLink="/register" [queryParams]="{ as: 'member' }">Create free account</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a routerLink="/privacy-policy">Privacy Policy</a>
+      <a routerLink="/terms-of-service">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; {{ year }} GymCrest. All rights reserved.</p>
+    <p class="credit">
+      Designed &amp; built by
+      <a href="https://www.linkedin.com/in/neel-parghi/" target="_blank" rel="noopener noreferrer">Neel Parghi</a>
+      <a class="credit-icon" href="https://www.linkedin.com/in/neel-parghi/" target="_blank" rel="noopener noreferrer"
+        aria-label="Neel Parghi on LinkedIn"><i class="fab fa-linkedin"></i></a>
+      <a class="credit-icon" href="https://github.com/Neel-Parghi" target="_blank" rel="noopener noreferrer"
+        aria-label="Neel Parghi on GitHub"><i class="fab fa-github"></i></a>
+    </p>
+  </div>
+</footer>

@@ -2,7 +2,7 @@
 
 **GymCrest** is a multi-tenant SaaS platform for gym owners, trainers, and members - one system to run a gym's day-to-day operations (memberships, billing, staff payroll, attendance) and give members a real fitness experience (workout & diet planning, progress tracking, nutrition logging).
 
-It's built as a monorepo: an Angular web app, a .NET Web API, and a static marketing landing page.
+It's built as a monorepo: an Angular web app (which also serves the public website) and a .NET Web API.
 
 ---
 
@@ -64,7 +64,7 @@ Log in with either of these accounts to explore the product without signing up:
 - **Cloudinary** - image/file storage
 - **USDA FoodData Central** (primary) + **CalorieNinjas** (fallback) - food/nutrition search for diet logging
 
-**Marketing site** (`apps/landing`) - static HTML/CSS/JS.
+**Website** - the public landing page is part of the web app (`features/landing`, route `/`); signed-in visitors go straight to their dashboard, and gym pricing is loaded live from the API.
 
 ---
 
@@ -73,15 +73,14 @@ Log in with either of these accounts to explore the product without signing up:
 ```
 GymForge/
 ├── apps/
-│   ├── web/       # Angular frontend (member, trainer, gym-owner, super-admin portals)
-│   ├── api/        # .NET Web API
-│   │   ├── GymForge.Api/              # Controllers, Program.cs, startup config
-│   │   ├── GymForge.Application/      # Business logic, services, DI wiring
-│   │   ├── GymForge.Domain/           # Entities, enums, repository interfaces
-│   │   ├── GymForge.Infrastructure/   # EF Core, external API clients, repositories
-│   │   ├── GymForge.Contracts/        # Request/response DTOs shared across layers
-│   │   └── GymForge.Shared/           # Cross-cutting enums/constants
-│   └── landing/    # Static marketing site
+│   ├── web/       # Angular frontend (public website + member, trainer, gym-owner, super-admin portals)
+│   └── api/        # .NET Web API
+│       ├── GymForge.Api/              # Controllers, Program.cs, startup config
+│       ├── GymForge.Application/      # Business logic, services, DI wiring
+│       ├── GymForge.Domain/           # Entities, enums, repository interfaces
+│       ├── GymForge.Infrastructure/   # EF Core, external API clients, repositories
+│       ├── GymForge.Contracts/        # Request/response DTOs shared across layers
+│       └── GymForge.Shared/           # Cross-cutting enums/constants
 └── docs/
     └── business-logic/    # In-depth write-ups of core domains (roles, billing, workout/diet planning, onboarding)
 ```
@@ -135,9 +134,6 @@ npm install
 npm start
 ```
 App runs at `http://localhost:4200`.
-
-### 4. Landing page (optional)
-`apps/landing` is static - open `index.html` directly or serve it with any static file server.
 
 ---
 

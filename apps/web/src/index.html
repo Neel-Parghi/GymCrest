@@ -6,15 +6,98 @@
   <title>GymCrest</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1f44">
+  <meta name="description"
+    content="GymCrest is gym management software for Indian gyms (members, billing, attendance, staff) with a free workout, diet and progress tracker for members.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GymCrest">
+  <meta property="og:url" content="https://gymcrest.vercel.app/">
+  <meta property="og:title" content="GymCrest: run your whole gym in one place">
+  <meta property="og:description"
+    content="Members, billing, attendance and staff for gym owners, plus a free workout and diet app for every member. Made in India.">
+  <meta property="og:image" content="https://gymcrest.vercel.app/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="GymCrest: run your whole gym in one place">
+  <meta property="og:locale" content="en_IN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GymCrest: run your whole gym in one place">
+  <meta name="twitter:description"
+    content="Members, billing, attendance and staff for gym owners, plus a free workout and diet app for every member.">
+  <meta name="twitter:image" content="https://gymcrest.vercel.app/og-image.jpg">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GymCrest",
+      "url": "https://gymcrest.vercel.app/",
+      "image": "https://gymcrest.vercel.app/og-image.jpg",
+      "description": "Gym management software for Indian gyms (members, billing, attendance, staff) with a free workout, diet and progress tracker for members.",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Gym management",
+      "operatingSystem": "Web, Android",
+      "inLanguage": "en-IN",
+      "countriesSupported": "IN",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "description": "Free for Users; paid plans for gyms"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Neel Parghi",
+        "sameAs": ["https://www.linkedin.com/in/neel-parghi/", "https://github.com/Neel-Parghi"]
+      }
+    }
+  </script>
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+  <link rel="stylesheet" href="splash.css">
+  <script>
+    (function () {
+      var started = Date.now();
+      if (/[?&]splash\b/.test(location.search)) document.documentElement.classList.add('force-splash');
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var MIN_MS = reduce ? 300 : 2200;
+      var hidden = false;
+
+      window.__hideSplash = function () {
+        if (hidden) return;
+        hidden = true;
+        var el = document.getElementById('app-splash');
+        if (!el) return;
+        if (getComputedStyle(el).display === 'none') { el.remove(); return; }
+        setTimeout(function () {
+          el.classList.add('hide');
+          setTimeout(function () { el.remove(); }, 500);
+        }, Math.max(0, MIN_MS - (Date.now() - started)));
+      };
+      setTimeout(window.__hideSplash, 8000);
+    })();
+  </script>
 </head>
 
 <body>
+  <div id="app-splash" aria-hidden="true">
+    <div class="splash-stage">
+      <svg class="splash-mark" viewBox="0 0 24 24">
+        <circle class="splash-glow" cx="15.4" cy="6.2" r="1.3" fill="#4a9cc4" />
+        <polyline class="splash-ridge" pathLength="1" points="5,17 10,10.5 12.6,13.7 15.4,9 19,17" fill="none"
+          stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        <circle class="splash-dot" cx="15.4" cy="6.2" r="1.3" fill="#4a9cc4" />
+      </svg>
+      <svg class="splash-word" viewBox="18 -772 6055 812">
+        <path d="M427 20Q324 20 250 -14.5Q176 -49 129 -105Q82 -161 60 -227Q38 -293 38 -356V-378Q38 -446 61 -512.5Q84 -579 130.5 -633Q177 -687 247 -719.5Q317 -752 411 -752Q512 -752 589.5 -715Q667 -678 714 -612.5Q761 -547 769 -461H583Q577 -494 554 -520.5Q531 -547 494.5 -562.5Q458 -578 411 -578Q366 -578 331.5 -562.5Q297 -547 273.5 -518.5Q250 -490 238 -451Q226 -412 226 -366Q226 -320 239 -280.5Q252 -241 277 -211.5Q302 -182 340 -166Q378 -150 427 -150Q489 -150 534 -176Q579 -202 597 -245L583 -135V-294H753V-144Q707 -65 622.5 -22.5Q538 20 427 20Z M407 -258V-388H813V-258Z M1069 -274 862 -730H1052L1191 -405L1165 -414H1237L1209 -405L1332 -730H1512L1323 -274Z M1105 0V-298H1287V0Z M1615 0V-730H1873L2023 -345H2043L2192 -730H2455V0H2271V-623L2300 -621L2112 -147H1943L1754 -621L1785 -623V0Z M2969 20Q2870 20 2799 -14.5Q2728 -49 2682 -105.5Q2636 -162 2614 -228Q2592 -294 2592 -356V-378Q2592 -447 2614.5 -513.5Q2637 -580 2683.5 -634Q2730 -688 2800 -720Q2870 -752 2964 -752Q3064 -752 3141.5 -714.5Q3219 -677 3266 -609.5Q3313 -542 3321 -453H3135Q3128 -491 3105 -519Q3082 -547 3046 -562.5Q3010 -578 2964 -578Q2921 -578 2886.5 -563Q2852 -548 2828.5 -520.5Q2805 -493 2792.5 -454Q2780 -415 2780 -366Q2780 -317 2792.5 -278Q2805 -239 2829.5 -211Q2854 -183 2889 -168.5Q2924 -154 2969 -154Q3039 -154 3087.5 -188Q3136 -222 3146 -279H3332Q3323 -197 3277 -129Q3231 -61 3153 -20.5Q3075 20 2969 20Z M3455 0V-736H3641V0Z M3895 0 3690 -310H3892L4109 0Z M3594 -224V-367H3769Q3802 -367 3826 -380Q3850 -393 3863.5 -417Q3877 -441 3877 -473Q3877 -506 3863.5 -530Q3850 -554 3826 -567Q3802 -580 3769 -580H3594V-736H3758Q3853 -736 3922 -707.5Q3991 -679 4028 -623.5Q4065 -568 4065 -486V-470Q4065 -388 4027.5 -333.5Q3990 -279 3921.5 -251.5Q3853 -224 3758 -224Z M4220 0V-730H4400V0Z M4380 0V-152H4688V0Z M4380 -295V-447H4667V-295Z M4380 -578V-730H4682V-578Z M5097 20Q4995 20 4925.5 -12Q4856 -44 4820.5 -99.5Q4785 -155 4785 -227H4965Q4965 -201 4979.5 -179.5Q4994 -158 5023 -146Q5052 -134 5097 -134Q5136 -134 5163.5 -144Q5191 -154 5205.5 -172Q5220 -190 5220 -215Q5220 -247 5193 -264.5Q5166 -282 5102 -287L5055 -291Q4942 -301 4875 -362Q4808 -423 4808 -524Q4808 -596 4841.5 -647Q4875 -698 4936 -725Q4997 -752 5080 -752Q5170 -752 5232.5 -722Q5295 -692 5328 -637.5Q5361 -583 5361 -511H5181Q5181 -535 5169 -555Q5157 -575 5134.5 -586.5Q5112 -598 5080 -598Q5050 -598 5029.5 -588.5Q5009 -579 4998.5 -562Q4988 -545 4988 -524Q4988 -496 5007 -476Q5026 -456 5073 -452L5120 -448Q5202 -441 5265 -412.5Q5328 -384 5364 -335Q5400 -286 5400 -215Q5400 -144 5363.5 -91Q5327 -38 5259.5 -9Q5192 20 5097 20Z M5667 0V-588H5853V0Z M5467 -568V-730H6053V-568Z" />
+      </svg>
+    </div>
+  </div>
   <app-root></app-root>
 </body>
 

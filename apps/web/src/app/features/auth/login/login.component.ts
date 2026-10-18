@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
+import { DEMO_ACCOUNTS, DemoAccountKey } from '../../../shared/constants/demo-accounts.constants';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -26,6 +27,11 @@ export class LoginComponent {
   ngOnInit(): void {
     if (this.route.snapshot.queryParamMap.get('setupSuccess') === 'true') {
       this.notification.success(CONSTANTS.AUTH.PASSWORD_SET_SUCCESS);
+    }
+
+    const demo = this.route.snapshot.queryParamMap.get('demo');
+    if (demo && demo in DEMO_ACCOUNTS) {
+      this.loginForm.patchValue({ ...DEMO_ACCOUNTS[demo as DemoAccountKey], rememberMe: false });
     }
   }
 

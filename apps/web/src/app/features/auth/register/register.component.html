@@ -1,7 +1,7 @@
 <div class="auth-page-wrapper">
   <!-- Top Navigation Bar -->
   <header class="auth-header">
-    <app-brand-logo class="brand-logo" />
+    <a routerLink="/" class="brand-link" aria-label="GymCrest home"><app-brand-logo class="brand-logo" /></a>
   </header>
 
   <main class="auth-main">
@@ -112,6 +112,10 @@
               </small>
             </div>
 
+            <p class="consent-note">By creating an account you agree to our
+              <a routerLink="/terms-of-service" target="_blank">Terms of Service</a> and
+              <a routerLink="/privacy-policy" target="_blank">Privacy Policy</a>.</p>
+
             <button class="submit-btn" type="submit" [disabled]="isLoading">
               {{ isLoading ? 'Creating account...' : 'Create Account' }}
               <i class="fa-solid fa-arrow-right arrow-icon" *ngIf="!isLoading"></i>
@@ -155,7 +159,7 @@
 
   <!-- Footer -->
   <footer class="auth-footer">
-    <app-brand-logo class="footer-logo" />
+    <a routerLink="/" class="brand-link" aria-label="GymCrest home"><app-brand-logo class="footer-logo" /></a>
     <div class="copyright">© 2026 <span class="copyright-brand">GYMCREST. </span>ALL RIGHTS RESERVED.</div>
     <div class="footer-links">
       <a routerLink="/privacy-policy">Privacy Policy</a>

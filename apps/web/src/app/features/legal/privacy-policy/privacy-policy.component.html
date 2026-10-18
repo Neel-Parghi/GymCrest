@@ -1,0 +1,174 @@
+<app-legal-layout title="Privacy Policy" [lastUpdated]="legal.lastUpdated">
+  <p>
+    GymCrest helps gyms run their business and helps people track their training, diet and progress. This policy
+    explains what personal data GymCrest collects, why, who it is shared with and the choices you have. It is written
+    for India's Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000 and its rules.
+  </p>
+
+  <h2>1. Who we are</h2>
+  <p>
+    GymCrest is operated by {{ legal.operator }}, {{ legal.location }} ("GymCrest", "we", "us"). For any question about
+    this policy or your data, email <a [href]="'mailto:' + legal.contactEmail">{{ legal.contactEmail }}</a>.
+  </p>
+
+  <h2>2. Two ways we handle your data</h2>
+  <ul>
+    <li>
+      <strong>Your own account.</strong> When you sign up yourself to track your training, GymCrest decides how that
+      data is used and is responsible for it.
+    </li>
+    <li>
+      <strong>Your gym's records.</strong> When a gym adds you as a member, the gym decides what to record about you
+      (for example your plan, attendance, measurements or medical notes) and is responsible for it. GymCrest stores and
+      processes those records on the gym's behalf. Questions or requests about them should go to your gym first; we will
+      help where we can.
+    </li>
+  </ul>
+
+  <h2>3. What we collect</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Type</th><th>Examples</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Account</td><td>Name, email address, password (stored only as a secure hash), role</td></tr>
+        <tr><td>Profile</td><td>Phone number, date of birth, gender, address, profile photo</td></tr>
+        <tr>
+          <td>Fitness and health</td>
+          <td>Goals, experience level, height, weight and body measurements, training limitations, workout and diet
+            plans and logs, nutrition targets</td>
+        </tr>
+        <tr>
+          <td>Gym records</td>
+          <td>Membership number and plan, attendance, freeze periods, emergency contact, blood group, medical conditions
+            and fitness goals entered by your gym</td>
+        </tr>
+        <tr>
+          <td>Payments</td>
+          <td>Plan, amount, status and transaction references. Card, UPI and bank details are entered on Razorpay's
+            checkout and are never seen or stored by GymCrest.</td>
+        </tr>
+        <tr><td>Technical</td><td>Login sessions, device and browser information and server logs (including IP address)
+            kept by our hosting providers to run and secure the service</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="callout">
+    Health and fitness information is sensitive. We use it only to provide the features you or your gym use, and never
+    for advertising.
+  </p>
+
+  <h2>4. How we use it</h2>
+  <ul>
+    <li>To create and secure your account and sign you in</li>
+    <li>To build and show workout and diet plans, track progress and log meals</li>
+    <li>To let your gym manage your membership, attendance, plans and billing</li>
+    <li>To send service emails: verification codes, password resets, invitations, receipts and plan or membership
+      notices</li>
+    <li>To process payments, prevent misuse and keep the service secure</li>
+    <li>To fix problems and improve GymCrest</li>
+  </ul>
+  <p>
+    We process your data on the basis of your consent and, where the law allows, for legitimate uses such as providing a
+    service you asked for or meeting a legal obligation. We do not sell your personal data and we do not show ads.
+  </p>
+
+  <h2>5. Who we share it with</h2>
+  <p>We share data only as needed to run GymCrest:</p>
+  <ul>
+    <li><strong>Your gym</strong>: if you are a member, your gym's owner, staff and trainers
+      can see your membership and the training and progress data needed to manage and coach you.</li>
+    <li><strong>Service providers</strong> that host or operate parts of GymCrest for us:</li>
+  </ul>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Provider</th><th>What they do</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Supabase</td><td>Database hosting</td></tr>
+        <tr><td>Render</td><td>Hosting for the GymCrest server</td></tr>
+        <tr><td>Vercel</td><td>Hosting for the GymCrest website</td></tr>
+        <tr><td>Brevo</td><td>Sending emails</td></tr>
+        <tr><td>Cloudinary</td><td>Storing uploaded photos and images</td></tr>
+        <tr><td>Razorpay</td><td>Payment processing</td></tr>
+        <tr><td>Google (Gemini) and USDA FoodData Central</td><td>Looking up nutrition data for foods you search for.
+            Only the search text is sent, not your name or account details.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><strong>Legal reasons</strong>: when required by law, a court or a government authority, or to protect the
+      rights and safety of users and GymCrest.</li>
+  </ul>
+  <p>
+    Some of these providers may store or process data outside India. We use reputable providers that protect data with
+    industry-standard security, and we transfer data only as permitted by Indian law.
+  </p>
+
+  <h2>6. How long we keep it</h2>
+  <ul>
+    <li>We keep your data while your account is active.</li>
+    <li>When you delete your account, it is permanently removed within about 24 hours. Copies in backups are cleared as
+      those backups are routinely replaced.</li>
+    <li>Records that belong to a gym (such as your membership and payment history with that gym) are kept for as long as
+      the gym keeps them, and invoices and payment records may be kept for as long as tax and accounting law requires.</li>
+  </ul>
+
+  <h2>7. Your rights</h2>
+  <p>Under Indian data protection law you can:</p>
+  <ul>
+    <li>Ask what personal data we hold about you and how it is used</li>
+    <li>Correct or update it (most of it is editable on your Account and Settings pages)</li>
+    <li>Delete your account and data (from your Account page, or by emailing us)</li>
+    <li>Withdraw consent at any time, which may stop some features from working</li>
+    <li>Nominate someone to exercise these rights if you die or become unable to</li>
+    <li>Raise a grievance with us and, if unresolved, with the Data Protection Board of India</li>
+  </ul>
+  <p>
+    Email <a [href]="'mailto:' + legal.contactEmail">{{ legal.contactEmail }}</a> to make a request. We will reply within
+    30 days. For data your gym entered, we may forward your request to the gym.
+  </p>
+
+  <h2>8. Children</h2>
+  <p>
+    People under 18 may use GymCrest only with the consent of a parent or legal guardian. Gyms that add members under 18
+    must obtain that consent before entering their data. We do not knowingly track children's behaviour or send them
+    targeted advertising. If you believe a child's data was added without consent, contact us and we will delete it.
+  </p>
+
+  <h2>9. Security</h2>
+  <p>
+    Data is sent over encrypted connections (HTTPS), passwords are stored only as secure hashes, and access is limited to
+    the people and services that need it. No system is perfectly secure, so please use a strong password and keep it
+    private. If a breach affects your data, we will notify you and the authorities as the law requires.
+  </p>
+
+  <h2>10. Cookies and browser storage</h2>
+  <p>
+    GymCrest stores only what it needs in your browser: your sign-in session, saved settings (such as dark mode) and
+    unfinished form drafts. We do not use advertising or third-party tracking cookies.
+  </p>
+
+  <h2>11. Emails</h2>
+  <p>
+    Service emails (verification codes, password resets, invitations, receipts and plan notices) are always sent because
+    they are needed to use your account. Optional emails from your gym, such as membership reminders, can be turned off in
+    your account settings under Notifications.
+  </p>
+
+  <h2>12. Changes to this policy</h2>
+  <p>
+    We may update this policy as GymCrest changes. We will change the date at the top, and for significant changes we
+    will notify you in the app or by email before they take effect.
+  </p>
+
+  <h2>13. Grievance officer and contact</h2>
+  <p>
+    {{ legal.operator }}<br>
+    GymCrest, {{ legal.location }}<br>
+    <a [href]="'mailto:' + legal.contactEmail">{{ legal.contactEmail }}</a>
+  </p>
+  <p>Also see our <a routerLink="/terms-of-service">Terms of Service</a>.</p>
+</app-legal-layout>

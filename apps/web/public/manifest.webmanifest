@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "GymCrest",
+  "short_name": "GymCrest",
+  "description": "Run your gym, or track your training: workouts, diet and progress.",
+  "start_url": "/login?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a1f44",
+  "theme_color": "#0a1f44",
+  "categories": ["health", "fitness", "business"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

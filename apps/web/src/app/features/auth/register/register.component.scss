@@ -123,6 +123,23 @@
   }
 }
 
+.consent-note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #6b7280;
+
+  a {
+    color: var(--primary-precision, #005bbc);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .field-hint {
   font-size: 0.72rem;
   color: #6b7280;
