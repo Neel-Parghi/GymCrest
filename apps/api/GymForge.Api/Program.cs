@@ -83,9 +83,22 @@ builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"))));
+    .UsePostgreSqlStorage(
+        c => c.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")),
+        new PostgreSqlStorageOptions
+        {
+            QueuePollInterval = TimeSpan.FromMinutes(15),
+            JobExpirationCheckInterval = TimeSpan.FromHours(12)
+        }));
 
-builder.Services.AddHangfireServer();
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 1;
+    options.SchedulePollingInterval = TimeSpan.FromMinutes(15);
+    options.HeartbeatInterval = TimeSpan.FromMinutes(5);
+    options.ServerTimeout = TimeSpan.FromMinutes(30);
+    options.ServerCheckInterval = TimeSpan.FromMinutes(15);
+});
 
 builder.Services.AddRateLimiter(options =>
 {
