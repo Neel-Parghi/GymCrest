@@ -1,0 +1,7 @@
+# GymCrest
+# Crawling stays open so search engines can load the app's scripts and see each page's robots tag.
+# Signed-in pages carry <meta name="robots" content="noindex">, so only the public pages get indexed.
+User-agent: *
+Allow: /
+
+Sitemap: https://gymcrest.vercel.app/sitemap.xml

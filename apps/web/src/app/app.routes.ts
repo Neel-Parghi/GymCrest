@@ -14,6 +14,7 @@ import { loggedInGuard } from './core/guards/logged-in.guard';
 import { subscriptionGuard } from './core/guards/subscription.guard';
 import { roleGuard } from './core/guards/role-guard';
 import { onboardingGuard } from './core/guards/onboarding.guard';
+import { DEFAULT_DESCRIPTION } from './core/seo/seo-title.strategy';
 
 
 export const routes: Routes = [
@@ -22,13 +23,21 @@ export const routes: Routes = [
     pathMatch: 'full',
     // Public website; signed-in visitors go straight to their dashboard
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent),
-    canActivate: [loggedInGuard]
+    canActivate: [loggedInGuard],
+    title: 'Gym management software & free workout tracker',
+    data: { seo: { index: true, description: DEFAULT_DESCRIPTION } }
   },
-  { path: 'login', component: LoginComponent, canActivate: [loggedInGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [loggedInGuard] },
-  { path: 'accept-invitation', component: AcceptInvitationComponent, canActivate: [loggedInGuard] },
-  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [loggedInGuard] },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  {
+    path: 'login', component: LoginComponent, canActivate: [loggedInGuard], title: 'Log in',
+    data: { seo: { index: true, description: 'Log in to GymCrest: one login for gym owners, trainers, staff and members.' } }
+  },
+  {
+    path: 'register', component: RegisterComponent, canActivate: [loggedInGuard], title: 'Create your account',
+    data: { seo: { index: true, description: 'Register your gym on GymCrest, or create a free member account to plan workouts, track your diet and see your progress.' } }
+  },
+  { path: 'accept-invitation', component: AcceptInvitationComponent, canActivate: [loggedInGuard], title: 'Accept invitation' },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [loggedInGuard], title: 'Forgot password' },
+  { path: 'reset-password', component: ResetPasswordComponent, title: 'Reset password' },
 
   {
     path: 'onboarding',
@@ -260,14 +269,19 @@ export const routes: Routes = [
   },
   {
     path: 'privacy-policy',
-    loadComponent: () => import('./features/legal/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+    loadComponent: () => import('./features/legal/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
+    title: 'Privacy Policy',
+    data: { seo: { index: true, description: 'How GymCrest collects, uses and protects your personal data, and the rights you have over it.' } }
   },
   {
     path: 'terms-of-service',
-    loadComponent: () => import('./features/legal/terms-of-service/terms-of-service.component').then(m => m.TermsOfServiceComponent)
+    loadComponent: () => import('./features/legal/terms-of-service/terms-of-service.component').then(m => m.TermsOfServiceComponent),
+    title: 'Terms of Service',
+    data: { seo: { index: true, description: 'The terms for using GymCrest as a gym owner, staff member, trainer or member.' } }
   },
   {
     path: '404',
+    title: 'Page not found',
     loadComponent: () => import('./features/errors/not-found/not-found.component').then(m => m.NotFoundComponent)
   },
   {
