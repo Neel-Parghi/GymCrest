@@ -46,7 +46,7 @@ export class TourService {
     const driverObj = driver({
       showProgress: true,
       animate: true,
-      popoverClass: 'elevatyon-tour-popover',
+      popoverClass: 'gymcrest-tour-popover',
       popoverOffset: 40,
       steps: steps
     });

@@ -133,7 +133,7 @@ export const CONSTANTS = {
         RAZORPAY: {
             KEY_ID: 'rzp_test_SgEiEY7pGSwfkM',
             CURRENCY: 'INR',
-            COMPANY_NAME: 'Elevatyon',
+            COMPANY_NAME: 'GymCrest',
             FLOW_DESCRIPTION: 'Testing 0 to 100 Payment Flow',
             THEME_COLOR: '#0f172a'
         },
@@ -159,7 +159,7 @@ export const CONSTANTS = {
         TITLE: 'Setup Account',
         SUBTITLE: 'Complete your profile by setting a secure password.',
         HERO_TITLE: 'Forge Your Future. Set Your Password.',
-        HERO_SUBTITLE: "You're one step away from joining the Elevatyon ecosystem. Master your management from day one.",
+        HERO_SUBTITLE: "You're one step away from joining the GymCrest ecosystem. Master your management from day one.",
         VALIDATING: 'Validating invitation...',
         INVALID_TOKEN: 'Invalid invitation link. No token provided.',
         EXPIRED_TOKEN: 'This invitation link has expired or is no longer valid.',

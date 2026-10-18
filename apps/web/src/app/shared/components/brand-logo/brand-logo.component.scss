@@ -3,12 +3,10 @@
   align-items: center;
   height: 18px;
   color: var(--primary-navy);
-  --brand-accent: #2f7fa8;
 }
 
 :host-context([data-theme="dark"]) {
   color: #ffffff;
-  --brand-accent: #4a9cc4;
 }
 
 .wordmark {
@@ -20,8 +18,4 @@
 
 .letters {
   fill: currentColor;
-}
-
-.accent {
-  fill: var(--brand-accent);
 }

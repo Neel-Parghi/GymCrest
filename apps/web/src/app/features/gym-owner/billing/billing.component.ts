@@ -727,7 +727,7 @@ export class BillingComponent implements OnInit {
         if (res.data) {
           this.platformInvoices = res.data.map(tx => ({
             id: tx.gatewayTransactionId || tx.id.substring(0, 8),
-            planName: tx.planName || 'Elevatyon Pro Plan',
+            planName: tx.planName || 'GymCrest Pro Plan',
             amount: tx.amount,
             status: tx.status as any,
             billingDate: new Date(tx.createdAt)
@@ -841,7 +841,7 @@ export class BillingComponent implements OnInit {
           if (!wasOpen) {
             this.selectedInvoice = null;
           }
-          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'Elevatyon License'));
+          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'GymCrest License'));
         }
       };
 

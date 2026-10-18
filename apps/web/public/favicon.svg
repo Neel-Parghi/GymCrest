@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1400">
   <rect width="1400" height="1400" rx="308" fill="#0a1f44" />
-  <path fill="#ffffff" transform="translate(333.8 1134.0) scale(1.1890)" d="M74 0V-730H254V0ZM234 0V-152H542V0ZM234 -295V-447H521V-295ZM234 -578V-730H536V-578Z" />
+  <polyline points="233.3,1033.3 566.7,600.0 740.0,813.3 926.7,500.0 1166.7,1033.3" fill="none" stroke="#ffffff" stroke-width="146.7" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="926.7" cy="313.3" r="86.7" fill="#4a9cc4" />
 </svg>
