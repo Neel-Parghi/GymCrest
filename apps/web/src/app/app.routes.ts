@@ -17,7 +17,13 @@ import { onboardingGuard } from './core/guards/onboarding.guard';
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: '',
+    pathMatch: 'full',
+    // Public website; signed-in visitors go straight to their dashboard
+    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent),
+    canActivate: [loggedInGuard]
+  },
   { path: 'login', component: LoginComponent, canActivate: [loggedInGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [loggedInGuard] },
   { path: 'accept-invitation', component: AcceptInvitationComponent, canActivate: [loggedInGuard] },
