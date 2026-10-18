@@ -61,34 +61,38 @@ namespace GymForge.Application.BackgroundJobs
             
             AnnouncementTemplate? expiringSoonTemplate = templates.FirstOrDefault(t => t.Type == TemplateType.ExpiringSoon && t.IsActive);
 
-            if (expiredTemplate == null && expiringSoonTemplate == null)
-            {
-                return;
-            }
-
             Gym? gym = await _gymRepository.GetGymByIdAsync(gymId);
             int triggerDays = gym?.Configuration?.PlanExpirationTriggerDays ?? 7;
 
-            // 2. Fetch all active or recently expired subscriptions for this gym
+            // 2. Fetch the active subscriptions for this gym (renewal deactivates the previous one, so one per member)
             IEnumerable<MemberSubscription> subscriptions = await _memberRepository.GetActiveSubscriptionsByGymIdAsync(gymId);
             // Runs at 00:00 IST (still the previous day in UTC), so compare IST calendar dates.
             DateTime today = AppTimeZone.Today;
 
             foreach (var sub in subscriptions)
             {
+                // A freeze pushes the end date back only when it is lifted (MemberFreezeCalculator.Unfreeze),
+                // so a frozen member's stored end date is not final yet
+                if (sub.Member.Status == MemberStatus.Freeze) continue;
+
                 DateTime endDate = AppTimeZone.ToLocalDate(sub.EndDate);
 
-                // EXPIRED TODAY
-                if (expiredTemplate != null && endDate == today.AddDays(-1))
+                // EXPIRED: the plan's last day has passed. Always mark it, whether or not the gym sends a message,
+                // and catch up on plans that ended on a day the job didn't run (e.g. the host was asleep).
+                if (endDate < today)
                 {
                     sub.Member.Status = MemberStatus.Expired;
                     sub.IsActive = false;
                     await _memberRepository.UpdateAsync(sub.Member);
 
-                    await SendNotificationAsync(gymId, gymName, sub, expiredTemplate);
-                    await SendEmailAsync(gymId, gymName, sub, expiredTemplate);
+                    if (expiredTemplate != null)
+                    {
+                        await SendNotificationAsync(gymId, gymName, sub, expiredTemplate);
+                        await SendEmailAsync(gymId, gymName, sub, expiredTemplate);
+                    }
+                    continue;
                 }
-                
+
                 // EXPIRING SOON
                 if (expiringSoonTemplate != null && endDate == today.AddDays(triggerDays))
                 {

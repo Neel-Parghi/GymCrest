@@ -41,21 +41,22 @@ namespace GymForge.Application.BackgroundJobs
                 try
                 {
                     SubscriptionRecord? subscription = await _saasPaymentRepository.GetLatestSubscriptionByGymIdAsync(gym.Id);
-                    if (subscription == null) continue;
-
-                    Gym? gymEntity = await _gymRepository.GetGymByIdAsync(gym.Id);
-                    if (gymEntity == null || gymEntity.Owner == null || string.IsNullOrEmpty(gymEntity.Owner.Email)) continue;
+                    if (subscription == null || !subscription.IsActive) continue;
 
                     DateTime endDate = AppTimeZone.ToLocalDate(subscription.EndDate);
 
-                    if (endDate == today.AddDays(-1) && subscription.IsActive)
-                    {
-                        subscription.IsActive = false;
+                    // The plan's last day has passed. Catches up on plans that ended on a night the job didn't run,
+                    // and closes the plan even when the owner can't be emailed.
+                    if (endDate >= today) continue;
 
-                        string ownerName = $"{gymEntity.Owner.FirstName} {gymEntity.Owner.LastName}";
-                        await _emailService.SendPlanExpiredEmailAsync(gymEntity.Owner.Email, ownerName, gymEntity.GymName, endDate.ToString("MMM dd, yyyy"));
-                        _logger.LogInformation($"Sent SaaS expiry email to {gymEntity.Owner.Email} for gym {gym.Id}.");
-                    }
+                    subscription.IsActive = false;
+
+                    Gym? gymEntity = await _gymRepository.GetGymByIdAsync(gym.Id);
+                    if (gymEntity?.Owner == null || string.IsNullOrEmpty(gymEntity.Owner.Email)) continue;
+
+                    string ownerName = $"{gymEntity.Owner.FirstName} {gymEntity.Owner.LastName}";
+                    await _emailService.SendPlanExpiredEmailAsync(gymEntity.Owner.Email, ownerName, gymEntity.GymName, endDate.ToString("MMM dd, yyyy"));
+                    _logger.LogInformation($"Sent SaaS expiry email to {gymEntity.Owner.Email} for gym {gym.Id}.");
                 }
                 catch (Exception ex)
                 {
