@@ -1,0 +1,22 @@
+<div class="legal-page">
+  <header class="legal-header">
+    <a routerLink="/login" aria-label="GymCrest home"><app-brand-logo class="brand-logo" /></a>
+    <a routerLink="/login" class="back-link">Sign in</a>
+  </header>
+
+  <main class="legal-main">
+    <article class="legal-doc">
+      <h1>{{ title() }}</h1>
+      <p class="updated">Last updated: {{ lastUpdated() }}</p>
+      <ng-content />
+    </article>
+  </main>
+
+  <footer class="legal-footer">
+    <span>© 2026 GymCrest</span>
+    <nav>
+      <a routerLink="/privacy-policy">Privacy Policy</a>
+      <a routerLink="/terms-of-service">Terms of Service</a>
+    </nav>
+  </footer>
+</div>

@@ -112,6 +112,10 @@
               </small>
             </div>
 
+            <p class="consent-note">By creating an account you agree to our
+              <a routerLink="/terms-of-service" target="_blank">Terms of Service</a> and
+              <a routerLink="/privacy-policy" target="_blank">Privacy Policy</a>.</p>
+
             <button class="submit-btn" type="submit" [disabled]="isLoading">
               {{ isLoading ? 'Creating account...' : 'Create Account' }}
               <i class="fa-solid fa-arrow-right arrow-icon" *ngIf="!isLoading"></i>

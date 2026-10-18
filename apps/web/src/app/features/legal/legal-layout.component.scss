@@ -1,0 +1,167 @@
+.legal-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-color);
+  color: var(--text-main);
+}
+
+.legal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+
+  .brand-logo {
+    height: 16px;
+  }
+
+  .back-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    padding: 14px 16px;
+  }
+}
+
+.legal-main {
+  flex: 1;
+  padding: 40px 16px 56px;
+
+  @media (max-width: 767px) {
+    padding: 24px 16px 40px;
+  }
+}
+
+.legal-doc {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 48px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  line-height: 1.65;
+  font-size: 0.95rem;
+
+  @media (max-width: 767px) {
+    padding: 24px 18px;
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    margin: 0 0 4px;
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+  }
+
+  .updated {
+    margin: 0 0 28px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  // Content comes from the page component through <ng-content>
+  ::ng-deep {
+    h2 {
+      margin: 32px 0 10px;
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+    }
+
+    h3 {
+      margin: 20px 0 6px;
+      font-size: 1rem;
+    }
+
+    p,
+    ul {
+      margin: 0 0 12px;
+    }
+
+    ul {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    a {
+      color: var(--accent-color);
+    }
+
+    table {
+      width: 100%;
+      margin: 8px 0 16px;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--bg-color);
+      font-weight: 600;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .callout {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--accent-color);
+      background: var(--bg-color);
+      border-radius: 6px;
+    }
+  }
+}
+
+.legal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 32px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+
+  nav {
+    display: flex;
+    gap: 18px;
+  }
+
+  a {
+    color: var(--text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-main);
+    }
+  }
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    padding: 16px;
+  }
+}

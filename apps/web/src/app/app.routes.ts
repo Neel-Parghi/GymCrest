@@ -253,6 +253,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'privacy-policy',
+    loadComponent: () => import('./features/legal/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+  },
+  {
+    path: 'terms-of-service',
+    loadComponent: () => import('./features/legal/terms-of-service/terms-of-service.component').then(m => m.TermsOfServiceComponent)
+  },
+  {
     path: '404',
     loadComponent: () => import('./features/errors/not-found/not-found.component').then(m => m.NotFoundComponent)
   },
