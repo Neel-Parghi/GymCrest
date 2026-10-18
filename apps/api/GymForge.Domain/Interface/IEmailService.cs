@@ -13,7 +13,7 @@ namespace GymForge.Domain.Interface
         Task SendMembershipLinkedEmailAsync(string email, string name, string firstName);
         Task SendPlanExpiredEmailAsync(string email, string ownerName, string gymName, string endDate);
 
-        /// <summary>Gym-written announcement (subject and message come from the gym's own templates).</summary>
-        Task SendGymAnnouncementEmailAsync(string email, string name, string gymName, string subject, string message);
+        /// <summary>The gym's own message about a member's membership (expiring soon / expired); subject and message come from the gym's templates.</summary>
+        Task SendMembershipNoticeEmailAsync(string email, string name, string gymName, string subject, string message);
     }
 }

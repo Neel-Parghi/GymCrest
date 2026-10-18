@@ -20,7 +20,7 @@ namespace GymForge.Infrastructure.Services
             SaleReceipt,
             MembershipLinked,
             PlanExpired,
-            GymAnnouncement
+            MembershipNotice
         }
 
         private readonly IConfiguration _config;
@@ -80,8 +80,8 @@ namespace GymForge.Infrastructure.Services
                 ["endDate"] = endDate
             });
 
-        public Task SendGymAnnouncementEmailAsync(string email, string name, string gymName, string subject, string message) =>
-            SendTemplateAsync(EmailTemplate.GymAnnouncement, email, name, new()
+        public Task SendMembershipNoticeEmailAsync(string email, string name, string gymName, string subject, string message) =>
+            SendTemplateAsync(EmailTemplate.MembershipNotice, email, name, new()
             {
                 ["name"] = name,
                 ["gymName"] = gymName,

@@ -133,7 +133,7 @@ namespace GymForge.Application.Modules.Gym.Services
             {
                 try
                 {
-                    await _emailService.SendGymAnnouncementEmailAsync(user.Email, userName, gymName, "[TEST] " + title, message);
+                    await _emailService.SendMembershipNoticeEmailAsync(user.Email, userName, gymName, "[TEST] " + title, message);
                 }
                 catch
                 {

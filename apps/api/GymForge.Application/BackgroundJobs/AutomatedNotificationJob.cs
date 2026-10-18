@@ -97,6 +97,7 @@ namespace GymForge.Application.BackgroundJobs
                 if (expiringSoonTemplate != null && endDate == today.AddDays(triggerDays))
                 {
                     await SendNotificationAsync(gymId, gymName, sub, expiringSoonTemplate);
+                    await SendEmailAsync(gymId, gymName, sub, expiringSoonTemplate);
                 }
             }
 
@@ -127,7 +128,7 @@ namespace GymForge.Application.BackgroundJobs
         private async Task SendEmailAsync(Guid gymId, string gymName, MemberSubscription sub, AnnouncementTemplate template)
         {
             if (sub.Member == null || sub.Member.User == null || string.IsNullOrEmpty(sub.Member.User.Email)) return;
-            // Gym announcements are optional mail: honour the member's "Email notifications" switch (in-app notice still goes out)
+            // Membership notices are optional mail: honour the member's "Email notifications" switch (in-app notice still goes out)
             if (!(sub.Member.User.Preference?.EmailNotificationsEnabled ?? true)) return;
 
             string subject = ReplaceVariables(template.TitleTemplate, gymName, sub, gymId);
@@ -135,9 +136,9 @@ namespace GymForge.Application.BackgroundJobs
 
             try
             {
-                await _emailService.SendGymAnnouncementEmailAsync(sub.Member.User.Email, sub.Member.FirstName + " " + sub.Member.LastName, gymName, subject, body);
+                await _emailService.SendMembershipNoticeEmailAsync(sub.Member.User.Email, sub.Member.FirstName + " " + sub.Member.LastName, gymName, subject, body);
 
-                _logger.LogInformation($"Sent Expired Email to {sub.Member.User.Email}.");
+                _logger.LogInformation($"Sent {template.Type} email to {sub.Member.User.Email}.");
             }
             catch (Exception ex)
             {
