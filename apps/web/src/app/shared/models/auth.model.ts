@@ -29,7 +29,6 @@ export interface ResendOtpRequestDto {
 
 export interface ForgotPasswordRequestDto {
   email: string;
-  clientUri: string;
 }
 
 export interface ResetPasswordRequestDto {

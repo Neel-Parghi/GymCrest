@@ -49,12 +49,15 @@ namespace GymForge.Infrastructure.Services
                 ["otpCode"] = otpCode
             });
 
-        public Task SendPasswordResetLinkEmailAsync(string email, string name, string resetLink) =>
-            SendTemplateAsync(EmailTemplate.PasswordReset, email, name, new()
+        public Task SendPasswordResetLinkEmailAsync(string email, string name, string token)
+        {
+            string resetLink = $"{AppUrl()}/reset-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+            return SendTemplateAsync(EmailTemplate.PasswordReset, email, name, new()
             {
                 ["name"] = name,
                 ["resetLink"] = resetLink
             });
+        } 
 
         public Task SendReceiptEmailAsync(string email, string name, string transactionId, string amount, string productName, string date) =>
             SendTemplateAsync(EmailTemplate.SaleReceipt, email, name, new()
