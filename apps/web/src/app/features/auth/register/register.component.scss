@@ -5,14 +5,128 @@
 @include photo-page-mobile;
 
 
-.role-switch-prompt {
-  margin-top: 0;
-  padding-top: 10px;
-  border-top: none;
+// Step 1: member / gym owner choice
+.role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  a {
-    cursor: pointer;
+.role-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--primary-precision, #005bbc);
+    background: #f8fafc;
+    outline: none;
+
+    .role-arrow {
+      color: var(--primary-precision, #005bbc);
+      transform: translateX(3px);
+    }
   }
+
+  .role-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef4fb;
+    color: var(--primary-precision, #005bbc);
+    font-size: 16px;
+  }
+
+  .role-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .role-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--on-surface-precision, #1a1c1c);
+  }
+
+  .role-desc {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #6b7280;
+    line-height: 1.35;
+  }
+
+  .role-arrow {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #9ca3af;
+    transition: transform 0.2s, color 0.2s;
+  }
+}
+
+.role-note {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+// Step 2: the chosen role, with a way back
+.role-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  font-size: 0.8rem;
+  color: #4b5563;
+
+  strong {
+    color: var(--on-surface-precision, #1a1c1c);
+  }
+
+  button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary-precision, #005bbc);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  @include bp.mobile {
+    margin-bottom: 12px;
+  }
+}
+
+.field-hint {
+  font-size: 0.72rem;
+  color: #6b7280;
+  line-height: 1.35;
 }
 
 .otp-instruction {

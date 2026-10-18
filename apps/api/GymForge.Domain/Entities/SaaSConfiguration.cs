@@ -6,7 +6,7 @@ namespace GymForge.Domain.Entities
     {
         [Required]
         [MaxLength(100)]
-        public string PlatformName { get; set; } = "Elevatyon";
+        public string PlatformName { get; set; } = "GymCrest";
 
         [Required]
         [EmailAddress]

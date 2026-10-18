@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, FormsModule, Validators, FormControl } from '@angular/forms';
 import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
@@ -21,6 +21,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authApiService = inject(AuthApiService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private notification = inject(NotificationService);
 
   registerForm = this.fb.group({
@@ -36,7 +37,7 @@ export class RegisterComponent {
 
   showPassword = false;
   isLoading = false;
-  selectedRole = 'User'; // default
+  selectedRole: 'User' | 'GymOwner' | null = null;
 
   isOtpStep = false;
   otpCode = '';
@@ -49,12 +50,20 @@ export class RegisterComponent {
     this.showPassword = !this.showPassword;
   }
 
-  setRole(role: string) {
+  ngOnInit(): void {
+    const as = this.route.snapshot.queryParamMap.get('as');
+    if (as === 'owner') this.selectedRole = 'GymOwner';
+    else if (as === 'member') this.selectedRole = 'User';
+  }
+
+  setRole(role: 'User' | 'GymOwner' | null) {
     this.selectedRole = role;
+    const as = role === 'GymOwner' ? 'owner' : role === 'User' ? 'member' : null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: { as }, replaceUrl: true });
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
+    if (this.registerForm.valid && this.selectedRole) {
       this.isLoading = true;
 
       const formValue = this.registerForm.value;
@@ -89,6 +98,8 @@ export class RegisterComponent {
           this.isLoading = false;
         },
       });
+    } else {
+      this.registerForm.markAllAsTouched();
     }
   }
 

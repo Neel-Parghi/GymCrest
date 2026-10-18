@@ -1993,13 +1993,13 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"),
-                            BillingEmail = "admin@elevatyon.com",
+                            BillingEmail = "admin@gymcrest.com",
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedOn = new DateTime(2026, 4, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Currency = "INR",
                             GracePeriodDays = 7,
                             IsMaintenanceMode = false,
-                            PlatformName = "Elevatyon",
+                            PlatformName = "GymCrest",
                             SubscriptionTarget = 100,
                             TaxPercentage = 18.0m,
                             UptimeThreshold = 99.9m,

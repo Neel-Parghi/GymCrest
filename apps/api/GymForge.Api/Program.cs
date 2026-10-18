@@ -24,23 +24,29 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
+string[] allowedOrigins = new[]
+    {
+        builder.Configuration["GymCrest:BaseUrl"],
+        "https://GymCrest.vercel.app",
+        "http://localhost:4200"
+    }
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin!.TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("https://elevatyon.vercel.app",
-                                "https://gymforge-prod.vercel.app",
-                                "https://gymforge-web.onrender.com",
-                                "http://localhost:4200")
+            policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .SetIsOriginAllowed(origin =>
                       new Uri(origin).Host == "localhost" ||
                       origin.EndsWith(".vercel.app") ||
-                      origin == "https://elevatyon.vercel.app" ||
-                      origin == "https://gymforge-prod.vercel.app" ||
-                      origin == "https://gymforge-web.onrender.com");
+                      allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase));
         });
 });
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

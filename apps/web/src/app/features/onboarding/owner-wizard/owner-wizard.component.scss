@@ -632,6 +632,12 @@ form.onboarding-form {
     resize: vertical;
     min-height: 80px;
   }
+
+  .field-note {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
 }
 
 .branches-container {

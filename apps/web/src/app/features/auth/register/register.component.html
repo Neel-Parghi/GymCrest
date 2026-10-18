@@ -14,10 +14,14 @@
               <h1 class="hero-title">Run your whole gym in one place.</h1>
               <p class="hero-subtitle">Manage members, trainers, plans and billing, and give every member an app that
                 keeps them training.</p>
-            } @else {
+            } @else if (selectedRole === 'User') {
               <h1 class="hero-title">Your fitness journey starts here.</h1>
               <p class="hero-subtitle">Get a workout and diet plan built for your goal, log every session and watch your
                 progress add up.</p>
+            } @else {
+              <h1 class="hero-title">One app for your gym and your training.</h1>
+              <p class="hero-subtitle">Members track workouts, diet and progress. Gym owners run members, plans and
+                billing.</p>
             }
           </div>
         </div>
@@ -28,13 +32,39 @@
         <div class="auth-card">
           <div class="card-header">
             <h2 class="card-title">Create Account</h2>
+            <p class="card-subtitle" *ngIf="!selectedRole">First, tell us how you'll use GymCrest.</p>
             <p class="card-subtitle" *ngIf="selectedRole === 'GymOwner'">Get started with the world's most powerful gym
               management tools.</p>
             <p class="card-subtitle" *ngIf="selectedRole === 'User'">Begin your fitness journey and track your progress
-              with Elevatyon.</p>
+              with GymCrest.</p>
           </div>
 
-          <form *ngIf="!isOtpStep" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <div class="role-options" *ngIf="!selectedRole">
+            <button type="button" class="role-option" (click)="setRole('User')">
+              <span class="role-icon"><i class="fa-solid fa-dumbbell"></i></span>
+              <span class="role-text">
+                <span class="role-title">I work out</span>
+                <span class="role-desc">Track workouts, diet and progress, on your own or with your gym.</span>
+              </span>
+              <i class="fa-solid fa-chevron-right role-arrow"></i>
+            </button>
+            <button type="button" class="role-option" (click)="setRole('GymOwner')">
+              <span class="role-icon"><i class="fa-solid fa-building"></i></span>
+              <span class="role-text">
+                <span class="role-title">I run a gym</span>
+                <span class="role-desc">Manage members, trainers, plans and billing.</span>
+              </span>
+              <i class="fa-solid fa-chevron-right role-arrow"></i>
+            </button>
+            <p class="role-note">Trainers and staff: use the invitation email from your gym instead.</p>
+          </div>
+
+          <div class="role-chip" *ngIf="selectedRole && !isOtpStep">
+            <span>Signing up as <strong>{{ selectedRole === 'GymOwner' ? 'Gym owner' : 'Member' }}</strong></span>
+            <button type="button" (click)="setRole(null)">Change</button>
+          </div>
+
+          <form *ngIf="selectedRole && !isOtpStep" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
 
             <div class="form-item">
               <label for="name">Full Name</label>
@@ -57,6 +87,8 @@
                 <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
                 <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email address.</span>
               </small>
+              <small class="field-hint" *ngIf="selectedRole === 'User'">Joining a gym? Use the same email your gym has
+                on file, so your account links to it.</small>
             </div>
 
             <div class="form-item">
@@ -80,7 +112,7 @@
               </small>
             </div>
 
-            <button class="submit-btn" type="submit" [disabled]="registerForm.invalid || isLoading">
+            <button class="submit-btn" type="submit" [disabled]="isLoading">
               {{ isLoading ? 'Creating account...' : 'Create Account' }}
               <i class="fa-solid fa-arrow-right arrow-icon" *ngIf="!isLoading"></i>
             </button>
@@ -111,17 +143,6 @@
             </div>
           </form>
 
-          <div class="auth-footer-prompt role-switch-prompt" *ngIf="!isOtpStep">
-            <ng-container *ngIf="selectedRole === 'User'">
-              Are you a gym owner?
-              <a (click)="setRole('GymOwner')">Register as Gym Owner</a>
-            </ng-container>
-            <ng-container *ngIf="selectedRole === 'GymOwner'">
-              Signing up as a member?
-              <a (click)="setRole('User')">Register as User</a>
-            </ng-container>
-          </div>
-
           <div class="auth-footer-prompt" *ngIf="!isOtpStep">
             Already have an account?
             <a routerLink="/login">Sign In</a>
@@ -135,7 +156,7 @@
   <!-- Footer -->
   <footer class="auth-footer">
     <app-brand-logo class="footer-logo" />
-    <div class="copyright">© 2026 <span class="copyright-brand">ELEVATYON. </span>ALL RIGHTS RESERVED.</div>
+    <div class="copyright">© 2026 <span class="copyright-brand">GYMCREST. </span>ALL RIGHTS RESERVED.</div>
     <div class="footer-links">
       <a routerLink="/privacy-policy">Privacy Policy</a>
       <a routerLink="/terms-of-service">Terms of Service</a>
