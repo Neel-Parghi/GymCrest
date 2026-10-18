@@ -277,7 +277,7 @@ form.onboarding-form {
     .banner-bg {
       position: absolute;
       inset: 0;
-      background: url('/images/welcome_hero.png') center/cover;
+      background: url('/images/welcome_hero.webp') center/cover;
       z-index: 0;
       transition: transform 10s ease;
       transform: scale(1.05);
@@ -829,13 +829,13 @@ form.onboarding-form {
 
 
 .bg-setup-profile {
-  background-image: url('/images/owner-wizard/setup_profile.png');
+  background-image: url('/images/owner-wizard/setup_profile.webp');
 }
 
 .bg-manage-members {
-  background-image: url('/images/owner-wizard/manage_members.png');
+  background-image: url('/images/owner-wizard/manage_members.webp');
 }
 
 .bg-track-revenue {
-  background-image: url('/images/owner-wizard/track_revenue.png');
+  background-image: url('/images/owner-wizard/track_revenue.webp');
 }

@@ -824,14 +824,14 @@ export class BillingComponent implements OnInit {
           type: 'PRINT_INVOICE',
           invoiceId: invoice.id || '',
           html: printableElement.innerHTML
-        }, '*');
+        }, window.location.origin);
       };
 
       printFrame.src = '/assets/templates/invoice-print.html';
       document.body.appendChild(printFrame);
 
       const handlePrintComplete = (msgEvent: MessageEvent) => {
-        if (msgEvent.data && msgEvent.data.type === 'PRINT_COMPLETE') {
+        if (msgEvent.origin === window.location.origin && msgEvent.data?.type === 'PRINT_COMPLETE') {
           if (printFrame.parentNode) {
             printFrame.parentNode.removeChild(printFrame);
           }

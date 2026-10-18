@@ -87,11 +87,11 @@ export class UserWizardComponent implements OnInit {
   ];
 
   readonly goals: { id: FitnessGoalId; label: string; icon: string; desc: string; image: string }[] = [
-    { id: 'weight_loss', label: 'Weight Loss', icon: 'fi-rr-fire', desc: 'Burn fat and get leaner', image: '/images/goals/weight_loss.png' },
-    { id: 'muscle_gain', label: 'Muscle Gain', icon: 'fi-rr-gym', desc: 'Build size and strength', image: '/images/goals/muscle_gain.png' },
-    { id: 'endurance', label: 'Endurance', icon: 'fi-rr-running', desc: 'Improve cardiovascular health', image: '/images/goals/endurance.png' },
-    { id: 'flexibility', label: 'Flexibility', icon: 'fi-rr-person-praying', desc: 'Enhance mobility and recovery', image: '/images/goals/flexibility.png' },
-    { id: 'general_fitness', label: 'General Fitness', icon: 'fi-rr-heart-pulse', desc: 'Stay active and healthy', image: '/images/goals/general_fitness.png' }
+    { id: 'weight_loss', label: 'Weight Loss', icon: 'fi-rr-fire', desc: 'Burn fat and get leaner', image: '/images/goals/weight_loss.webp' },
+    { id: 'muscle_gain', label: 'Muscle Gain', icon: 'fi-rr-gym', desc: 'Build size and strength', image: '/images/goals/muscle_gain.webp' },
+    { id: 'endurance', label: 'Endurance', icon: 'fi-rr-running', desc: 'Improve cardiovascular health', image: '/images/goals/endurance.webp' },
+    { id: 'flexibility', label: 'Flexibility', icon: 'fi-rr-person-praying', desc: 'Enhance mobility and recovery', image: '/images/goals/flexibility.webp' },
+    { id: 'general_fitness', label: 'General Fitness', icon: 'fi-rr-heart-pulse', desc: 'Stay active and healthy', image: '/images/goals/general_fitness.webp' }
   ];
 
   readonly experienceLevels: { id: ExperienceLevel; label: string; desc: string; icon: string; days: number }[] = [
