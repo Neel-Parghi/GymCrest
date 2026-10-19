@@ -46,7 +46,7 @@ Log in with either of these accounts to explore the product without signing up:
 ## 🛠 Tech Stack
 
 **Frontend** (`apps/web`)
-- Angular 21 (standalone components, SSR via `@angular/ssr` + Express)
+- Angular 21 (standalone components, signals), built as a static single-page app and hosted on Vercel; installable as an app (web manifest + launch splash)
 - Angular Material + CDK
 - Chart.js (via `ng2-charts`) for data visualization
 - RxJS-based services (no NgRx/Akita - state lives in services + signals)
@@ -92,48 +92,54 @@ If you want to understand *why* something works the way it does (not just what t
 ## 🏁 Getting Started (Local Setup)
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) 20+ and npm
+- [Node.js](https://nodejs.org/) **20.19+ or 22.12+** (required by Angular 21) and npm
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- A PostgreSQL database (local or hosted - e.g. Supabase, Render, Docker)
+- EF Core CLI: `dotnet tool install --global dotnet-ef`
+- A PostgreSQL database (local or hosted - e.g. Supabase, Docker)
 
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/Neel-Parghi/GymForge.git
 cd GymForge
 ```
+> **Windows:** some file paths are long (up to ~160 characters). If the clone fails with *Filename too long*, run `git config --global core.longpaths true` (or clone into a short folder such as `C:\code`) and clone again.
 
 ### 2. Backend setup (`apps/api`)
-```bash
-cd apps/api/GymForge.Api
-```
-
-Create `apps/api/GymForge.Api/appsettings.Development.json` (gitignored, safe for real secrets) with at least:
+Create `apps/api/GymForge.Api/appsettings.Development.json` (gitignored, safe for real secrets):
 ```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=gymcrest;Username=postgres;Password=yourpassword"
+  },
+  "Jwt": {
+    "Key": "replace-with-a-random-secret-of-at-least-32-characters"
+  },
+  "GymCrest": {
+    "BaseUrl": "http://localhost:4200"
   }
 }
 ```
+- Use the key=value connection-string format shown above (the EF tools don't accept `postgresql://` URLs).
+- `Jwt:Key` **must** be at least 32 characters, otherwise login fails (the placeholder in `appsettings.json` is too short on purpose).
+- `GymCrest:BaseUrl` is the frontend address used in emailed links and allowed by CORS.
+- Other sections in `appsettings.json` (`Brevo`, `Cloudinary`, `Razorpay`, `Gemini`, `CalorieNinjas`, `UsdaFoodData`) hold placeholders: the app runs without them, but email, uploads, payments and food search stay disabled until you add real keys the same way. `apps/api/.env.example` lists every setting as environment variables (the format used by Docker and Render).
 
-`GymCrest:BaseUrl` is the frontend address used in emailed links (invitations) and is also allowed by CORS; set it to `http://localhost:4200` for local development.
-
-Other config sections in `appsettings.json` (`Jwt`, `Brevo`, `Cloudinary`, `Razorpay` keys per gym, `CalorieNinjas`, `UsdaFoodData`) ship with placeholder values - the app runs without them, but the features they back (email, file uploads, payments, food search) will be degraded or disabled until you supply real keys the same way.
-
-Apply migrations and run:
+Trust the local HTTPS certificate (once per machine), apply migrations and run the **https** profile:
 ```bash
+cd apps/api/GymForge.Api
+dotnet dev-certs https --trust
 dotnet ef database update --project ../GymForge.Infrastructure --startup-project .
-dotnet run
+dotnet run --launch-profile https
 ```
-API runs at `http://localhost:5250` (HTTPS: `https://localhost:7184`).
+The API runs at `https://localhost:7184` (also `http://localhost:5250`); the web app's dev config calls the HTTPS address. The API also applies any pending migrations itself on startup.
 
 ### 3. Frontend setup (`apps/web`)
 ```bash
 cd apps/web
-npm install
+npm ci
 npm start
 ```
-App runs at `http://localhost:4200`.
+App runs at `http://localhost:4200` (the public website at `/`, the app at `/login`).
 
 ---
 
@@ -151,4 +157,8 @@ App runs at `http://localhost:4200`.
 
 ## 🤝 Contributing
 
-This is currently a solo/small-team project. If you're exploring the code and have questions, the `docs/business-logic/` folder is the best starting point before diving into the source.
+1. Branch from `main` (e.g. `feature/<short-name>`), commit, push and open a pull request into `main`.
+2. **CI must pass** (`.github/workflows/ci.yml`): it builds the Angular app, builds the API, and fails if an EF entity changed without a migration (`dotnet ef migrations add <Name> --project GymForge.Infrastructure --startup-project GymForge.Api` from `apps/api`).
+3. Never commit secrets: `.env`, `appsettings.Development.json` and `*.sql` dumps are gitignored for a reason.
+
+If you're exploring the code and have questions, the `docs/business-logic/` folder is the best starting point before diving into the source.

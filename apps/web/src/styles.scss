@@ -4,6 +4,11 @@
 @import 'ngx-toastr/toastr';
 @import 'driver.js/dist/driver.css';
 
+/* Installed app (class set in index.html): allow scrolling but not pinch or double-tap zoom */
+html.installed-app {
+  touch-action: pan-x pan-y;
+}
+
 :root {
   /* ==========================================================================
      GYMCREST DESIGN SYSTEM - COLOR PALETTE

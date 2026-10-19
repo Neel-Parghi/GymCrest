@@ -1,0 +1,159 @@
+<!-- Miniatures of the real app (sample data): owner dashboard with the gym message, member app (real screenshots) with the member message -->
+<div class="hero-scenes" aria-hidden="true">
+  <div class="hero-scene" [class.active]="active() === 0">
+    <div class="mock-window">
+      <div class="browser-bar">
+        <span></span><span></span><span></span>
+        <span class="url">gymcrest.vercel.app/gym-owner/dashboard</span>
+      </div>
+      <div class="app">
+        <aside class="app-side">
+          <div class="app-brand">
+            <app-brand-logo class="app-logo" />
+            <small>Gym owner portal</small>
+            <i class="fas fa-bars app-burger"></i>
+          </div>
+          <div class="app-nav active"><i class="fas fa-house"></i> Dashboard</div>
+          <div class="app-label">Management</div>
+          <div class="app-nav"><i class="fas fa-users"></i> Members</div>
+          <div class="app-nav"><i class="fas fa-calendar-check"></i> Attendance</div>
+          <div class="app-nav"><i class="fas fa-user-tie"></i> Staff &amp; Trainers</div>
+          <div class="app-nav"><i class="fas fa-receipt"></i> Gym Plans</div>
+          <div class="app-nav"><i class="fas fa-bullhorn"></i> Announcements</div>
+          <div class="app-label">Resources</div>
+          <div class="app-nav"><i class="fas fa-boxes-stacked"></i> Inventory</div>
+          <div class="app-nav"><i class="fas fa-building"></i> My Gyms</div>
+          <div class="app-nav"><i class="fas fa-dumbbell"></i> Workout Library</div>
+          <div class="app-nav"><i class="fas fa-utensils"></i> Diet Library</div>
+          <div class="app-label">Finances</div>
+          <div class="app-nav"><i class="fas fa-file-invoice-dollar"></i> Billing &amp; Invoices</div>
+          <div class="app-label">Account</div>
+          <div class="app-nav"><i class="fas fa-user-circle"></i> My Account</div>
+          <div class="app-nav"><i class="fas fa-gear"></i> Settings</div>
+          <div class="app-nav app-logout"><i class="fas fa-right-from-bracket"></i> Logout</div>
+        </aside>
+
+        <div class="app-main">
+          <div class="app-top">
+            <span class="app-location"><i class="fas fa-globe"></i> All Locations (Global)</span>
+            <span class="app-top-icons"><i class="fas fa-bell"></i><span class="app-me">IT</span></span>
+          </div>
+          <div class="app-title">
+            <strong>Gym Overview</strong>
+            <small>Performance metrics and operational overview of your gym.</small>
+          </div>
+
+          <div class="app-stats">
+            <div class="app-stat">
+              <div class="app-stat-head"><span class="tile blue"><i class="fas fa-wallet"></i></span><span class="badge">+12%</span></div>
+              <small>Total Revenue</small>
+              <strong>₹1,24,500</strong>
+            </div>
+            <div class="app-stat">
+              <div class="app-stat-head"><span class="tile purple"><i class="fas fa-id-card"></i></span><span class="badge">+8% growth</span></div>
+              <small>Total Members</small>
+              <strong>248</strong>
+            </div>
+            <div class="app-stat">
+              <div class="app-stat-head"><span class="tile green"><i class="fas fa-users"></i></span></div>
+              <small>Today's Attendance</small>
+              <strong>63</strong>
+            </div>
+            <div class="app-stat">
+              <div class="app-stat-head"><span class="tile red"><i class="fas fa-box-open"></i></span><span class="badge">Healthy</span></div>
+              <small>Inventory Status</small>
+              <strong>42 <em>Products</em></strong>
+            </div>
+          </div>
+
+          <div class="app-row">
+            <div class="app-card">
+              <strong>Check-in Count</strong>
+              <small>Member peak hours throughout the day</small>
+              <div class="chart-bars">
+                <div class="bar" style="--h: 55%"></div>
+                <div class="bar" style="--h: 85%"></div>
+                <div class="bar" style="--h: 48%"></div>
+                <div class="bar" style="--h: 22%"></div>
+                <div class="bar" style="--h: 18%"></div>
+                <div class="bar" style="--h: 40%"></div>
+                <div class="bar highlight-bar" style="--h: 100%"></div>
+                <div class="bar" style="--h: 70%"></div>
+                <div class="bar" style="--h: 30%"></div>
+              </div>
+              <div class="chart-axis"><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>10 PM</span></div>
+            </div>
+            <div class="app-card app-distribution">
+              <strong>Member Distribution</strong>
+              <small>Active subscriptions by tier</small>
+              <div class="donut"><span class="donut-ring"></span><span class="donut-label"><b>248</b>Total</span></div>
+              <div class="legend"><i class="dot-navy"></i> 6 Months Plan <b>58%</b></div>
+              <div class="legend"><i class="dot-light"></i> 3 Months Plan <b>42%</b></div>
+            </div>
+          </div>
+
+          <div class="app-row">
+            <div class="app-card">
+              <div class="app-card-head"><strong>Recent Enrollments</strong><span>View All Members</span></div>
+              <table class="app-table">
+                <thead><tr><th>Member name</th><th>Date joined</th><th>Tier</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="app-avatar">RS</span> Rohan Shah</td><td>Oct 16, 2026</td><td><span class="tier">6 Months</span></td><td><span class="status-pill">Active</span></td></tr>
+                  <tr><td><span class="app-avatar">AP</span> Ananya Patel</td><td>Oct 14, 2026</td><td><span class="tier">3 Months</span></td><td><span class="status-pill">Active</span></td></tr>
+                  <tr><td><span class="app-avatar">KM</span> Karan Mehta</td><td>Oct 11, 2026</td><td><span class="tier">Monthly</span></td><td><span class="status-pill">Active</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="app-card">
+              <strong>Upcoming Renewals</strong>
+              <div class="renewal"><b>Vikram Desai</b><span>In 2 days</span></div>
+              <div class="renewal"><b>Priya Nair</b><span>In 4 days</span></div>
+              <div class="renewal"><b>Arjun Rao</b><span>In 6 days</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="float-note float-top">
+      <span class="tile green"><i class="fas fa-indian-rupee-sign"></i></span>
+      <div><strong>₹1,500 received</strong><small>Rohan S. renewed · 3 Months Plan</small></div>
+    </div>
+    <div class="float-note float-bottom">
+      <span class="tile amber"><i class="fas fa-bell"></i></span>
+      <div><strong>9 memberships expiring soon</strong><small>Reminders sent automatically</small></div>
+    </div>
+  </div>
+
+  <div class="hero-scene" [class.active]="active() === 1">
+    <!-- Real screenshots of the member app: desktop layout, and the phone layout on small screens -->
+    <div class="mock-window shot">
+      <div class="browser-bar">
+        <span></span><span></span><span></span>
+        <span class="url">gymcrest.vercel.app/user/dashboard</span>
+      </div>
+      <picture>
+        <source media="(max-width: 700px)" srcset="images/landing/member-dashboard-mobile.webp" width="780" height="1688">
+        <img src="images/landing/member-dashboard.webp" width="1600" height="1000" alt="" decoding="async">
+      </picture>
+    </div>
+
+    <div class="float-note float-top">
+      <span class="tile amber"><i class="fas fa-trophy"></i></span>
+      <div><strong>New personal record</strong><small>Bench press · 80 kg × 5</small></div>
+    </div>
+    <div class="float-note float-bottom">
+      <span class="tile blue"><i class="fas fa-clock"></i></span>
+      <div><strong>Next: Lunch · 1:30 PM</strong><small>Planned meal · 650 kcal</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="scene-switch">
+  <button type="button" [class.active]="active() === 0" [attr.aria-pressed]="active() === 0" (click)="viewChange.emit(0)">
+    <i class="fas fa-crown"></i> Gym owner portal
+  </button>
+  <button type="button" [class.active]="active() === 1" [attr.aria-pressed]="active() === 1" (click)="viewChange.emit(1)">
+    <i class="fas fa-mobile-screen-button"></i> Member app
+  </button>
+</div>
