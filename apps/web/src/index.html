@@ -9,6 +9,8 @@
   <meta name="theme-color" content="#0a1f44">
   <meta name="description"
     content="GymCrest is gym management software for Indian gyms (members, billing, attendance, staff) with a free workout, diet and progress tracker for members.">
+  <meta name="google-site-verification" content="_TA483GDiVRBWHxS6AiBkwaWLgSNA0gOSy0_FNrBjvQ">
+  <link rel="canonical" href="https://gymcrest.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="GymCrest">
   <meta property="og:url" content="https://gymcrest.vercel.app/">
@@ -63,6 +65,18 @@
   <script>
     (function () {
       var started = Date.now();
+
+      // Installed app behaves like a native app: no pinch / double-tap zoom.
+      // The website in a normal browser keeps zoom for accessibility.
+      var installed = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches ||
+        matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true;
+      if (installed) {
+        document.documentElement.classList.add('installed-app');
+        document.querySelector('meta[name=viewport]').setAttribute('content',
+          'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+        // iOS ignores user-scalable=no, so block its pinch gesture directly
+        document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, { passive: false });
+      }
       if (/[?&]splash\b/.test(location.search)) document.documentElement.classList.add('force-splash');
       var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
       var MIN_MS = reduce ? 300 : 2200;

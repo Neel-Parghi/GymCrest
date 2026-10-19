@@ -1,0 +1,61 @@
+name: CI
+
+# Builds both apps on every pull request (and on pushes to main / feature branches),
+# so a PR can't be merged with a broken build or a forgotten EF migration.
+on:
+  pull_request:
+  push:
+    branches: [main, 'feature/**']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (Angular build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Production build
+        run: npx ng build
+
+  api:
+    name: API (.NET build + migrations check)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build GymForge.Api/GymForge.Api.csproj -c Release
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef --version 10.0.*
+
+      # Fails if an entity/config changed without a matching migration. No database is needed:
+      # it only compares the model with the migrations snapshot (the connection string is a dummy).
+      - name: Check for missing EF migrations
+        env:
+          ConnectionStrings__DefaultConnection: Host=localhost;Database=ci;Username=ci;Password=ci
+        run: dotnet ef migrations has-pending-model-changes --project GymForge.Infrastructure --startup-project GymForge.Api --no-build --configuration Release

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, PLATFORM_ID, co
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-logo.component';
+import { HeroPreviewComponent } from './hero-preview/hero-preview.component';
 import { PricingService } from '../../core/services/pricing.service';
 import { PricingPlan } from '../../shared/models/pricing.model';
 
@@ -21,7 +22,7 @@ type PlansState = 'loading' | 'ready' | 'error';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, BrandLogoComponent],
+  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
