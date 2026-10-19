@@ -72,6 +72,8 @@ export const CONSTANTS = {
         DELETE_PLAN_MESSAGE: 'Are you sure you want to delete this plan? This action cannot be undone.',
         DELETE_OWNER_TITLE: 'Delete Gym Owner',
         DELETE_OWNER_MESSAGE: 'Are you sure you want to delete this gym owner? This action cannot be undone.',
+        DELETE_USER_TITLE: 'Delete User',
+        DELETE_USER_MESSAGE: 'Permanently delete {name}? Their workouts, diet logs and progress will be erased. This cannot be undone.',
         DELETE_PRODUCT_CONFIRM: 'Are you sure you want to delete this product?',
     },
     //#endregion

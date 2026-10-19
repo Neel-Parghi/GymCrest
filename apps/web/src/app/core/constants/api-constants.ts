@@ -31,6 +31,7 @@ export const API_CONSTANTS = {
     MY_SUBSCRIPTIONS: 'users/my-subscriptions',
     MY_GYM: 'users/my-gym',
     STANDALONE: 'users/standalone',
+    DELETE: 'users',
     SAVE_ONBOARDING_STEP: 'users/save-onboarding-step',
     COMPLETE_ONBOARDING: 'users/complete-user-onboarding',
     ONBOARDING_PREVIEW_TARGETS: 'users/onboarding/preview-targets',

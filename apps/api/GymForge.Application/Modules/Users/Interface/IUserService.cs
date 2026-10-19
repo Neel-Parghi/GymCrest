@@ -38,6 +38,9 @@ namespace GymForge.Application.Modules.Users.Interface
 
         Task<PagedResponse<StandaloneUserDto>> GetStandaloneUsersAsync(PaginationParams pagination);
 
+
+        Task DeleteUserAsAdminAsync(Guid userId);
+
         Task SaveOnboardingStepAsync(Guid userId, int step);
 
         Task CompleteUserOnboardingAsync(Guid userId, CompleteUserOnboardingDto dto);
