@@ -177,6 +177,14 @@ namespace GymForge.Api.Controllers.User
             });
         }
 
+        [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            await _userService.DeleteUserAsAdminAsync(id);
+            return Ok(new { message = "User deleted." });
+        }
+
         [HttpPost("save-onboarding-step/{step}")]
         [Authorize]
         public async Task<IActionResult> SaveOnboardingStep(int step)

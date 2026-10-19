@@ -1,4 +1,5 @@
 using AutoMapper;
+using GymForge.Application.BackgroundJobs;
 using GymForge.Application.Modules.Auth.Interface;
 using GymForge.Application.Modules.Common.Interfaces;
 using GymForge.Application.Modules.PlanGeneration.Interface;
@@ -32,6 +33,7 @@ namespace GymForge.Application.Modules.Users.Services
         private readonly IMapper _mapper;
         private readonly IPlanGenerationService _planGenerationService;
         private readonly ILogger<UserService> _logger;
+        private readonly AccountDeletionJob _accountDeletionJob;
 
         /// <summary>Steps in the member onboarding wizard; completing it leaves the member on the last one.</summary>
         private const int OnboardingStepCount = 4;
@@ -48,7 +50,8 @@ namespace GymForge.Application.Modules.Users.Services
             IAddressRepository addressRepository,
             IMapper mapper,
             IPlanGenerationService planGenerationService,
-            ILogger<UserService> logger)
+            ILogger<UserService> logger,
+            AccountDeletionJob accountDeletionJob)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
@@ -62,6 +65,7 @@ namespace GymForge.Application.Modules.Users.Services
             _mapper = mapper;
             _planGenerationService = planGenerationService;
             _logger = logger;
+            _accountDeletionJob = accountDeletionJob;
         }
 
         public async Task InviteOwnerAsync(InviteOwnerRequestDto inviteOwnerRequestDto)
@@ -343,6 +347,34 @@ namespace GymForge.Application.Modules.Users.Services
                 DeletionRequestedOn = u.Security!.DeletionRequestedOn!.Value,
                 ScheduledDeletionTime = u.Security!.DeletionRequestedOn!.Value.AddHours(24)
             })];
+        }
+
+        public async Task DeleteUserAsAdminAsync(Guid userId)
+        {
+            User user = await _userRepository.GetUserByIdAsync(userId)
+                ?? throw new Exception("User not found.");
+
+            if (user.Id == _currentUserService.UserId)
+            {
+                throw new Exception("You can't delete your own account from here.");
+            }
+            if (user.Role == UserRole.SuperAdmin)
+            {
+                throw new Exception("Super admin accounts can't be deleted.");
+            }
+            if (user.Role == UserRole.GymOwner)
+            {
+                throw new Exception("Gym owners are managed from Gym Owners.");
+            }
+
+            string[] demoEmails = _config.GetSection("Demo:Emails").Get<string[]>() ?? [];
+            if (demoEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new Exception("Demo accounts can't be deleted.");
+            }
+
+            _logger.LogInformation("Super admin {AdminId} deleted user {UserId}", _currentUserService.UserId, userId);
+            await _accountDeletionJob.ExecuteAsync(userId);
         }
 
         public async Task<PagedResponse<StandaloneUserDto>> GetStandaloneUsersAsync(PaginationParams pagination)

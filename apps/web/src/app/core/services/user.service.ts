@@ -109,6 +109,11 @@ export class UserService extends BaseApiService {
     return this.get<ApiResponse>(API_CONSTANTS.USER.STANDALONE, params);
   }
 
+  /** Super admin only: permanently deletes a member or trainer account. */
+  deleteUser(userId: string): Observable<ApiResponse> {
+    return this.delete<ApiResponse>(`${API_CONSTANTS.USER.DELETE}/${userId}`);
+  }
+
   saveOnboardingStep(step: number): Observable<ApiResponse> {
     return this.post<ApiResponse>(`${API_CONSTANTS.USER.SAVE_ONBOARDING_STEP}/${step}`, {});
   }

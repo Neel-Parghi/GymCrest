@@ -2,7 +2,7 @@
   <div class="page-header">
     <div class="header-info">
       <h2>Users</h2>
-      <p>Manage standalone platform users and deletion requests.</p>
+      <p>Manage standalone platform users and remove test or unwanted accounts.</p>
     </div>
   </div>
 
@@ -10,6 +10,7 @@
   </app-filter-bar>
 
   <app-data-grid [config]="gridConfig" [data]="displayData" [totalItems]="totalItems" [pageSize]="pageSize"
-    [currentPage]="currentPage" (pageChange)="onPageChanged($event)" (pageSizeChange)="onPageSizeChanged($event)">
+    [currentPage]="currentPage" (pageChange)="onPageChanged($event)" (pageSizeChange)="onPageSizeChanged($event)"
+    (actionEvent)="handleAction($event)">
   </app-data-grid>
 </div>

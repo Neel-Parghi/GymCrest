@@ -37,9 +37,10 @@ export const AppGridConfig: Record<string, GridConfigDef> = {
       { key: 'isEmailVerified', label: 'Email Verified', type: 'bool' },
       { key: 'status', label: 'Status', type: 'badge' },
       { key: 'deletionRequestedOn', label: 'Deletion Scheduled On', type: 'date' },
+      { key: 'actions', label: 'Actions', type: 'action' }
     ],
     selectable: false,
-    excludeActions: ['edit', 'delete', 'view']
+    excludeActions: ['edit', 'view']
   },
   PricingList: {
     columns: [
