@@ -15,6 +15,7 @@
   #app-splash { display: flex; }
 }
 .force-splash #app-splash { display: flex; }
+.skip-splash #app-splash { display: none; }
 #app-splash.hide { opacity: 0; visibility: hidden; }
 #app-splash.hide .splash-stage { transform: scale(1.06); }
 

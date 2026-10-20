@@ -77,7 +77,16 @@
         // iOS ignores user-scalable=no, so block its pinch gesture directly
         document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, { passive: false });
       }
-      if (/[?&]splash\b/.test(location.search)) document.documentElement.classList.add('force-splash');
+      var forced = /[?&]splash\b/.test(location.search);
+      if (forced) document.documentElement.classList.add('force-splash');
+      // The splash belongs to opening the app. sessionStorage survives a refresh but not closing the app,
+      // so a pull-to-refresh or reload skips it and the next real launch plays it again.
+      var relaunch = false;
+      try {
+        relaunch = sessionStorage.getItem('gc-splash-shown') === '1';
+        sessionStorage.setItem('gc-splash-shown', '1');
+      } catch (e) { /* storage blocked: keep showing it */ }
+      if (relaunch && !forced) document.documentElement.classList.add('skip-splash');
       var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
       var MIN_MS = reduce ? 300 : 2200;
       var hidden = false;
