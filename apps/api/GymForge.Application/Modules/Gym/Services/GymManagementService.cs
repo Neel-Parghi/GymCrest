@@ -305,6 +305,11 @@ namespace GymForge.Application.Modules.Gym.Services
                 throw new Exception("Gym not found for this owner.");
             }
 
+            if (string.IsNullOrWhiteSpace(updateMyGymDto.GymName))
+            {
+                updateMyGymDto.GymName = gym.GymName;
+            }
+
             _mapper.Map(updateMyGymDto, gym);
             _gymManagementRepository.UpdateGym(gym);
             await _unitOfWork.SaveChangesAsync();

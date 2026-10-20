@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { BaseApiService } from "./base-api.service";
 import { API_CONSTANTS } from "../constants/api-constants";
-import { Observable, shareReplay, tap, catchError, of } from "rxjs";
+import { Observable, Subject, shareReplay, tap, catchError, of } from "rxjs";
 import { ApiResponse } from "../../shared/models/api-response.model";
 import { OnboardGymRequest, GymOwnerResponse, GymListResponse, UpdateGymOwnerRequest, UpdateMyGymRequest, BranchDto } from "../../shared/models/gym.model";
 import { PagedResponse } from "../../shared/models/paged-response.model";
@@ -18,6 +18,8 @@ export class GymService extends BaseApiService {
     private branchesCache = new Map<string, Observable<ApiResponse<BranchDto[]>>>();
     private myBranchesCache$: Observable<ApiResponse<BranchDto[]>> | null = null;
     private myGymCache$: Observable<ApiResponse<GymListResponse>> | null = null;
+    private myGymUpdatedSubject = new Subject<void>();
+    readonly myGymUpdated$ = this.myGymUpdatedSubject.asObservable();
 
     constructor() {
         super();
@@ -159,7 +161,10 @@ export class GymService extends BaseApiService {
 
     updateMyGym(payload: UpdateMyGymRequest): Observable<ApiResponse<unknown>> {
         return this.put<ApiResponse<unknown>>(API_CONSTANTS.GYM.MY_GYM, payload).pipe(
-            tap(() => this.clearMyGymCache())
+            tap(() => {
+                this.clearMyGymCache();
+                this.myGymUpdatedSubject.next();
+            })
         );
     }
 

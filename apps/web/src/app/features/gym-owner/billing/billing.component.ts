@@ -822,6 +822,7 @@ export class BillingComponent implements OnInit {
       printFrame.setAttribute('style', 'position: absolute; width: 1024px; height: 768px; top: -9999px; left: -9999px; visibility: hidden;');
 
       printFrame.onload = () => {
+        this.notification.info(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_HINT);
         printFrame.contentWindow?.postMessage({
           type: 'PRINT_INVOICE',
           invoiceId: invoice.id || '',
@@ -843,7 +844,6 @@ export class BillingComponent implements OnInit {
           if (!wasOpen) {
             this.selectedInvoice = null;
           }
-          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'GymCrest License'));
         }
       };
 

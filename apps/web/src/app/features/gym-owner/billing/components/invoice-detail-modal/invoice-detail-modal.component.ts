@@ -16,6 +16,7 @@ export class InvoiceDetailModalComponent {
   @Input() invoice!: any;
   @Input() gymDetails: any = null;
   @Input() platformConfig: any = null;
+  logoFailed = false;
 
   @Output() close = new EventEmitter<void>();
 
@@ -49,6 +50,7 @@ export class InvoiceDetailModalComponent {
       printFrame.setAttribute('style', 'position: absolute; width: 1024px; height: 768px; top: -9999px; left: -9999px; visibility: hidden;');
 
       printFrame.onload = () => {
+        this.notification.info(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_HINT);
         printFrame.contentWindow?.postMessage({
           type: 'PRINT_INVOICE',
           invoiceId: invoice.id || '',
@@ -65,7 +67,6 @@ export class InvoiceDetailModalComponent {
             printFrame.parentNode.removeChild(printFrame);
           }
           window.removeEventListener('message', handlePrintComplete);
-          this.notification.success(CONSTANTS.BILLING_MODULE.RECEIPT_PDF_SUCCESS.replace('{name}', invoice.id || invoice.memberName || 'GymCrest License'));
         }
       };
 

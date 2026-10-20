@@ -294,7 +294,7 @@ export const CONSTANTS = {
         TAX_CONFIG_ERROR: 'Failed to save billing configuration to server.',
         VALIDATION_ERROR: 'Please resolve validation errors in the settings form.',
         RECEIPT_TEMPLATE_ERROR: 'Failed to locate print receipt template.',
-        RECEIPT_PDF_SUCCESS: 'PDF receipt generated for {name}.',
+        RECEIPT_PDF_HINT: 'To download, choose "Save as PDF" as the printer.',
         CREATE_INVOICE_VALIDATION_ERROR: 'Please enter valid invoice details.',
         CREATE_INVOICE_INVALID_MEMBER: 'Selected member is invalid.',
         CREATE_INVOICE_SUCCESS: 'Custom invoice generated and recorded successfully!',
@@ -328,8 +328,8 @@ export const CONSTANTS = {
 
     //#region Gym Module
     GYM_MODULE: {
-        LOGO_UPLOAD_SUCCESS: 'Logo uploaded successfully. Save profile changes to persist.',
-        LOGO_UPLOAD_ERROR: 'Failed to upload logo.',
+        LOGO_UPLOAD_ERROR: 'Could not upload the logo, so nothing was saved. Please try again.',
+        LOGO_TYPE_ERROR: 'Please choose a PNG, JPG, WebP or GIF image.',
         LOAD_DETAILS_ERROR: 'Failed to load gym details',
         LOAD_BRANCHES_ERROR: 'Failed to load branches',
         UPDATE_SUCCESS: 'Gym profile updated successfully',

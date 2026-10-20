@@ -10,6 +10,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { BranchContextService } from '../../../core/services/branch-context.service';
 import { SlideDrawerComponent } from '../../../shared/components/slide-drawer/slide-drawer.component';
 import { FileUploadService } from '../../../core/services/file-upload.service';
+import { EMPTY, Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { PricingService } from '../../../core/services/pricing.service';
 import { PlanCheckoutService } from '../../../core/services/plan-checkout.service';
 import { CONSTANTS } from '../../../core/constants/constants';
@@ -65,6 +67,8 @@ export class MyGymsComponent implements OnInit {
   isSaving = false;
   isEditMode = false;
   gymData: GymListResponse | null = null;
+  selectedLogoFile: File | null = null;
+  logoPreviewUrl: string | null = null;
   availableManagers: any[] = [];
   managerDropdownOptions: DropdownOption[] = [];
   branches: any[] = [];
@@ -143,6 +147,8 @@ export class MyGymsComponent implements OnInit {
 
   cancelEdit(): void {
     this.isEditMode = false;
+    this.selectedLogoFile = null;
+    this.logoPreviewUrl = null;
     this.profileForm.disable();
     if (this.gymData) {
       this.profileForm.patchValue(this.gymData);
@@ -152,27 +158,31 @@ export class MyGymsComponent implements OnInit {
   onLogoChange(event: Event): void {
     if (!this.isEditMode) return;
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.isLoading = true;
-      this.fileUploadService.uploadFile(file, 'logos').subscribe({
-        next: (res) => {
-          if (res.data?.url) {
-            if (this.gymData) {
-              this.gymData.logoUrl = res.data.url;
-            }
-            this.profileForm.patchValue({ logoUrl: res.data.url });
-            this.profileForm.markAsDirty();
-            this.toastService.success(CONSTANTS.GYM_MODULE.LOGO_UPLOAD_SUCCESS);
-          }
-          this.isLoading = false;
-        },
-        error: () => {
-          this.toastService.error(CONSTANTS.GYM_MODULE.LOGO_UPLOAD_ERROR);
-          this.isLoading = false;
-        }
-      });
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+      this.toastService.error(CONSTANTS.GYM_MODULE.LOGO_TYPE_ERROR);
+      return;
     }
+
+    this.selectedLogoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => this.logoPreviewUrl = reader.result as string;
+    reader.readAsDataURL(file);
+    this.profileForm.markAsDirty();
+  }
+
+  removeLogo(): void {
+    this.selectedLogoFile = null;
+    this.logoPreviewUrl = null;
+    this.profileForm.patchValue({ logoUrl: '' });
+    this.profileForm.markAsDirty();
+  }
+
+  get displayedLogoUrl(): string | null {
+    if (this.logoPreviewUrl) return this.logoPreviewUrl;
+    return this.isEditMode ? this.profileForm.get('logoUrl')?.value || null : this.gymData?.logoUrl || null;
   }
 
   private loadGymData(): void {
@@ -216,15 +226,30 @@ export class MyGymsComponent implements OnInit {
     }
 
     this.isSaving = true;
-    this.gymService.updateMyGym(this.profileForm.value).subscribe({
+    const logoUpload$: Observable<string | undefined> = this.selectedLogoFile
+      ? this.fileUploadService.uploadFile(this.selectedLogoFile, 'logos').pipe(map(res => res.data?.url))
+      : of(undefined);
+
+    logoUpload$.pipe(
+      catchError(() => {
+        this.toastService.error(CONSTANTS.GYM_MODULE.LOGO_UPLOAD_ERROR);
+        return EMPTY;
+      }),
+      switchMap(logoUrl => {
+        if (logoUrl) this.profileForm.patchValue({ logoUrl });
+        return this.gymService.updateMyGym(this.profileForm.value);
+      }),
+      finalize(() => this.isSaving = false)
+    ).subscribe({
       next: () => {
         this.toastService.success(CONSTANTS.GYM_MODULE.UPDATE_SUCCESS);
-        this.isSaving = false;
         this.isEditMode = false;
+        this.selectedLogoFile = null;
+        this.logoPreviewUrl = null;
         this.profileForm.disable();
 
         if (this.gymData) {
-          this.gymData = { ...this.gymData, ...this.profileForm.value };
+          this.gymData = { ...this.gymData, ...this.profileForm.getRawValue() };
         }
       },
       error: () => {

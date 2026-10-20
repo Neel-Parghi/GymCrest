@@ -37,6 +37,12 @@ export class MainLayoutComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
 
   roleName: string = '';
+  gymBrand: { name: string; logoUrl: string | null } | null = null;
+  gymLogoFailed = false;
+
+  get portalLabel(): string {
+    return this.gymBrand?.name || this.roleName + ' Portal';
+  }
   dashboardRoute: string = '/super-admin/dashboard';
   profileRoute: string = '/super-admin/profile';
   isSidebarCollapsed = false;
@@ -85,6 +91,8 @@ export class MainLayoutComponent implements OnInit {
 
     const currentRole = this.authApiService.getUserRole();
     if (currentRole === 'GymOwner' || currentRole === 'Staff' || currentRole === 'Trainer') {
+      this.loadGymBrand();
+      this.gymService.myGymUpdated$.subscribe(() => this.loadGymBrand());
       this.gymSettingsService.loadSettings().subscribe({
         next: () => {
           this.menuItems = this.navService.getMenuItems();
@@ -112,6 +120,14 @@ export class MainLayoutComponent implements OnInit {
     }
 
     this.loadAnnouncements();
+  }
+
+  private loadGymBrand(): void {
+    this.gymService.getMyGym().subscribe(res => {
+      const gym = res?.data;
+      this.gymBrand = gym?.gymName ? { name: gym.gymName, logoUrl: gym.logoUrl || null } : null;
+      this.gymLogoFailed = false;
+    });
   }
 
   private resetScrollOnPageChange(url: string): void {

@@ -6,6 +6,12 @@
       <div class="greeting-text">
         <span class="greeting-eyebrow">{{ isFirstTime() ? 'Welcome' : greeting }}</span>
         <h1>{{ userName() }}</h1>
+        @if (myGym()?.gymName) {
+          <span class="gym-badge">
+            <img [src]="myGym()!.gymLogoUrl || 'favicon.svg'" alt="" (error)="useGymCrestLogo($event)">
+            {{ myGym()!.gymName }}
+          </span>
+        }
       </div>
     </div>
     @if (showBuddy()) {

@@ -10,10 +10,21 @@
         <div class="brand-container" [routerLink]="dashboardRoute">
 
           @if (!isSidebarCollapsed) {
+          @if (gymBrand?.logoUrl && !gymLogoFailed) {
+          <!-- The gym's own logo when it has one; GymCrest otherwise -->
+          <div class="gym-brand">
+            <img class="gym-brand-logo" [src]="gymBrand!.logoUrl" [alt]="gymBrand!.name + ' logo'" (error)="gymLogoFailed = true">
+            <div class="brand-text">
+              <span class="gym-brand-name" [title]="gymBrand!.name">{{ gymBrand!.name }}</span>
+              <span class="brand-subtext">{{roleName}} Portal</span>
+            </div>
+          </div>
+          } @else {
           <app-brand-logo class="brand-logo" />
           <div class="brand-text">
-            <span class="brand-subtext">{{roleName}} Portal</span>
+            <span class="brand-subtext" [title]="portalLabel">{{ portalLabel }}</span>
           </div>
+          }
           }
         </div>
         <button class="toggle-icon-btn" (click)="toggleSidebar()">
@@ -78,6 +89,9 @@
       </nav>
 
       <div class="sidebar-footer">
+        @if (gymBrand?.logoUrl && !gymLogoFailed && !isSidebarCollapsed) {
+        <span class="powered-by">Powered by <app-brand-logo class="powered-by-logo" /></span>
+        }
         <button class="logout-btn" (click)="logout()" title="Log Out">
           <i class="fas fa-sign-out-alt nav-icon"></i>
           <span class="nav-label">Logout</span>

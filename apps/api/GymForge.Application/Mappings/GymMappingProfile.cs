@@ -17,7 +17,11 @@ namespace GymForge.Application.Mappings
             CreateMap<BranchDto, Branch>().ReverseMap();
 
             CreateMap<UpdateGymDto, Gym>();
-            CreateMap<UpdateMyGymDto, Gym>();
+            CreateMap<UpdateMyGymDto, Gym>()
+                .ForMember(dest => dest.DefaultTaxRate, opt => opt.PreCondition(src => src.DefaultTaxRate.HasValue))
+                .ForMember(dest => dest.OverdueGraceDays, opt => opt.PreCondition(src => src.OverdueGraceDays.HasValue))
+                .ForMember(dest => dest.AutoEmailReceipts, opt => opt.PreCondition(src => src.AutoEmailReceipts.HasValue))
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<OwnerDto, User>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => 
