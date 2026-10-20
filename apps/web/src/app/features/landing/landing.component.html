@@ -44,7 +44,10 @@
       <span> or </span>
       <a routerLink="/register" [queryParams]="{ as: 'member' }" class="btn btn-outline btn-large">I want to log work out</a>
     </div>
-    <a href="#demo" class="demo-link" (click)="scrollTo('demo', $event)"><i class="fas fa-circle-play"></i> Or try the live demo first</a>
+    <div class="hero-links">
+      <a href="#demo" class="demo-link" (click)="scrollTo('demo', $event)"><i class="fas fa-circle-play"></i> Or try the live demo first</a>
+      <button type="button" class="demo-link tour-link" (click)="openTour()"><i class="fas fa-film"></i> Watch the 25-second tour</button>
+    </div>
     <ul class="hero-highlights">
       <li><i class="fas fa-id-card"></i> Memberships &amp; renewals</li>
       <li><i class="fas fa-file-invoice"></i> Billing &amp; Razorpay</li>
@@ -409,3 +412,15 @@
     </p>
   </div>
 </footer>
+
+@if (tour(); as video) {
+  <div class="tour-backdrop" (click)="closeTour()">
+    <div class="tour-dialog" [class.vertical]="video.vertical" role="dialog" aria-modal="true" aria-label="GymCrest tour video"
+      (click)="$event.stopPropagation()">
+      <button #tourClose type="button" class="tour-close" (click)="closeTour()" aria-label="Close video">
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
+      <video [src]="video.src" [poster]="video.poster" controls autoplay playsinline preload="metadata"></video>
+    </div>
+  </div>
+}

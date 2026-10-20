@@ -1392,11 +1392,18 @@ section, header.hero {
     margin-bottom: 1.1rem;
 }
 
+.hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 2rem;
+}
+
 .demo-link {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    margin-bottom: 2rem;
     color: var(--accent-primary);
     font-weight: 600;
     font-size: 0.95rem;
@@ -1600,4 +1607,76 @@ section, header.hero {
 @keyframes backdrop-in {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.tour-link {
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .hero-links {
+        justify-content: center;
+    }
+}
+
+/* Tour video: opens on request, so the file never loads with the page */
+.tour-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(10, 31, 68, 0.78);
+    backdrop-filter: blur(6px);
+}
+
+.tour-dialog {
+    position: relative;
+    width: min(1100px, 100%);
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+
+    &.vertical {
+        width: min(100%, calc(min(86vh, 900px) * 9 / 16));
+        aspect-ratio: 9 / 16;
+    }
+
+    video {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.tour-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.7);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
 }

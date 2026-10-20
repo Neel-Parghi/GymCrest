@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-logo.component';
@@ -19,6 +19,18 @@ interface Faq {
 
 type PlansState = 'loading' | 'ready' | 'error';
 
+interface TourVideo {
+  src: string;
+  poster: string;
+  vertical: boolean;
+}
+
+/** Phones get the 9:16 cut, wider screens the 16:9 one. */
+const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
+  vertical: { src: 'videos/gymcrest-tour-vertical.mp4', poster: 'images/landing/tour-poster-vertical.webp', vertical: true },
+  landscape: { src: 'videos/gymcrest-tour.mp4', poster: 'images/landing/tour-poster.webp', vertical: false }
+};
+
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -26,7 +38,7 @@ type PlansState = 'loading' | 'ready' | 'error';
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'menuOpen.set(false)' }
+  host: { '(document:keydown.escape)': 'menuOpen.set(false); closeTour()' }
 })
 export class LandingComponent implements OnInit {
   private readonly pricingService = inject(PricingService);
@@ -78,11 +90,28 @@ export class LandingComponent implements OnInit {
     }
   ];
 
+  /** The tour video only loads once the visitor opens it, so it never slows the page down. */
+  readonly tour = signal<TourVideo | null>(null);
+  private readonly tourClose = viewChild<ElementRef<HTMLButtonElement>>('tourClose');
+
   readonly plansState = signal<PlansState>('loading');
   readonly plans = signal<PricingPlan[]>([]);
   readonly hasTrial = computed(() => this.plans().some(p => p.isTrial));
   readonly paidPlans = computed(() => this.plans().filter(p => !p.isTrial));
 
+  constructor() {
+    effect(() => this.tourClose()?.nativeElement.focus());
+  }
+
+  openTour(): void {
+    const narrow = this.isBrowser && window.matchMedia('(max-width: 700px)').matches;
+    this.menuOpen.set(false);
+    this.tour.set(TOUR_VIDEOS[narrow ? 'vertical' : 'landscape']);
+  }
+
+  closeTour(): void {
+    this.tour.set(null);
+  }
   ngOnInit(): void {
     this.loadPlans();
     this.startHeroRotation();
