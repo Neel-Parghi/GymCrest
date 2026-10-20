@@ -3,6 +3,10 @@ import { environment } from '../../../environments/environment';
 export const API_CONSTANTS = {
   BASE_URL: environment.apiUrl,
 
+  PLATFORM: {
+    STATUS: 'public/platform-status',
+  },
+
   AUTH: {
     LOGIN: 'auth/login',
     REGISTER: 'auth/register',
@@ -67,6 +71,7 @@ export const API_CONSTANTS = {
     DASHBOARD: 'superadmin/dashboard/stats',
     REVENUE: 'superadmin/payments/stats',
     CONFIG: 'superadmin/config',
+    RESET_DEMO_MEMBER: 'superadmin/demo-data/reset-member',
     REPORTS: {
       EXPORT: 'superadmin/reports/export'
     }
@@ -112,8 +117,6 @@ export const API_CONSTANTS = {
     TRANSACTIONS: 'payments/transactions',
     INITIATE: 'payments/initiate',
     VERIFY: 'payments/verify',
-    SETTINGS: 'payments/settings',
-    UPDATE_SAAS_CONFIG: 'payments/settings/update',
     SUBSCRIPTION: 'payments/subscription',
     HISTORY: 'payments/history'
   },

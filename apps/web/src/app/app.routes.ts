@@ -280,6 +280,11 @@ export const routes: Routes = [
     data: { seo: { index: true, description: 'The terms for using GymCrest as a gym owner, staff member, trainer or member.' } }
   },
   {
+    path: 'maintenance',
+    title: 'Back shortly',
+    loadComponent: () => import('./features/errors/maintenance/maintenance.component').then(m => m.MaintenanceComponent)
+  },
+  {
     path: '404',
     title: 'Page not found',
     loadComponent: () => import('./features/errors/not-found/not-found.component').then(m => m.NotFoundComponent)

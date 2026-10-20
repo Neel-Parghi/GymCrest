@@ -30,4 +30,18 @@ export class ConfigurationService extends BaseApiService {
       tap(() => this.cache$ = undefined)
     );
   }
+
+  /** Rebuilds the public demo member's plans and two weeks of logged history. */
+  resetDemoMember(): Observable<ApiResponse<DemoDataResetResult>> {
+    return this.post<ApiResponse<DemoDataResetResult>>(API_CONSTANTS.SUPER_ADMIN.RESET_DEMO_MEMBER, {});
+  }
+}
+
+export interface DemoDataResetResult {
+  email: string;
+  workoutsLogged: number;
+  restDaysLogged: number;
+  daysOfMealsLogged: number;
+  mealEntriesLogged: number;
+  healthCheckIns: number;
 }

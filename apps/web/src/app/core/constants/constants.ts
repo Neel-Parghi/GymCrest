@@ -483,3 +483,12 @@ export const CONSTANTS = {
     }
     //#endregion
 }
+
+/**
+ * True while the app uses a Razorpay test key: checkout charges nothing, so the launch-phase notices show.
+ * Swapping in a live key (rzp_live_…) hides them everywhere.
+ */
+export const PAYMENTS_TEST_MODE = CONSTANTS.PAYMENT.RAZORPAY.KEY_ID.startsWith('rzp_test_');
+
+/** Razorpay's list of test cards and UPI IDs for trying checkout in test mode. */
+export const RAZORPAY_TEST_DETAILS_URL = 'https://razorpay.com/docs/payments/payments/test-card-details/';

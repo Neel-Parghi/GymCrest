@@ -9,6 +9,7 @@ import { ConfigurationService } from '../../../core/services/configuration.servi
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { AuthApiService } from '../../../core/services/auth-api.service';
+import { ConfirmationService } from '../../../core/services/confirmation.service';
 
 @Component({
   selector: 'app-settings',
@@ -25,17 +26,20 @@ export class SettingsComponent implements OnInit {
   private notification = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthApiService);
+  private confirmation = inject(ConfirmationService);
 
   settingsForm: FormGroup;
-  activeTab: 'general' | 'strategy' | 'financial' | 'legal' | 'status' = 'general';
+  activeTab: 'general' | 'strategy' | 'financial' | 'status' = 'general';
   loading = true;
   saving = false;
+  resettingDemo = false;
   isAdmin = false;
 
   constructor() {
     this.settingsForm = this.fb.group({
-      platformName: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.PLATFORM_NAME)]],
-      billingEmail: ['', [Validators.required, Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
+      // Not shown on the page (not used yet) but kept in the form so saving never clears them
+      platformName: ['', [Validators.maxLength(FIELD_LIMITS.PLATFORM_NAME)]],
+      billingEmail: ['', [Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
       taxPercentage: [18, [Validators.required, Validators.min(0), Validators.max(100)]],
       gracePeriodDays: [7, [Validators.required, Validators.min(0)]],
       yearlyRevenueTarget: [0, [Validators.required, Validators.min(0)]],
@@ -45,6 +49,7 @@ export class SettingsComponent implements OnInit {
       supportPhone: ['', [Validators.maxLength(FIELD_LIMITS.PHONE), phoneValidator]],
       supportEmail: ['', [Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
       isMaintenanceMode: [false],
+      isFoodSearchEnabled: [true],
       maintenanceStartTime: [null],
       maintenanceEndTime: [null],
       termsUrl: ['', [Validators.maxLength(FIELD_LIMITS.URL), urlValidator]],
@@ -67,7 +72,7 @@ export class SettingsComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['tab']) {
         const tab = params['tab'];
-        if (tab === 'strategy' || tab === 'legal' || tab === 'general' || tab === 'financial' || tab === 'status') {
+        if (tab === 'strategy' || tab === 'general' || tab === 'financial' || tab === 'status') {
           this.activeTab = tab as any;
         }
       }
@@ -105,7 +110,11 @@ export class SettingsComponent implements OnInit {
     if (this.settingsForm.invalid) return;
 
     this.saving = true;
-    this.configService.updateConfig(this.settingsForm.value).subscribe({
+    // The inputs hold local time; the API stores UTC
+    const toUtc = (value: string | null) => value ? new Date(value).toISOString() : null;
+    const value = this.settingsForm.getRawValue();
+    const payload = { ...value, maintenanceStartTime: toUtc(value.maintenanceStartTime), maintenanceEndTime: toUtc(value.maintenanceEndTime) };
+    this.configService.updateConfig(payload).subscribe({
       next: () => {
         this.notification.success(CONSTANTS.SETTINGS.UPDATE_SUCCESS);
         this.saving = false;
@@ -114,6 +123,30 @@ export class SettingsComponent implements OnInit {
         this.notification.error(CONSTANTS.SETTINGS.UPDATE_ERROR);
         this.saving = false;
       }
+    });
+  }
+
+  resetDemoMember() {
+    this.confirmation.confirm({
+      title: 'Reset demo member',
+      message: 'This replaces everything in the demo member account with a fresh plan and two weeks of workouts, meals and check-ins. Anything visitors logged will be removed.',
+      type: 'danger'
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.resettingDemo = true;
+      this.configService.resetDemoMember().subscribe({
+        next: (res) => {
+          const r = res.data;
+          this.notification.success(r
+            ? `Demo member reset: ${r.workoutsLogged} workouts, ${r.daysOfMealsLogged} days of meals, ${r.healthCheckIns} check-ins.`
+            : 'Demo member reset.');
+          this.resettingDemo = false;
+        },
+        error: (err) => {
+          this.notification.error(err.error?.message || 'Could not reset the demo member.');
+          this.resettingDemo = false;
+        }
+      });
     });
   }
 }

@@ -215,9 +215,11 @@
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
           <span class="visually-hidden">Describe what you ate</span>
           <input type="search" placeholder="e.g. 2 rotis, dal and a bowl of rice" [formControl]="searchQueryControl"
-            (keyup.enter)="searchFood()" [maxlength]="limits.FOOD_SEARCH" enterkeyhint="search">
+            (keyup.enter)="searchFood()" [maxlength]="limits.FOOD_SEARCH" enterkeyhint="search"
+            [attr.disabled]="foodSearchAvailable() ? null : true">
         </label>
-        <button type="button" class="btn-primary" (click)="searchFood()" [disabled]="isSearching() || !searchQueryControl.value.trim()">
+        <button type="button" class="btn-primary" (click)="searchFood()"
+          [disabled]="isSearching() || !searchQueryControl.value.trim() || !foodSearchAvailable()">
           @if (isSearching()) {
             <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span class="visually-hidden">Searching</span>
           } @else {
@@ -226,7 +228,11 @@
         </button>
       </div>
 
-      @if (isSearching()) {
+      @if (!foodSearchAvailable()) {
+        <p class="search-off" role="status">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Food search is temporarily unavailable. You can still enter it below.
+        </p>
+      } @else if (isSearching()) {
         <div class="search-results loading" aria-live="polite">
           <span class="searching-text"><i class="fa-solid fa-globe" aria-hidden="true"></i> Looking up nutrition on the web…</span>
           <span class="skeleton"></span>

@@ -26,6 +26,7 @@ import { DataGrid, GridCellDirective } from '../../../shared/components/data-gri
 import { AppGridConfig } from '../../../shared/constants/grid-config';
 import { ConfigurationService } from '../../../core/services/configuration.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { TestPaymentNoticeComponent } from '../../../shared/components/test-payment-notice/test-payment-notice.component';
 import { BranchContextService } from '../../../core/services/branch-context.service';
 
 @Component({
@@ -33,6 +34,7 @@ import { BranchContextService } from '../../../core/services/branch-context.serv
   standalone: true,
   imports: [
     CommonModule,
+    TestPaymentNoticeComponent,
     FormsModule,
     ReactiveFormsModule,
     DropdownComponent,

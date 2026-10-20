@@ -82,109 +82,24 @@
     </div>
 
     <div class="tab-content" *ngIf="activeTab === 'settings'">
-        <div class="settings-layout" *ngIf="settings">
-            <!-- Sidebar for Settings Navigation -->
-            <div class="settings-sidebar">
-                <button class="side-tab" [class.active]="activeSettingsTab === 'financials'"
-                    (click)="activeSettingsTab = 'financials'">
-                    <i class="fa-solid fa-scale-balanced"></i> Financials
-                </button>
-                <button class="side-tab" [class.active]="activeSettingsTab === 'gateway'"
-                    (click)="activeSettingsTab = 'gateway'">
-                    <i class="fa-solid fa-key"></i> Gateway Integration
-                </button>
-                <button class="side-tab" [class.active]="activeSettingsTab === 'emails'"
-                    (click)="activeSettingsTab = 'emails'">
-                    <i class="fa-solid fa-envelope-open-text"></i> Email Templates
-                </button>
-            </div>
-
-            <!-- Main Settings Form -->
-            <div class="settings-main">
-                <!-- Financials Tab Content -->
-                <div class="settings-card" *ngIf="activeSettingsTab === 'financials'" [formGroup]="settingsForm">
-                    <div class="settings-section">
-                        <div class="section-header">
-                            <h3><i class="fa-solid fa-scale-balanced"></i> Compliance & Taxes</h3>
-                            <p>Manage tax rates, currency, and global billing rules.</p>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Gateway Currency</label>
-                                <app-dropdown 
-                                  [options]="currencyOptions" 
-                                  formControlName="currency">
-                                </app-dropdown>
-                            </div>
-                            <div class="form-group">
-                                <label>Tax Rate (%)</label>
-                                <div class="input-with-suffix">
-                                    <input type="number" formControlName="taxPercentage">
-                                    <span>%</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Grace Period</label>
-                                <div class="input-with-suffix">
-                                    <input type="number" formControlName="gracePeriodDays">
-                                    <span>Days</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-footer">
-                        <button class="btn-secondary" (click)="loadSettings()">Discard Changes</button>
-                        <button class="btn-premium" (click)="saveSettings()"
-                            [disabled]="isSaving || settingsForm.invalid">
-                            <i class="fa-solid" [class.fa-floppy-disk]="!isSaving" [class.fa-spinner]="isSaving"
-                                [class.fa-spin]="isSaving"></i>
-                            {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Gateway Integration Tab Content -->
-                <div class="settings-card" *ngIf="activeSettingsTab === 'gateway'" [formGroup]="settingsForm">
-                    <div class="settings-section">
-                        <div class="section-header">
-                            <h3><i class="fa-solid fa-key"></i> Gateway Integration</h3>
-                            <p>Configure your production and test gateway credentials.</p>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Razorpay Key ID</label>
-                                <input type="text" formControlName="razorpayKeyId" placeholder="rzp_live_..." [maxlength]="limits.API_KEY">
-                            </div>
-                            <div class="form-group">
-                                <label>Razorpay Secret</label>
-                                <input type="password" formControlName="razorpayKeySecret" placeholder="••••••••••••" [maxlength]="limits.API_KEY">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-footer">
-                        <button class="btn-secondary" (click)="loadSettings()">Discard Changes</button>
-                        <button class="btn-premium" (click)="saveSettings()"
-                            [disabled]="isSaving || settingsForm.invalid">
-                            <i class="fa-solid" [class.fa-floppy-disk]="!isSaving" [class.fa-spinner]="isSaving"
-                                [class.fa-spin]="isSaving"></i>
-                            {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Email Templates Tab Content -->
-                <div class="settings-card" *ngIf="activeSettingsTab === 'emails'">
-                    <div class="settings-section">
-                        <div class="section-header">
-                            <h3><i class="fa-solid fa-envelope"></i> Notification Settings</h3>
-                            <p>Configure platform emails and alerts.</p>
-                        </div>
-                        <p class="placeholder-text">Email template editor coming soon...</p>
-                    </div>
-                </div>
-            </div>
+        <div class="settings-guide">
+            <h3><i class="fa-solid fa-circle-info"></i> Where payment settings live</h3>
+            <ul>
+                <li>
+                    <strong>Grace period, invoice GSTIN and address, maintenance mode</strong>
+                    <span>Edit them in <a routerLink="/super-admin/settings" [queryParams]="{ tab: 'financial' }">Settings</a>.</span>
+                </li>
+                <li>
+                    <strong>Razorpay keys</strong>
+                    <span>The secret, key ID and webhook secret are server environment variables on Render
+                        (<code>RazorPay__ApiKeyId</code>, <code>RazorPay__ApiKeySecret</code>, <code>RazorPay__WebhookSecret</code>).
+                        The checkout key ID is also set in the web app. They can't be changed here, which keeps them out of the database.</span>
+                </li>
+                <li>
+                    <strong>Email wording and design</strong>
+                    <span>Edited as templates in Brevo; changes apply without a deploy.</span>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

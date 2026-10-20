@@ -918,3 +918,16 @@
     min-height: 52px;
   }
 }
+
+.search-off {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  color: var(--m-muted);
+
+  i {
+    color: var(--slate-400);
+  }
+}

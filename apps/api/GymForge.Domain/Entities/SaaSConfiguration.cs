@@ -25,6 +25,8 @@ namespace GymForge.Domain.Entities
         public string? SupportPhone { get; set; }
         public string? SupportEmail { get; set; }
         public bool IsMaintenanceMode { get; set; } = false;
+        /// <summary>Off stops the paid AI food lookup; members see "temporarily unavailable" and can log food by hand.</summary>
+        public bool IsFoodSearchEnabled { get; set; } = true;
         public string? TermsUrl { get; set; }
         public string? PrivacyUrl { get; set; }
         public DateTime? MaintenanceStartTime { get; set; }

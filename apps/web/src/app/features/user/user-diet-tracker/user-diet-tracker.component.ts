@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable, map, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
 import { DietTrackingService } from '../../../core/services/diet-tracking.service';
+import { PlatformStatusService } from '../../../core/services/platform-status.service';
 import { ConfirmationService } from '../../../core/services/confirmation.service';
 import { AssignedMealDto, DietLogDto, MealLogEntryDto } from '../../../shared/models/diet-tracking.model';
 import { SegmentedTabsComponent } from '../../../shared/components/segmented-tabs/segmented-tabs.component';
@@ -40,6 +41,7 @@ export class UserDietTrackerComponent implements OnInit {
   private toastr = inject(ToastrService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private platformStatus = toSignal(inject(PlatformStatusService).getStatus());
 
   readonly tabs: SegmentedTab[] = [
     { id: 'today', label: 'Today' },
@@ -60,6 +62,9 @@ export class UserDietTrackerComponent implements OnInit {
   readonly quickLoggingId = signal<string | null>(null);
 
   readonly isSearching = signal(false);
+  /** Off when the super admin has switched food search off, or the API says it is. */
+  private readonly searchTurnedOff = signal(false);
+  readonly foodSearchAvailable = computed(() => this.platformStatus()?.foodSearchEnabled !== false && !this.searchTurnedOff());
   readonly searchError = signal('');
   readonly searchResult = signal<FoodSearchResult | null>(null);
   readonly searchItems = signal<SelectedFoodItem[]>([]);
@@ -211,7 +216,7 @@ export class UserDietTrackerComponent implements OnInit {
 
   searchFood(): void {
     const query = this.searchQueryControl.value.trim();
-    if (!query || this.isSearching()) return;
+    if (!query || this.isSearching() || !this.foodSearchAvailable()) return;
     this.isSearching.set(true);
     this.searchError.set('');
     this.searchResult.set(null);
@@ -225,10 +230,14 @@ export class UserDietTrackerComponent implements OnInit {
         this.isSearching.set(false);
       },
       error: (err: HttpErrorResponse) => {
+        this.isSearching.set(false);
+        if (err.status === 503 && err.error?.code === 'FOOD_SEARCH_OFF') {
+          this.searchTurnedOff.set(true);
+          return;
+        }
         this.searchError.set(err.status === 429
           ? 'Too many searches. Please wait a minute and try again.'
           : "Couldn't find that. Try describing it differently, or enter the details manually.");
-        this.isSearching.set(false);
       }
     });
   }

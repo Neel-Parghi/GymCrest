@@ -9,10 +9,12 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
     public class SaaSConfigurationService : ISaaSConfigurationService
     {
         private readonly ISaaSConfigurationRepository _configRepository;
+        private readonly IPlatformStatusService _platformStatus;
 
-        public SaaSConfigurationService(ISaaSConfigurationRepository configRepository)
+        public SaaSConfigurationService(ISaaSConfigurationRepository configRepository, IPlatformStatusService platformStatus)
         {
             _configRepository = configRepository;
+            _platformStatus = platformStatus;
         }
 
         public async Task<SaaSConfigurationDto> GetConfigurationAsync()
@@ -31,6 +33,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
                 SupportPhone = config.SupportPhone,
                 SupportEmail = config.SupportEmail,
                 IsMaintenanceMode = config.IsMaintenanceMode,
+                IsFoodSearchEnabled = config.IsFoodSearchEnabled,
                 TermsUrl = config.TermsUrl,
                 PrivacyUrl = config.PrivacyUrl,
                 MaintenanceStartTime = config.MaintenanceStartTime,
@@ -55,6 +58,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
             config.SupportPhone = configDto.SupportPhone;
             config.SupportEmail = configDto.SupportEmail;
             config.IsMaintenanceMode = configDto.IsMaintenanceMode;
+            config.IsFoodSearchEnabled = configDto.IsFoodSearchEnabled;
             config.TermsUrl = configDto.TermsUrl;
             config.PrivacyUrl = configDto.PrivacyUrl;
             config.MaintenanceStartTime = configDto.MaintenanceStartTime;
@@ -64,6 +68,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
             config.UptimeThreshold = configDto.UptimeThreshold;
 
             await _configRepository.UpdateConfigurationAsync(config);
+            _platformStatus.Invalidate();
         }
     }
 }

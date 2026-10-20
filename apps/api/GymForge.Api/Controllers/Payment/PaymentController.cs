@@ -96,21 +96,5 @@ namespace GymForge.Api.Controllers.Payment
             List<PaymentTransactionDto> transactions = await _paymentService.GetAllTransactionsAsync();
             return Ok(transactions);
         }
-
-        [HttpGet("settings")]
-        [Authorize(Roles = "SuperAdmin")]
-        public async Task<IActionResult> GetSettings()
-        {
-            SaaSConfigurationDto settings = await _paymentService.GetSettingsAsync();
-            return Ok(settings);
-        }
-
-        [HttpPut("settings/update")]
-        [Authorize(Roles = "SuperAdmin")]
-        public async Task<IActionResult> UpdateSettings([FromBody] SaaSConfigurationDto settings)
-        {
-            await _paymentService.UpdateSettingsAsync(settings);
-            return Ok();
-        }
     }
 }

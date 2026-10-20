@@ -13,6 +13,7 @@ namespace GymForge.Contracts.SuperAdmin.Configuration
         public string? SupportPhone { get; set; }
         public string? SupportEmail { get; set; }
         public bool IsMaintenanceMode { get; set; }
+        public bool IsFoodSearchEnabled { get; set; } = true;
         public string? TermsUrl { get; set; }
         public string? PrivacyUrl { get; set; }
         public DateTime? MaintenanceStartTime { get; set; }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BaseApiService } from './base-api.service';
 import { Observable, shareReplay, tap } from 'rxjs';
 import { ApiResponse } from '../../shared/models/api-response.model';
-import { CreatePaymentRequest, GymSubscriptionStatus, InitiatePaymentResponse, PaymentStats, PaymentTransaction, SaaSConfiguration, VerifyPaymentRequest } from '../../shared/models/payment.model';
+import { CreatePaymentRequest, GymSubscriptionStatus, InitiatePaymentResponse, PaymentStats, PaymentTransaction, VerifyPaymentRequest } from '../../shared/models/payment.model';
 import { API_CONSTANTS } from '../constants/api-constants';
 
 @Injectable({
@@ -68,14 +68,6 @@ export class PaymentService extends BaseApiService {
         this.clearSubscriptionCache();
       })
     );
-  }
-
-  getSettings(): Observable<ApiResponse<SaaSConfiguration>> {
-    return this.get(API_CONSTANTS.PAYMENTS.SETTINGS);
-  }
-
-  updateSettings(settings: SaaSConfiguration): Observable<ApiResponse<void>> {
-    return this.put(API_CONSTANTS.PAYMENTS.UPDATE_SAAS_CONFIG, settings);
   }
 
   getSubscriptionStatus(forceRefresh = false): Observable<ApiResponse<GymSubscriptionStatus>> {

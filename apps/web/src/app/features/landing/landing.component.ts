@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-logo.component';
 import { HeroPreviewComponent } from './hero-preview/hero-preview.component';
 import { PricingService } from '../../core/services/pricing.service';
 import { PricingPlan } from '../../shared/models/pricing.model';
+import { TestPaymentNoticeComponent } from '../../shared/components/test-payment-notice/test-payment-notice.component';
+import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
+import { PlatformStatusService } from '../../core/services/platform-status.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface HeroMessage {
   lead: string;
@@ -19,19 +23,33 @@ interface Faq {
 
 type PlansState = 'loading' | 'ready' | 'error';
 
+interface TourVideo {
+  src: string;
+  poster: string;
+  vertical: boolean;
+}
+
+/** Phones get the 9:16 cut, wider screens the 16:9 one. */
+const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
+  vertical: { src: 'videos/gymcrest-tour-vertical.mp4', poster: 'images/landing/tour-poster-vertical.webp', vertical: true },
+  landscape: { src: 'videos/gymcrest-tour.mp4', poster: 'images/landing/tour-poster.webp', vertical: false }
+};
+
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent],
+  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent, TestPaymentNoticeComponent],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'menuOpen.set(false)' }
+  host: { '(document:keydown.escape)': 'menuOpen.set(false); closeTour()' }
 })
 export class LandingComponent implements OnInit {
   private readonly pricingService = inject(PricingService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  /** Support email and phone from platform settings, for the footer. */
+  readonly platformStatus = toSignal(inject(PlatformStatusService).getStatus());
 
   readonly year = new Date().getFullYear();
   readonly menuOpen = signal(false);
@@ -52,6 +70,10 @@ export class LandingComponent implements OnInit {
   private heroTimer?: ReturnType<typeof setInterval>;
 
   readonly faqs: Faq[] = [
+    ...(PAYMENTS_TEST_MODE ? [{
+      question: 'Do gym owners have to pay right now?',
+      answer: "Not yet. GymCrest is in its launch phase, so it's free for gym owners too. Checkout runs in test mode and no money is charged. We'll let you know well before real billing starts."
+    }] : []),
     {
       question: 'Is GymCrest really free for members?',
       answer: 'Yes. Anyone can create a member account and use workouts, diet tracking and progress for free, with or without a gym. Only gyms pay for a plan.'
@@ -78,10 +100,32 @@ export class LandingComponent implements OnInit {
     }
   ];
 
+  /** The tour video only loads once the visitor opens it, so it never slows the page down. */
+  readonly tour = signal<TourVideo | null>(null);
+  private readonly tourClose = viewChild<ElementRef<HTMLButtonElement>>('tourClose');
+
   readonly plansState = signal<PlansState>('loading');
   readonly plans = signal<PricingPlan[]>([]);
   readonly hasTrial = computed(() => this.plans().some(p => p.isTrial));
   readonly paidPlans = computed(() => this.plans().filter(p => !p.isTrial));
+
+  constructor() {
+    effect(() => this.tourClose()?.nativeElement.focus());
+  }
+
+  openTour(): void {
+    const narrow = this.isBrowser && window.matchMedia('(max-width: 700px)').matches;
+    this.menuOpen.set(false);
+    this.tour.set(TOUR_VIDEOS[narrow ? 'vertical' : 'landscape']);
+  }
+
+  closeTour(): void {
+    this.tour.set(null);
+  }
+
+  telHref(phone: string): string {
+    return 'tel:' + phone.replace(/[^\d+]/g, '');
+  }
 
   ngOnInit(): void {
     this.loadPlans();

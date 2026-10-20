@@ -1,0 +1,15 @@
+@if (status(); as s) {
+  @if (s.supportEmail || s.supportPhone) {
+    <p class="support-contact" [class.footer]="variant() === 'footer'">
+      @if (variant() === 'inline') {
+        <span class="label">{{ label() }}</span>
+      }
+      @if (s.supportEmail) {
+        <a [href]="'mailto:' + s.supportEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> {{ s.supportEmail }}</a>
+      }
+      @if (s.supportPhone) {
+        <a [href]="telHref(s.supportPhone)"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{ s.supportPhone }}</a>
+      }
+    </p>
+  }
+}

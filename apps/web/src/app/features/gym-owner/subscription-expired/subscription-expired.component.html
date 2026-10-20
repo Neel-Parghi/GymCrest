@@ -13,7 +13,7 @@
       <h2>Access Suspended</h2>
       <ng-container *ngIf="isOwner; else staffNotice">
         <p class="subtitle" *ngIf="gym?.isTrialPlan">
-          Your 14-day free trial for <strong>{{ gym?.gymName }}</strong> has expired.
+          Your free trial for <strong>{{ gym?.gymName }}</strong> has ended.
         </p>
         <p class="subtitle" *ngIf="!gym?.isTrialPlan">
           Your subscription for <strong>{{ gym?.gymName }}</strong> has expired or is inactive.
@@ -25,6 +25,7 @@
         <p class="subtitle">Your gym's GymCrest subscription has expired or is inactive.</p>
         <p class="instruction">Please ask your gym owner to renew the plan. You'll regain access as soon as it's active again.</p>
       </ng-template>
+      <app-support-contact class="support-line" label="Questions about your plan?" />
     </div>
 
     <!-- Loading State -->
@@ -32,6 +33,8 @@
       <div class="spinner"></div>
       <p>Fetching active plans...</p>
     </div>
+
+    <app-test-payment-notice class="plan-notice" *ngIf="isOwner && !loading && plans.length > 0" />
 
     <!-- Plans Matrix Grid -->
     <div class="plans-grid" *ngIf="isOwner && !loading && plans.length > 0">
@@ -86,6 +89,7 @@
           <i class="fa-solid fa-lock"></i>
           Secure payment via Razorpay. Your plan activates as soon as the payment is confirmed.
         </p>
+        <app-test-payment-notice />
         <p class="checkout-message" *ngIf="checkoutMessage" [class.error]="checkoutMessage.tone === 'error'" role="status">
           {{ checkoutMessage.text }}
         </p>

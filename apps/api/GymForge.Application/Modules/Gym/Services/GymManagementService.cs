@@ -19,6 +19,11 @@ namespace GymForge.Application.Modules.Gym.Services
         private readonly IAddressRepository _addressRepository;
         private readonly ISaaSPlanRepository _saasPlanRepository;
 
+        /// <summary>Used only when no trial plan is set up in Pricing.</summary>
+        private const int DefaultTrialDays = 14;
+        /// <summary>Used only when a plan has no duration set.</summary>
+        private const int DefaultPlanDays = 30;
+
         public GymManagementService(
             IGymManagementRepository repository,
             IUnitOfWork unitOfWork,
@@ -80,16 +85,35 @@ namespace GymForge.Application.Modules.Gym.Services
             }
 
             // 5 Setup and Add Gym Subscription Plan
-            Plan? plan = await _saasPlanRepository.GetPlanByIdAsync(gymOnboardingDto.PlanId);
+            Plan? plan = gymOnboardingDto.PlanId != Guid.Empty ? await _saasPlanRepository.GetPlanByIdAsync(gymOnboardingDto.PlanId) : null;
+            Guid planId = gymOnboardingDto.PlanId;
+            int durationDays;
+            if (gymOnboardingDto.IsTrial)
+            {
+                // Trial length comes from the trial plan in Pricing, so the super admin controls it there
+                Plan? trialPlan = plan is { IsTrial: true }
+                    ? plan
+                    : (await _saasPlanRepository.GetAllPlansAsync()).FirstOrDefault(p => p.IsTrial && p.IsActive);
+                durationDays = trialPlan?.DurationInDays > 0 ? trialPlan.DurationInDays : DefaultTrialDays;
+                if (plan == null && trialPlan != null)
+                {
+                    plan = trialPlan;
+                    planId = trialPlan.Id;
+                }
+            }
+            else
+            {
+                durationDays = plan?.DurationInDays > 0 ? plan.DurationInDays : DefaultPlanDays;
+            }
             decimal amount = plan?.Price ?? 0m;
 
             SubscriptionRecord subscription = new() 
             {
                 Id = Guid.NewGuid(),
                 GymId = gym.Id,
-                PlanId = gymOnboardingDto.PlanId,
+                PlanId = planId,
                 StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(gymOnboardingDto.IsTrial ? 14 : 30),
+                EndDate = DateTime.UtcNow.AddDays(durationDays),
                 IsTrial = gymOnboardingDto.IsTrial,
                 IsActive = activateImmediately,
                 PriceAtPurchase = amount,
