@@ -13,7 +13,7 @@
       <h2>Access Suspended</h2>
       <ng-container *ngIf="isOwner; else staffNotice">
         <p class="subtitle" *ngIf="gym?.isTrialPlan">
-          Your 14-day free trial for <strong>{{ gym?.gymName }}</strong> has expired.
+          Your free trial for <strong>{{ gym?.gymName }}</strong> has ended.
         </p>
         <p class="subtitle" *ngIf="!gym?.isTrialPlan">
           Your subscription for <strong>{{ gym?.gymName }}</strong> has expired or is inactive.

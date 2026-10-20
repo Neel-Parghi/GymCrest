@@ -313,21 +313,17 @@ namespace GymForge.Application.Modules.Payments.Services
 
             if (sub == null)
             {
-                // Find default active Pro plan or any active plan from the database dynamically
-                List<Domain.Entities.Plan> plans = await _saaSPlanRepository.GetAllPlansAsync();
-                Domain.Entities.Plan proPlan = plans.FirstOrDefault(p => p.Name.Contains("Pro", StringComparison.OrdinalIgnoreCase)) 
-                              ?? plans.FirstOrDefault(p => p.IsActive)
-                              ?? new Domain.Entities.Plan { Name = "GymCrest Pro Plan", Price = 4999, MaxBranches = 10, IsTrial = false };
-
+                // No plan record at all: no access until the owner picks a plan. This used to return a made-up
+                // plan ending 15 days from "now", which moved forward on every check and never expired.
                 return new GymSubscriptionStatusDto
                 {
-                    PlanName = proPlan.Name,
-                    Price = proPlan.Price,
-                    EndDate = DateTime.UtcNow.AddDays(15),
-                    IsActive = true,
-                    IsTrial = proPlan.IsTrial,
+                    PlanName = "No plan",
+                    Price = 0,
+                    EndDate = DateTime.UtcNow,
+                    IsActive = false,
+                    IsTrial = false,
                     BranchUsageCount = branchesCount,
-                    BranchLimit = proPlan.MaxBranches ?? 10
+                    BranchLimit = 1
                 };
             }
 

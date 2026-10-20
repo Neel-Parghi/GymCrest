@@ -53,6 +53,12 @@ export class GymOnboardingModalComponent implements OnInit {
   pricingService = inject(PricingService);
   plans: any[] = [];
 
+  /** Trial length from the active trial plan in Pricing; the API falls back to 14 days when there is none. */
+  get trialDays(): number {
+    const trial = this.plans.find(p => p.isTrial && p.isActive && p.durationInDays > 0);
+    return trial?.durationInDays ?? 14;
+  }
+
   get ownerOptions(): DropdownOption[] {
     return this.gymOwners.map(owner => ({
       label: `${owner.name} (${owner.email})`,
