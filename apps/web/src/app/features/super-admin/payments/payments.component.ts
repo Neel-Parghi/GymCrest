@@ -1,17 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
-import { phoneValidator } from '../../../shared/validators/custom-validators';
 import { PaymentService } from '../../../core/services/payment.service';
 import { PlanCheckoutService } from '../../../core/services/plan-checkout.service';
 import { DataGrid } from '../../../shared/components/data-grid/data-grid.component';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { GymService } from '../../../core/services/gym.service';
 import { PricingService } from '../../../core/services/pricing.service';
-import { PaymentStats, PaymentTransaction, SaaSConfiguration } from '../../../shared/models/payment.model';
+import { PaymentStats, PaymentTransaction } from '../../../shared/models/payment.model';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { DropdownOption } from '../../../shared/models/dropdown.model';
 import { AppGridConfig } from '../../../shared/constants/grid-config';
@@ -21,12 +19,11 @@ declare var Razorpay: any;
 @Component({
   selector: 'app-payments',
   standalone: true,
-  imports: [CommonModule, DataGrid, ReactiveFormsModule, DropdownComponent],
+  imports: [CommonModule, DataGrid, ReactiveFormsModule, DropdownComponent, RouterLink],
   templateUrl: './payments.component.html',
   styleUrl: './payments.component.scss',
 })
 export class PaymentsComponent implements OnInit {
-  readonly limits = FIELD_LIMITS;
 
 
   private paymentService = inject(PaymentService);
@@ -38,7 +35,6 @@ export class PaymentsComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   // Forms
-  settingsForm!: FormGroup;
   testPaymentForm!: FormGroup;
 
   // Selections for Payment Testing
@@ -46,12 +42,9 @@ export class PaymentsComponent implements OnInit {
   plans: any[] = [];
 
   activeTab: 'overview' | 'transactions' | 'settings' = 'overview';
-  activeSettingsTab: 'financials' | 'gateway' | 'emails' = 'financials';
 
   stats?: PaymentStats;
   transactions: PaymentTransaction[] = [];
-  settings?: SaaSConfiguration;
-  isSaving = false;
 
   get gymOptions(): DropdownOption[] {
     return this.gyms.map(gym => ({
@@ -68,13 +61,6 @@ export class PaymentsComponent implements OnInit {
       icon: 'fa-solid fa-gem'
     }));
   }
-
-  readonly currencyOptions: DropdownOption[] = [
-    { label: 'Indian Rupee (₹)', value: 'INR', icon: 'fa-solid fa-indian-rupee-sign' },
-    { label: 'US Dollar ($)', value: 'USD', icon: 'fa-solid fa-dollar-sign' },
-    { label: 'Euro (€)', value: 'EUR', icon: 'fa-solid fa-euro-sign' },
-    { label: 'British Pound (£)', value: 'GBP', icon: 'fa-solid fa-sterling-sign' }
-  ];
 
   gridConfig = AppGridConfig["PaymentList"];
   isAddPlanModalOpen: boolean = false;
@@ -107,19 +93,6 @@ export class PaymentsComponent implements OnInit {
       selectedPlanId: ['', Validators.required]
     });
 
-    this.settingsForm = this.fb.group({
-      id: [''],
-      taxPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      gracePeriodDays: [0, [Validators.required, Validators.min(0)]],
-      yearlyRevenueTarget: [0],
-      subscriptionTarget: [0],
-      isMaintenanceMode: [false],
-      currency: ['INR'],
-      razorpayKeyId: ['', [Validators.maxLength(FIELD_LIMITS.API_KEY)]],
-      razorpayKeySecret: ['', [Validators.maxLength(FIELD_LIMITS.API_KEY)]],
-      billingEmail: ['', [Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
-      supportPhone: ['', [Validators.maxLength(FIELD_LIMITS.PHONE), phoneValidator]]
-    });
   }
 
   loadGyms() {
@@ -154,38 +127,8 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
-  loadSettings() {
-    this.paymentService.getSettings().subscribe({
-      next: (res) => {
-        this.settings = res.data;
-        if (this.settings) {
-          this.settingsForm.patchValue(this.settings);
-        }
-      }
-    });
-  }
-
-  saveSettings() {
-    if (this.settingsForm.invalid) return;
-
-    this.isSaving = true;
-    this.paymentService.updateSettings(this.settingsForm.value).subscribe({
-      next: () => {
-        this.toastr.success(CONSTANTS.PAYMENT.MESSAGES.CONFIG_UPDATE_SUCCESS, CONSTANTS.COMMON_SUCCESS_TITLE);
-        this.isSaving = false;
-      },
-      error: () => {
-        this.toastr.error(CONSTANTS.PAYMENT.MESSAGES.CONFIG_UPDATE_ERROR, CONSTANTS.COMMON_ERROR_TITLE);
-        this.isSaving = false;
-      }
-    });
-  }
-
   setActiveTab(tab: 'overview' | 'transactions' | 'settings') {
     this.activeTab = tab;
-    if (tab === 'settings' && !this.settings) {
-      this.loadSettings();
-    }
   }
 
   payWithRazorpay() {

@@ -400,6 +400,19 @@
       <a routerLink="/privacy-policy">Privacy Policy</a>
       <a routerLink="/terms-of-service">Terms of Service</a>
     </div>
+    @if (platformStatus(); as status) {
+      @if (status.supportEmail || status.supportPhone) {
+        <div class="footer-col">
+          <h4>Support</h4>
+          @if (status.supportEmail) {
+            <a [href]="'mailto:' + status.supportEmail">{{ status.supportEmail }}</a>
+          }
+          @if (status.supportPhone) {
+            <a [href]="telHref(status.supportPhone)">{{ status.supportPhone }}</a>
+          }
+        </div>
+      }
+    }
   </div>
   <div class="footer-bottom">
     <p>&copy; {{ year }} GymCrest. All rights reserved.</p>

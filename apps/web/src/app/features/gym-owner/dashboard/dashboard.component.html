@@ -11,12 +11,15 @@
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
       <div class="warning-text">
-        <span class="warning-title">{{ daysToExpiry < 0 ? 'Plan expired!' : 'Plan expiring soon!' }}</span>
+        <span class="warning-title">{{ graceDaysLeft !== null ? 'Plan ended: renew to keep access' : daysToExpiry < 0 ? 'Plan expired!' : 'Plan expiring soon!' }}</span>
             <span class="warning-desc">
               <ng-container *ngIf="daysToExpiry > 0">Your subscription expires in {{ daysToExpiry }} day{{ daysToExpiry
                 === 1 ? '' : 's' }}.</ng-container>
               <ng-container *ngIf="daysToExpiry === 0">Your subscription expires today.</ng-container>
-              <ng-container *ngIf="daysToExpiry < 0">Your subscription has expired. Please renew
+              <ng-container *ngIf="graceDaysLeft !== null">Your plan has ended, but your gym keeps full access for
+                {{ graceDaysLeft === 0 ? 'the rest of today' : graceDaysLeft + ' more day' + (graceDaysLeft === 1 ? '' : 's') }}.
+                Renew before then to avoid any interruption.</ng-container>
+              <ng-container *ngIf="daysToExpiry < 0 && graceDaysLeft === null">Your subscription has expired. Please renew
                 immediately.</ng-container>
             </span>
       </div>

@@ -739,7 +739,10 @@ section, header.hero {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.6fr repeat(3, 1fr);
+    // Brand column, then one equal column per link group (Support only appears once contacts are set)
+    grid-template-columns: 1.6fr;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
     gap: 2rem;
     padding-bottom: 3rem;
     margin-bottom: 2rem;
@@ -839,6 +842,7 @@ section, header.hero {
 
     .footer-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-auto-flow: row;
     }
 
     .spotlight {
@@ -1291,6 +1295,7 @@ section, header.hero {
 
     .footer-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-auto-flow: row;
         gap: 2rem 1.5rem;
         padding-bottom: 2rem;
     }

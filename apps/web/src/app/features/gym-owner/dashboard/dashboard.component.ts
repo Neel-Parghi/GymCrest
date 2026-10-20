@@ -10,6 +10,7 @@ import { BranchContextService } from '../../../core/services/branch-context.serv
 import { GymService } from '../../../core/services/gym.service';
 import { GymListResponse } from '../../../shared/models/gym.model';
 import { GymPlanService } from '../../../core/services/gym-plan.service';
+import { PlatformStatusService } from '../../../core/services/platform-status.service';
 
 @Component({
   selector: 'app-gym-owner-dashboard',
@@ -26,10 +27,14 @@ export class DashboardComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private branchContextService = inject(BranchContextService);
   private planService = inject(GymPlanService);
+  private platformStatus = inject(PlatformStatusService);
 
   stats: GymOwnerStats | null = null;
   gymData: GymListResponse | null = null;
   daysToExpiry: number | null = null;
+  /** Days of access left after the plan ended (the platform grace period); null when not in grace. */
+  graceDaysLeft: number | null = null;
+  private gracePeriodDays = 0;
   isLoading = true;
   selectedDensityRange: 'today' | 'week' = 'today';
   todayDate = new Date();
@@ -47,6 +52,10 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.platformStatus.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(status => {
+      this.gracePeriodDays = status.gracePeriodDays;
+      this.calculateExpiryDays();
+    });
     this.branchContextService.activeBranch$.pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => {
@@ -73,6 +82,8 @@ export class DashboardComponent implements OnInit {
       const today = new Date();
       const diffTime = expiryDate.getTime() - today.getTime();
       this.daysToExpiry = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const left = this.daysToExpiry + this.gracePeriodDays;
+      this.graceDaysLeft = this.daysToExpiry < 0 && left >= 0 ? left : null;
     }
   }
 

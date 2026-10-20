@@ -1,0 +1,16 @@
+<main class="maintenance">
+  <div class="card">
+    <app-brand-logo class="logo" />
+    <span class="icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></span>
+    <h1>We'll be back shortly</h1>
+    <p>GymCrest is down for scheduled maintenance. Your data is safe, and everything will be back as it was.</p>
+    @if (endTime(); as end) {
+      <p class="eta"><i class="fa-regular fa-clock" aria-hidden="true"></i><span>Expected back by <strong>{{ end | date: 'd MMM, h:mm a' }}</strong></span></p>
+    }
+    <button type="button" class="btn-primary" (click)="tryAgain()" [disabled]="checking()">
+      <i class="fa-solid fa-rotate" [class.fa-spin]="checking()" aria-hidden="true"></i>
+      {{ checking() ? 'Checking…' : 'Try again' }}
+    </button>
+    <app-support-contact class="support" label="Something urgent?" />
+  </div>
+</main>

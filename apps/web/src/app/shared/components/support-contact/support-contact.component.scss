@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.support-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+
+  .label {
+    font-weight: 600;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Footer column: stacked links styled like the column's other links
+  &.footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+
+    a {
+      color: inherit;
+      font-weight: 500;
+    }
+  }
+}

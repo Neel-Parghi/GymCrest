@@ -37,21 +37,6 @@ namespace GymForge.Application.Modules.Payments.Services
             _mapper = mapper;
         }
 
-        public async Task<SaaSConfigurationDto> GetSettingsAsync()
-        {
-            SaaSConfiguration settings = await _configRepository.GetConfigurationAsync();
-            return _mapper.Map<SaaSConfigurationDto>(settings);
-        }
-
-        public async Task UpdateSettingsAsync(SaaSConfigurationDto settingsDto)
-        {
-            SaaSConfiguration settings = await _configRepository.GetConfigurationAsync();
-            _mapper.Map(settingsDto, settings);
-            
-            await _configRepository.UpdateConfigurationAsync(settings);
-            await _uow.SaveChangesAsync();
-        }
-
         public async Task<InitiatePaymentResponseDto> InitiateSaaSPaymentAsync(CreatePaymentDto paymentDto)
         {
             Domain.Entities.Plan? plan = await _saaSPlanRepository.GetPlanByIdAsync(paymentDto.PlanId);

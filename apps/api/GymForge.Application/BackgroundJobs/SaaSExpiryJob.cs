@@ -11,6 +11,7 @@ namespace GymForge.Application.BackgroundJobs
         private readonly IGymManagementRepository _gymRepository;
         private readonly ISaaSPaymentRepository _saasPaymentRepository;
         private readonly IEmailService _emailService;
+        private readonly ISaaSConfigurationRepository _configRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<SaaSExpiryJob> _logger;
 
@@ -18,12 +19,14 @@ namespace GymForge.Application.BackgroundJobs
             IGymManagementRepository gymRepository,
             ISaaSPaymentRepository saasPaymentRepository,
             IEmailService emailService,
+            ISaaSConfigurationRepository configRepository,
             IUnitOfWork unitOfWork,
             ILogger<SaaSExpiryJob> logger)
         {
             _gymRepository = gymRepository;
             _saasPaymentRepository = saasPaymentRepository;
             _emailService = emailService;
+            _configRepository = configRepository;
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
@@ -35,6 +38,8 @@ namespace GymForge.Application.BackgroundJobs
             List<GymListResponseDto> gyms = await _gymRepository.GetAllGymsAsync();
             // Runs at 01:00 IST (still the previous day in UTC), so compare IST calendar dates.
             DateTime today = AppTimeZone.Today;
+            // Plans stay open through the grace period, so the gym keeps access until it ends
+            int graceDays = Math.Max((await _configRepository.GetConfigurationAsync()).GracePeriodDays, 0);
 
             foreach (var gym in gyms)
             {
@@ -47,7 +52,7 @@ namespace GymForge.Application.BackgroundJobs
 
                     // The plan's last day has passed. Catches up on plans that ended on a night the job didn't run,
                     // and closes the plan even when the owner can't be emailed.
-                    if (endDate >= today) continue;
+                    if (endDate.AddDays(graceDays) >= today) continue;
 
                     subscription.IsActive = false;
 

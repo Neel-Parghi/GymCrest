@@ -37,20 +37,17 @@
 
           <ng-container *ngIf="isSaaSInvoice(invoice)">
             <p *ngIf="platformConfig?.billingAddress">{{ platformConfig.billingAddress }}</p>
-            <p class="meta-field"><strong>GSTIN:</strong> {{ platformConfig?.gstNo }}</p>
+            <p class="meta-field" *ngIf="platformConfig?.gstNo"><strong>GSTIN:</strong> {{ platformConfig.gstNo }}</p>
           </ng-container>
 
           <ng-container *ngIf="!isSaaSInvoice(invoice)">
             <p *ngIf="invoice.branchName" class="meta-field"><strong>Branch:</strong> {{ invoice.branchName }}</p>
-            <ng-container *ngIf="invoice.branchLine1; else fallbackAddress">
+            <!-- Only real details: an invoice must never print a placeholder address or tax number -->
+            <ng-container *ngIf="invoice.branchLine1">
               <p>{{ invoice.branchLine1 }}<span *ngIf="invoice.branchLine2">, {{ invoice.branchLine2 }}</span></p>
               <p>{{ invoice.branchCity }}, {{ invoice.branchState }} - {{ invoice.branchPostalCode }}</p>
             </ng-container>
-            <ng-template #fallbackAddress>
-              <p>Sector 15, Vashi, Navi Mumbai,</p>
-              <p>Maharashtra, 400703</p>
-            </ng-template>
-            <p class="meta-field"><strong>GSTIN:</strong> {{ gymDetails?.gstNumber || '27AAAAA1111A1Z1' }}</p>
+            <p class="meta-field" *ngIf="gymDetails?.gstNumber"><strong>GSTIN:</strong> {{ gymDetails.gstNumber }}</p>
           </ng-container>
         </div>
         <div class="address-col client">

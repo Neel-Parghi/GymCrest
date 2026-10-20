@@ -29,7 +29,7 @@ export class SettingsComponent implements OnInit {
   private confirmation = inject(ConfirmationService);
 
   settingsForm: FormGroup;
-  activeTab: 'general' | 'strategy' | 'financial' | 'legal' | 'status' = 'general';
+  activeTab: 'general' | 'strategy' | 'financial' | 'status' = 'general';
   loading = true;
   saving = false;
   resettingDemo = false;
@@ -37,8 +37,9 @@ export class SettingsComponent implements OnInit {
 
   constructor() {
     this.settingsForm = this.fb.group({
-      platformName: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.PLATFORM_NAME)]],
-      billingEmail: ['', [Validators.required, Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
+      // Not shown on the page (not used yet) but kept in the form so saving never clears them
+      platformName: ['', [Validators.maxLength(FIELD_LIMITS.PLATFORM_NAME)]],
+      billingEmail: ['', [Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
       taxPercentage: [18, [Validators.required, Validators.min(0), Validators.max(100)]],
       gracePeriodDays: [7, [Validators.required, Validators.min(0)]],
       yearlyRevenueTarget: [0, [Validators.required, Validators.min(0)]],
@@ -70,7 +71,7 @@ export class SettingsComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['tab']) {
         const tab = params['tab'];
-        if (tab === 'strategy' || tab === 'legal' || tab === 'general' || tab === 'financial' || tab === 'status') {
+        if (tab === 'strategy' || tab === 'general' || tab === 'financial' || tab === 'status') {
           this.activeTab = tab as any;
         }
       }
@@ -108,7 +109,11 @@ export class SettingsComponent implements OnInit {
     if (this.settingsForm.invalid) return;
 
     this.saving = true;
-    this.configService.updateConfig(this.settingsForm.value).subscribe({
+    // The inputs hold local time; the API stores UTC
+    const toUtc = (value: string | null) => value ? new Date(value).toISOString() : null;
+    const value = this.settingsForm.getRawValue();
+    const payload = { ...value, maintenanceStartTime: toUtc(value.maintenanceStartTime), maintenanceEndTime: toUtc(value.maintenanceEndTime) };
+    this.configService.updateConfig(payload).subscribe({
       next: () => {
         this.notification.success(CONSTANTS.SETTINGS.UPDATE_SUCCESS);
         this.saving = false;

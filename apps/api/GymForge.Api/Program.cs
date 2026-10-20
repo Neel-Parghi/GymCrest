@@ -176,6 +176,7 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<MaintenanceMiddleware>();
 app.UseRateLimiter();
 
 app.UseMiddleware<ResponseWrapperMiddleware>();

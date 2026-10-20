@@ -17,10 +17,6 @@ namespace GymForge.Application.Modules.Payments.Interfaces
 
         Task<PaymentStatsDto> GetPaymentStatsAsync();
 
-        Task<SaaSConfigurationDto> GetSettingsAsync();
-
-        Task UpdateSettingsAsync(SaaSConfigurationDto settings);
-
         Task<GymSubscriptionStatusDto> GetSubscriptionStatusAsync(Guid gymId);
 
         Task<GymSubscriptionStatusDto> RenewGymSubscriptionAsync(Guid gymId, Guid planId);

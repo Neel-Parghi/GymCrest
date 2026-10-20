@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { AuthApiService } from '../services/auth-api.service';
 import { catchError, switchMap, throwError, BehaviorSubject, Subject, filter, take, race, Observable } from 'rxjs';
 
+/** Pages that stay usable during maintenance; they handle a failed request on their own. */
+const PUBLIC_PAGES = ['/', '/privacy-policy', '/terms-of-service', '/maintenance'];
+
 let isRefreshing = false;
 const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 const refreshFailedSubject = new Subject<unknown>();
@@ -33,6 +36,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
       // Gym's SaaS plan expired (owners and staff; members are exempt server-side)
       if (error instanceof HttpErrorResponse && error.status === 402 && !router.url.includes('/subscription-expired')) {
         router.navigate(['/subscription-expired']);
+      }
+
+      // Platform in maintenance mode: the public website keeps working, the app shows the maintenance page
+      if (error instanceof HttpErrorResponse && error.status === 503 && error.error?.code === 'MAINTENANCE'
+        && !PUBLIC_PAGES.includes(router.url.split(/[?#]/)[0])) {
+        router.navigate(['/maintenance']);
       }
 
       return throwError(() => error);

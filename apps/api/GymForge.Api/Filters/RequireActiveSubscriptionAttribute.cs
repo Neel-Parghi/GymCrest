@@ -1,4 +1,5 @@
 using GymForge.Application.Modules.Payments.Interfaces;
+using GymForge.Application.Modules.SuperAdmin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,10 +16,12 @@ namespace GymForge.Api.Filters
     public class RequireActiveSubscriptionFilter : IAsyncActionFilter
     {
         private readonly ISaaSPaymentService _paymentService;
+        private readonly IPlatformStatusService _platformStatus;
 
-        public RequireActiveSubscriptionFilter(ISaaSPaymentService paymentService)
+        public RequireActiveSubscriptionFilter(ISaaSPaymentService paymentService, IPlatformStatusService platformStatus)
         {
             _paymentService = paymentService;
+            _platformStatus = platformStatus;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -65,7 +68,9 @@ namespace GymForge.Api.Filters
             }
 
             var status = await _paymentService.GetSubscriptionStatusAsync(gymId);
-            if (status == null || !status.IsActive || status.EndDate < DateTime.UtcNow)
+            // The grace period keeps a lapsed gym working for a few days so the owner has time to renew
+            int graceDays = (await _platformStatus.GetStatusAsync()).GracePeriodDays;
+            if (status == null || !status.IsActive || status.EndDate.AddDays(graceDays) < DateTime.UtcNow)
             {
                 context.Result = new ObjectResult(new { message = "Subscription Expired" })
                 {

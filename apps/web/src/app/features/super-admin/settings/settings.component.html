@@ -3,7 +3,7 @@
   <div class="settings-header">
     <div class="header-content">
       <h1>Platform Settings</h1>
-      <p>Configure platform brand identity, financial structures, strategic metrics, and system-wide status.</p>
+      <p>Support contacts, dashboard targets, billing details and maintenance mode for the whole platform.</p>
     </div>
     <button *ngIf="isAdmin" class="save-btn" [disabled]="settingsForm.invalid || saving" (click)="saveSettings()">
       <i class="fas" [class.fa-save]="!saving" [class.fa-spinner]="saving" [class.fa-spin]="saving"></i>
@@ -15,7 +15,7 @@
   <div class="settings-tabs">
     <button class="tab-btn" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
       <span class="tab-icon-wrapper general-tab"><i class="fas fa-id-card"></i></span>
-      <span class="tab-label">Identity</span>
+      <span class="tab-label">Support</span>
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'strategy'" (click)="activeTab = 'strategy'">
       <span class="tab-icon-wrapper strategy-tab"><i class="fas fa-bullseye"></i></span>
@@ -24,10 +24,6 @@
     <button class="tab-btn" [class.active]="activeTab === 'financial'" (click)="activeTab = 'financial'">
       <span class="tab-icon-wrapper financial-tab"><i class="fas fa-receipt"></i></span>
       <span class="tab-label">Financials</span>
-    </button>
-    <button class="tab-btn" [class.active]="activeTab === 'legal'" (click)="activeTab = 'legal'">
-      <span class="tab-icon-wrapper legal-tab"><i class="fas fa-file-contract"></i></span>
-      <span class="tab-label">Legal Docs</span>
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'status'" (click)="activeTab = 'status'">
       <span class="tab-icon-wrapper status-tab"><i class="fas fa-server"></i></span>
@@ -45,27 +41,18 @@
     } @else {
     <form [formGroup]="settingsForm" class="tab-content">
 
-      <!-- Tab 1: Platform Identity -->
+      <!-- Tab 1: Support contacts -->
       @if (activeTab === 'general') {
       <div class="settings-pane">
         <div class="pane-header">
           <div class="pane-icon identity-icon"><i class="fas fa-id-card"></i></div>
           <div class="pane-title-group">
-            <h3>Platform Identity</h3>
-            <p>Set up the core brand identity and primary contact touchpoints of the GymCrest platform.</p>
+            <h3>Support Contacts</h3>
+            <p>Shown on the website footer, the legal pages and the "Access suspended" and maintenance screens, so gym owners and members know how to reach you.</p>
           </div>
         </div>
 
         <div class="pane-body">
-          <div class="form-group full-width">
-            <label for="platformName"><i class="fas fa-building"></i> Platform Name</label>
-            <div class="input-wrapper">
-              <input id="platformName" type="text" formControlName="platformName" placeholder="e.g. GymCrest" [maxlength]="limits.PLATFORM_NAME">
-            </div>
-            <app-validation-message [control]="settingsForm.get('platformName')" fieldName="Platform name"></app-validation-message>
-            <span class="field-hint">The public-facing name of the SaaS platform.</span>
-          </div>
-
           <div class="form-grid-2">
             <div class="form-group">
               <label for="supportEmail"><i class="fas fa-envelope"></i> Support Email</label>
@@ -73,7 +60,7 @@
                 <input id="supportEmail" type="email" formControlName="supportEmail" placeholder="support@gymcrest.com" [maxlength]="limits.EMAIL">
               </div>
               <app-validation-message [control]="settingsForm.get('supportEmail')" fieldName="Support email"></app-validation-message>
-              <span class="field-hint">Used for handling general gym owner inquiries.</span>
+              <span class="field-hint">Leave empty to hide it everywhere.</span>
             </div>
 
             <div class="form-group">
@@ -82,7 +69,7 @@
                 <input id="supportPhone" type="text" formControlName="supportPhone" placeholder="e.g. +91 98765 43210" [maxlength]="limits.PHONE">
               </div>
               <app-validation-message [control]="settingsForm.get('supportPhone')" fieldName="Support phone"></app-validation-message>
-              <span class="field-hint">Helpline contact displayed on public portals.</span>
+              <span class="field-hint">Include the country code, e.g. +91. Leave empty to hide it.</span>
             </div>
           </div>
         </div>
@@ -96,8 +83,7 @@
           <div class="pane-icon strategy-icon"><i class="fas fa-bullseye"></i></div>
           <div class="pane-title-group">
             <h3>Strategic Dashboard Targets</h3>
-            <p>Define high-level revenue goals, subscription targets, and service thresholds for dashboard analytics.
-            </p>
+            <p>Goals behind the progress bars on the super-admin Dashboard and in the CSV report.</p>
           </div>
         </div>
 
@@ -110,7 +96,7 @@
               <input id="yearlyRevenueTarget" type="number" formControlName="yearlyRevenueTarget"
                 placeholder="e.g. 1200000">
             </div>
-            <span class="field-hint">Benchmark to compute annual subscription target progression.</span>
+            <span class="field-hint">Annual recurring revenue the Dashboard measures progress against.</span>
           </div>
 
           <div class="form-grid-2">
@@ -120,76 +106,31 @@
                 <input id="subscriptionTarget" type="number" formControlName="subscriptionTarget"
                   placeholder="e.g. 100">
               </div>
-              <span class="field-hint">Target count of simultaneously active gym plans.</span>
-            </div>
-
-            <div class="form-group">
-              <label for="uptimeThreshold"><i class="fas fa-tachometer-alt"></i> Uptime Threshold (%)</label>
-              <div class="input-wrapper">
-                <input id="uptimeThreshold" type="number" formControlName="uptimeThreshold" step="0.01"
-                  placeholder="e.g. 99.9">
-              </div>
-              <span class="field-hint">Service level agreement target for uptime metrics.</span>
+              <span class="field-hint">Number of gyms on an active plan the Dashboard measures progress against.</span>
             </div>
           </div>
         </div>
       </div>
       }
 
-      <!-- Tab 3: Financials & Billing -->
+      <!-- Tab 3: Billing -->
       @if (activeTab === 'financial') {
       <div class="settings-pane">
         <div class="pane-header">
           <div class="pane-icon financial-icon"><i class="fas fa-receipt"></i></div>
           <div class="pane-title-group">
-            <h3>Financials & Billing</h3>
-            <p>Configure default currencies, tax structures, grace periods, and commercial identification attributes.
-            </p>
+            <h3>Billing</h3>
+            <p>How long gyms keep access after their plan ends, and the details printed on GymCrest invoices to gyms.</p>
           </div>
         </div>
 
         <div class="pane-body">
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="currency"><i class="fas fa-coins"></i> Platform Currency</label>
-              <div class="input-wrapper">
-                <select id="currency" formControlName="currency">
-                  <option value="INR">INR (₹) - Indian Rupee</option>
-                  <option value="USD">USD ($) - US Dollar</option>
-                  <option value="EUR">EUR (€) - Euro</option>
-                  <option value="GBP">GBP (£) - British Pound</option>
-                </select>
-              </div>
-              <span class="field-hint">Base currency used for subscription rates.</span>
+          <div class="form-group full-width">
+            <label for="gracePeriodDays"><i class="fas fa-calendar-alt"></i> Grace Period (Days)</label>
+            <div class="input-wrapper">
+              <input id="gracePeriodDays" type="number" formControlName="gracePeriodDays" min="0" placeholder="7">
             </div>
-
-            <div class="form-group">
-              <label for="billingEmail"><i class="fas fa-file-invoice-dollar"></i> Billing & Finance Email</label>
-              <div class="input-wrapper">
-                <input id="billingEmail" type="email" formControlName="billingEmail" placeholder="billing@gymcrest.com" [maxlength]="limits.EMAIL">
-              </div>
-              <app-validation-message [control]="settingsForm.get('billingEmail')" fieldName="Billing email"></app-validation-message>
-              <span class="field-hint">Receives SaaS payment receipts and notifications.</span>
-            </div>
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="taxPercentage"><i class="fas fa-percent"></i> Tax Rate (%)</label>
-              <div class="input-wrapper">
-                <input id="taxPercentage" type="number" formControlName="taxPercentage" min="0" max="100"
-                  placeholder="18">
-              </div>
-              <span class="field-hint">Applicable tax added during gym subscription billing.</span>
-            </div>
-
-            <div class="form-group">
-              <label for="gracePeriodDays"><i class="fas fa-calendar-alt"></i> Billing Grace Period (Days)</label>
-              <div class="input-wrapper">
-                <input id="gracePeriodDays" type="number" formControlName="gracePeriodDays" min="0" placeholder="7">
-              </div>
-              <span class="field-hint">Extra days allowed for payment before system suspension.</span>
-            </div>
+            <span class="field-hint">Gyms keep full access for this many days after their plan ends, so the owner has time to renew. 0 stops access on the last day.</span>
           </div>
 
           <div class="form-group full-width">
@@ -198,7 +139,7 @@
               <input id="gstNo" type="text" formControlName="gstNo" placeholder="e.g. 27AAACG9988A1Z9" [maxlength]="limits.GST_NUMBER">
             </div>
             <app-validation-message [control]="settingsForm.get('gstNo')" fieldName="GSTIN"></app-validation-message>
-            <span class="field-hint">Corporate registration tax number printed on all generated invoices.</span>
+            <span class="field-hint">Printed on GymCrest invoices to gyms. Leave empty until you are GST-registered.</span>
           </div>
 
           <div class="form-group full-width">
@@ -207,46 +148,13 @@
               <textarea id="billingAddress" formControlName="billingAddress" rows="3"
                 placeholder="Enter full physical corporate billing address here..." [maxlength]="limits.ADDRESS_BLOCK"></textarea>
             </div>
-            <span class="field-hint">Company billing address used dynamically for tax receipts and statements.</span>
+            <span class="field-hint">Printed as the "Issued by" address on GymCrest invoices to gyms.</span>
           </div>
         </div>
       </div>
       }
 
-      <!-- Tab 4: Legal & Compliance -->
-      @if (activeTab === 'legal') {
-      <div class="settings-pane">
-        <div class="pane-header">
-          <div class="pane-icon legal-icon"><i class="fas fa-file-contract"></i></div>
-          <div class="pane-title-group">
-            <h3>Legal & Compliance</h3>
-            <p>Maintain platform agreements, terms of service, and privacy policies for absolute compliance.</p>
-          </div>
-        </div>
-
-        <div class="pane-body">
-          <div class="form-group full-width">
-            <label for="termsUrl"><i class="fas fa-signature"></i> Terms of Service URL</label>
-            <div class="input-wrapper">
-              <input id="termsUrl" type="url" formControlName="termsUrl" placeholder="https://gymcrest.com/terms" [maxlength]="limits.URL">
-            </div>
-            <app-validation-message [control]="settingsForm.get('termsUrl')" fieldName="Terms of Service URL"></app-validation-message>
-            <span class="field-hint">Weblink to the official SaaS Terms of Service.</span>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="privacyUrl"><i class="fas fa-user-shield"></i> Privacy Policy URL</label>
-            <div class="input-wrapper">
-              <input id="privacyUrl" type="url" formControlName="privacyUrl" placeholder="https://gymcrest.com/privacy" [maxlength]="limits.URL">
-            </div>
-            <app-validation-message [control]="settingsForm.get('privacyUrl')" fieldName="Privacy Policy URL"></app-validation-message>
-            <span class="field-hint">Weblink to the official SaaS Privacy & Security Policy.</span>
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- Tab 5: Platform Status -->
+      <!-- Tab 4: Platform Status -->
       @if (activeTab === 'status') {
       <div class="settings-pane">
         <div class="pane-header">
@@ -263,8 +171,8 @@
             <div class="box-main">
               <div class="box-info">
                 <h4><i class="fas fa-exclamation-triangle"></i> Maintenance Status</h4>
-                <p>Enabling maintenance mode prevents regular and administrative users from accessing the system,
-                  showing a custom offline message instead.</p>
+                <p>While on, everyone except super admins sees a maintenance page instead of the app. Set a start and
+                  end time to limit it to that window; leave them empty to apply it straight away until you switch it off.</p>
               </div>
               <label class="switch-premium">
                 <input type="checkbox" formControlName="isMaintenanceMode">

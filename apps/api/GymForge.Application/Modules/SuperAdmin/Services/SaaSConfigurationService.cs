@@ -9,10 +9,12 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
     public class SaaSConfigurationService : ISaaSConfigurationService
     {
         private readonly ISaaSConfigurationRepository _configRepository;
+        private readonly IPlatformStatusService _platformStatus;
 
-        public SaaSConfigurationService(ISaaSConfigurationRepository configRepository)
+        public SaaSConfigurationService(ISaaSConfigurationRepository configRepository, IPlatformStatusService platformStatus)
         {
             _configRepository = configRepository;
+            _platformStatus = platformStatus;
         }
 
         public async Task<SaaSConfigurationDto> GetConfigurationAsync()
@@ -64,6 +66,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
             config.UptimeThreshold = configDto.UptimeThreshold;
 
             await _configRepository.UpdateConfigurationAsync(config);
+            _platformStatus.Invalidate();
         }
     }
 }

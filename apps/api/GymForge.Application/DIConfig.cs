@@ -85,6 +85,7 @@ namespace GymForge.Application
 
             services.AddScoped<IPlanGenerationService, PlanGenerationService>();
             services.AddScoped<IDemoDataService, DemoDataService>();
+            services.AddScoped<IPlatformStatusService, PlatformStatusService>();
             
             services.AddScoped<IGymAnnouncementService, GymAnnouncementService>();
             

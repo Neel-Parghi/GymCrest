@@ -7,6 +7,8 @@ import { PricingService } from '../../core/services/pricing.service';
 import { PricingPlan } from '../../shared/models/pricing.model';
 import { TestPaymentNoticeComponent } from '../../shared/components/test-payment-notice/test-payment-notice.component';
 import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
+import { PlatformStatusService } from '../../core/services/platform-status.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface HeroMessage {
   lead: string;
@@ -46,6 +48,8 @@ export class LandingComponent implements OnInit {
   private readonly pricingService = inject(PricingService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  /** Support email and phone from platform settings, for the footer. */
+  readonly platformStatus = toSignal(inject(PlatformStatusService).getStatus());
 
   readonly year = new Date().getFullYear();
   readonly menuOpen = signal(false);
@@ -118,6 +122,11 @@ export class LandingComponent implements OnInit {
   closeTour(): void {
     this.tour.set(null);
   }
+
+  telHref(phone: string): string {
+    return 'tel:' + phone.replace(/[^\d+]/g, '');
+  }
+
   ngOnInit(): void {
     this.loadPlans();
     this.startHeroRotation();
