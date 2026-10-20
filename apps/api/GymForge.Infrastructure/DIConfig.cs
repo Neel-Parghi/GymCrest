@@ -94,6 +94,7 @@ namespace GymForge.Infrastructure
             services.AddScoped<IGymMemberRepository, GymMemberRepository>();
             services.AddScoped<IResourceOwnershipRepository, ResourceOwnershipRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
+            services.AddScoped<IDemoDataRepository, DemoDataRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IInventoryRepository, InventoryRepository>();
             services.AddScoped<IEquipmentRepository, EquipmentRepository>();

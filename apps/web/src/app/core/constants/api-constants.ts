@@ -67,6 +67,7 @@ export const API_CONSTANTS = {
     DASHBOARD: 'superadmin/dashboard/stats',
     REVENUE: 'superadmin/payments/stats',
     CONFIG: 'superadmin/config',
+    RESET_DEMO_MEMBER: 'superadmin/demo-data/reset-member',
     REPORTS: {
       EXPORT: 'superadmin/reports/export'
     }

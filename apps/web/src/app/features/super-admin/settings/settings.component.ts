@@ -9,6 +9,7 @@ import { ConfigurationService } from '../../../core/services/configuration.servi
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { AuthApiService } from '../../../core/services/auth-api.service';
+import { ConfirmationService } from '../../../core/services/confirmation.service';
 
 @Component({
   selector: 'app-settings',
@@ -25,11 +26,13 @@ export class SettingsComponent implements OnInit {
   private notification = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthApiService);
+  private confirmation = inject(ConfirmationService);
 
   settingsForm: FormGroup;
   activeTab: 'general' | 'strategy' | 'financial' | 'legal' | 'status' = 'general';
   loading = true;
   saving = false;
+  resettingDemo = false;
   isAdmin = false;
 
   constructor() {
@@ -114,6 +117,30 @@ export class SettingsComponent implements OnInit {
         this.notification.error(CONSTANTS.SETTINGS.UPDATE_ERROR);
         this.saving = false;
       }
+    });
+  }
+
+  resetDemoMember() {
+    this.confirmation.confirm({
+      title: 'Reset demo member',
+      message: 'This replaces everything in the demo member account with a fresh plan and two weeks of workouts, meals and check-ins. Anything visitors logged will be removed.',
+      type: 'danger'
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.resettingDemo = true;
+      this.configService.resetDemoMember().subscribe({
+        next: (res) => {
+          const r = res.data;
+          this.notification.success(r
+            ? `Demo member reset: ${r.workoutsLogged} workouts, ${r.daysOfMealsLogged} days of meals, ${r.healthCheckIns} check-ins.`
+            : 'Demo member reset.');
+          this.resettingDemo = false;
+        },
+        error: (err) => {
+          this.notification.error(err.error?.message || 'Could not reset the demo member.');
+          this.resettingDemo = false;
+        }
+      });
     });
   }
 }

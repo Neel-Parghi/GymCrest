@@ -285,6 +285,20 @@
             </div>
             }
           </div>
+
+          <div class="maintenance-box-premium demo-data-box">
+            <div class="box-main">
+              <div class="box-info">
+                <h4><i class="fas fa-user-check"></i> Demo Member Data</h4>
+                <p>Refills the public demo member with a fresh workout and diet plan, 14 days of logged workouts
+                  and meals, and 4 health check-ins. Use it before sharing the demo or after visitors clutter it.</p>
+              </div>
+              <button type="button" class="demo-reset-btn" [disabled]="resettingDemo" (click)="resetDemoMember()">
+                <i class="fas" [class.fa-rotate]="!resettingDemo" [class.fa-spinner]="resettingDemo" [class.fa-spin]="resettingDemo"></i>
+                {{ resettingDemo ? 'Resetting…' : 'Reset demo member' }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       }
