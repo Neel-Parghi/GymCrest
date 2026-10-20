@@ -3,21 +3,26 @@
   <!-- Profile Header -->
   <div class="profile-header-banner">
     <div class="header-left">
-      <div class="logo-box" [class.editable]="isEditMode" (click)="logoInput.click()">
-        <img *ngIf="gymData?.logoUrl" [src]="gymData?.logoUrl" alt="Gym Logo">
-        <div class="placeholder-logo" *ngIf="!gymData?.logoUrl">
+      <div class="logo-box">
+        <input type="file" #logoInput hidden accept="image/png,image/jpeg,image/webp,image/gif" (change)="onLogoChange($event)">
+        <img *ngIf="displayedLogoUrl" [src]="displayedLogoUrl" alt="Gym Logo">
+        <div class="placeholder-logo" *ngIf="!displayedLogoUrl">
           <i class="fas fa-dumbbell"></i>
         </div>
-        <div class="logo-overlay" *ngIf="isEditMode">
+        <button type="button" class="logo-upload" *ngIf="isEditMode" (click)="logoInput.click()"
+          [title]="displayedLogoUrl ? 'Change logo' : 'Upload logo'" aria-label="Upload gym logo">
           <i class="fas fa-camera"></i>
-        </div>
-        <input type="file" #logoInput hidden accept="image/*" (change)="onLogoChange($event)" [disabled]="!isEditMode">
+        </button>
+        <button type="button" class="logo-remove" *ngIf="isEditMode && displayedLogoUrl" (click)="removeLogo()"
+          title="Remove logo" aria-label="Remove gym logo">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
       <div class="title-block">
         <h1>{{ gymData?.gymName || 'Your Gym' }}</h1>
         <div class="status-row">
           <span class="badge active-partner">ACTIVE PARTNER</span>
-          <span class="since-text">Partner since {{ (gymData?.createdOn | date:'MMM yyyy') || 'Oct 2021' }}</span>
+          <span class="since-text" *ngIf="gymData?.createdOn">Partner since {{ gymData?.createdOn | date:'MMM yyyy' }}</span>
         </div>
       </div>
     </div>

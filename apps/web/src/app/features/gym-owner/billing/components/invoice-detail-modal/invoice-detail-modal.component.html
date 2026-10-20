@@ -18,6 +18,9 @@
       <!-- Top Meta Brand Block -->
       <div class="invoice-banner-header">
         <div class="brand">
+          @if (!isSaaSInvoice(invoice) && gymDetails?.logoUrl && !logoFailed) {
+            <img class="brand-logo" [src]="gymDetails.logoUrl" [alt]="(gymDetails?.gymName || 'Gym') + ' logo'" (error)="logoFailed = true">
+          }
           <h2 class="name">{{ isSaaSInvoice(invoice) ? 'GYMCREST' : (gymDetails?.gymName || 'YOUR GYM')
             }}</h2>
           <span class="tag">{{ isSaaSInvoice(invoice) ? 'GymCrest Platform Subscriptions' : (gymDetails?.brandName

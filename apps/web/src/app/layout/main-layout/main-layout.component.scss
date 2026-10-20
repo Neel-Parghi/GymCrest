@@ -161,7 +161,36 @@
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+          max-width: 190px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
+      }
+
+      .gym-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .gym-brand-logo {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+
+      .gym-brand-name {
+        max-width: 150px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
@@ -268,6 +297,22 @@
   .sidebar-footer {
     padding: 20px 16px;
     border-top: 1px solid var(--border-color);
+
+    .powered-by {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 12px 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .powered-by-logo {
+      height: 9px;
+      width: auto;
+      color: var(--text-muted);
+    }
 
     .logout-btn {
       display: flex;

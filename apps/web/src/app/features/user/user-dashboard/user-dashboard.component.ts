@@ -84,6 +84,15 @@ export class UserDashboardComponent implements OnInit {
     amount: new FormControl('', { nonNullable: true, validators: [this.routineAmountValidator()] })
   });
 
+  readonly myGym = toSignal(this.userService.getMyGym().pipe(
+    map(res => (res?.data as { gymName?: string; gymLogoUrl?: string | null } | null) ?? null)
+  ));
+
+  useGymCrestLogo(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.endsWith('favicon.svg')) img.src = 'favicon.svg';
+  }
+
   readonly userName = computed(() => this.summary()?.userName || this.profile()?.firstName || 'Member');
 
   readonly initials = computed(() => {
