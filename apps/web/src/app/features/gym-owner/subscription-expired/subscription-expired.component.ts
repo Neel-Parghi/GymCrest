@@ -7,13 +7,14 @@ import { GymService } from '../../../core/services/gym.service';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { TestPaymentNoticeComponent } from '../../../shared/components/test-payment-notice/test-payment-notice.component';
 import { PricingPlan } from '../../../shared/models/pricing.model';
 import { GymListResponse } from '../../../shared/models/gym.model';
 
 @Component({
   selector: 'app-subscription-expired',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TestPaymentNoticeComponent],
   templateUrl: './subscription-expired.component.html',
   styleUrl: './subscription-expired.component.scss'
 })

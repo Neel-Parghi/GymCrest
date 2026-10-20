@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.test-payment-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--info-border);
+  border-radius: 12px;
+  background: var(--info-bg);
+  color: #1e3a8a;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  text-align: left;
+
+  i {
+    margin-top: 0.2rem;
+    color: var(--info-color);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  a {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+}

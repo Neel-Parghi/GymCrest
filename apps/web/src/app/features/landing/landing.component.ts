@@ -5,6 +5,8 @@ import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-log
 import { HeroPreviewComponent } from './hero-preview/hero-preview.component';
 import { PricingService } from '../../core/services/pricing.service';
 import { PricingPlan } from '../../shared/models/pricing.model';
+import { TestPaymentNoticeComponent } from '../../shared/components/test-payment-notice/test-payment-notice.component';
+import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
 
 interface HeroMessage {
   lead: string;
@@ -34,7 +36,7 @@ const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent],
+  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent, TestPaymentNoticeComponent],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +66,10 @@ export class LandingComponent implements OnInit {
   private heroTimer?: ReturnType<typeof setInterval>;
 
   readonly faqs: Faq[] = [
+    ...(PAYMENTS_TEST_MODE ? [{
+      question: 'Do gym owners have to pay right now?',
+      answer: "Not yet. GymCrest is in its launch phase, so it's free for gym owners too. Checkout runs in test mode and no money is charged. We'll let you know well before real billing starts."
+    }] : []),
     {
       question: 'Is GymCrest really free for members?',
       answer: 'Yes. Anyone can create a member account and use workouts, diet tracking and progress for free, with or without a gym. Only gyms pay for a plan.'

@@ -1,0 +1,18 @@
+@if (show) {
+  <div class="test-payment-notice" role="note">
+    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+    @if (audience() === 'public') {
+      <p>
+        <strong>GymCrest is in its launch phase, so it's free for gym owners too.</strong>
+        Payments currently run in test mode: you can try the full checkout without being charged, and we'll let you know
+        well before real billing starts.
+      </p>
+    } @else {
+      <p>
+        <strong>Free during launch.</strong>
+        Checkout runs in Razorpay test mode, so no real money is charged.
+        <a [href]="testDetailsUrl" target="_blank" rel="noopener">Use Razorpay's test card or UPI details</a> to complete it.
+      </p>
+    }
+  </div>
+}

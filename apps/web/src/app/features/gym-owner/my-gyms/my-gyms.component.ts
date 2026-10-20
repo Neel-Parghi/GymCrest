@@ -13,6 +13,7 @@ import { FileUploadService } from '../../../core/services/file-upload.service';
 import { PricingService } from '../../../core/services/pricing.service';
 import { PlanCheckoutService } from '../../../core/services/plan-checkout.service';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { TestPaymentNoticeComponent } from '../../../shared/components/test-payment-notice/test-payment-notice.component';
 import { PricingPlan } from '../../../shared/models/pricing.model';
 import { StaffService } from '../../../core/services/staff.service';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
@@ -23,7 +24,7 @@ import { TimePickerComponent } from '../../../shared/components/time-picker/time
 @Component({
   selector: 'app-my-gyms',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SlideDrawerComponent, DropdownComponent, TimePickerComponent, ValidationMessage],
+  imports: [CommonModule, ReactiveFormsModule, SlideDrawerComponent, DropdownComponent, TimePickerComponent, ValidationMessage, TestPaymentNoticeComponent],
   templateUrl: './my-gyms.component.html',
   styleUrl: './my-gyms.component.scss',
 })
