@@ -261,7 +261,7 @@ section, header.hero {
 
 .section-header {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 2.75rem;
     // max-width: 640px;
     margin-left: auto;
     margin-right: auto;
@@ -294,8 +294,8 @@ section, header.hero {
     gap: 3rem;
     align-items: center;
     max-width: 1200px;
-    margin: 0 auto 5rem;
-    padding: 2.75rem;
+    margin: 0 auto 3rem;
+    padding: 2.25rem;
     background: var(--bg-surface-alt);
     border: 1px solid var(--border-color);
     border-radius: 24px;
@@ -430,13 +430,6 @@ section, header.hero {
 }
 
 /* How It Works */
-.how-it-works {
-    padding: 4rem 5%;
-    background: var(--bg-surface-alt);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-}
-
 .steps {
     display: flex;
     align-items: flex-start;
@@ -488,7 +481,7 @@ section, header.hero {
 
 /* Pricing */
 .pricing {
-    padding: 7rem 5%;
+    padding: 4.5rem 5%;
     background: var(--bg-surface);
 }
 
@@ -498,7 +491,7 @@ section, header.hero {
     justify-content: space-between;
     gap: 2rem;
     max-width: 1200px;
-    margin: 0 auto 3.5rem;
+    margin: 0 auto 2.5rem;
     padding: 2rem 2.5rem;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, var(--bg-surface-alt) 60%);
     border: 1px solid rgba(16, 185, 129, 0.25);
@@ -683,7 +676,7 @@ section, header.hero {
 
 /* CTA banner - the one bold dark moment on an otherwise light page */
 .cta-banner {
-    padding: 5.5rem 5%;
+    padding: 4rem 5%;
     background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-hover) 100%);
 }
 
@@ -733,7 +726,7 @@ section, header.hero {
 
 /* Footer */
 .footer {
-    padding: 4rem 5% 2rem;
+    padding: 3rem 5% 1.5rem;
     background: var(--bg-surface-alt);
 }
 
@@ -939,6 +932,11 @@ section, header.hero {
 .features.members {
     padding-top: 0;
 
+    // last thing in its section, so its bottom margin would only stack on the section padding
+    .spotlight {
+        margin-bottom: 0;
+    }
+
     .spotlight-text .btn {
         margin-top: 1.5rem;
     }
@@ -993,7 +991,7 @@ section, header.hero {
 
 /* Why GymCrest: before / after */
 .why {
-    padding: 2rem 5% 6rem;
+    padding: 1.5rem 5% 4rem;
 }
 
 .compare {
@@ -1064,7 +1062,7 @@ section, header.hero {
 
 /* Live demo */
 .demo {
-    padding: 7rem 5% 0;
+    padding: 2.5rem 5% 0;
     background: var(--bg-surface);
 }
 
@@ -1109,12 +1107,12 @@ section, header.hero {
 
 /* FAQ */
 .faq {
-    padding: 4rem 5%;
+    padding: 3.5rem 5%;
     background: var(--bg-surface-alt);
     border-top: 1px solid var(--border-color);
 
     .section-header {
-        margin-bottom: 3rem;
+        margin-bottom: 2.25rem;
     }
 }
 
@@ -1186,14 +1184,13 @@ section, header.hero {
 /* Phones: tighter rhythm so the page doesn't feel endless */
 @media (max-width: 700px) {
     .why {
-        padding: 1rem 5% 4rem;
+        padding: 0.5rem 5% 2.5rem;
     }
 
     .features,
-    .how-it-works,
     .pricing,
     .faq {
-        padding: 4.5rem 5%;
+        padding: 3rem 5%;
     }
 
     .features.members {
@@ -1201,15 +1198,15 @@ section, header.hero {
     }
 
     .demo {
-        padding: 4.5rem 5% 0;
+        padding: 1.5rem 5% 0;
     }
 
     .cta-banner {
-        padding: 4rem 5%;
+        padding: 3rem 5%;
     }
 
     .section-header {
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.75rem;
 
         h2 {
             font-size: 1.85rem;
@@ -1226,7 +1223,7 @@ section, header.hero {
 
     .spotlight {
         padding: 1.5rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
         border-radius: 20px;
     }
 
@@ -1259,7 +1256,7 @@ section, header.hero {
 
     .individual-plan {
         padding: 1.5rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.75rem;
     }
 
     .pricing-card {
@@ -1314,7 +1311,7 @@ section, header.hero {
     align-items: center;
     gap: 4rem;
     margin: 0 auto;
-    padding: 2.5rem 5% 5rem;
+    padding: 2.5rem 5% 3.5rem;
 }
 
 .hero-content {
@@ -1499,7 +1496,7 @@ section, header.hero {
 
 @media (max-width: 700px) {
     .hero {
-        padding: 2rem 5% 3.5rem;
+        padding: 1.5rem 5% 2.5rem;
     }
 
     .hero p {
@@ -1689,4 +1686,164 @@ section, header.hero {
 .pricing-notice {
     max-width: 820px;
     margin: 0 auto 1.5rem;
+}
+
+/* "How it works" steps, grouped under the live demo cards */
+.demo-steps {
+    max-width: 1100px;
+    margin: 3rem auto 0;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.demo-steps-title {
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 2.25rem;
+}
+
+/* Phones: card groups become a swipeable row with the next card peeking in, instead of a long stack */
+@mixin swipe-row($card-width: 82%) {
+    display: flex;
+    // start-aligned: a centred row that overflows spills off both sides and its first card can't be reached
+    justify-content: flex-start;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-left: -5%;
+    margin-right: -5%;
+    padding: 0.25rem 5% 0.5rem;
+    scroll-padding: 0 5%;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    > * {
+        flex: 0 0 $card-width;
+        scroll-snap-align: start;
+    }
+}
+
+@media (max-width: 700px) {
+    .feature-grid {
+        @include swipe-row(78%);
+    }
+
+    .demo-grid {
+        @include swipe-row;
+    }
+
+    // Role cards (Owner / Trainer / Member, Workouts / Diet / Progress) sit inside the spotlight box,
+    // which has its own 1.5rem padding, so the row bleeds to that edge rather than the page edge
+    .spotlight-visual {
+        @include swipe-row(70%);
+        flex-direction: row;
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        padding: 0.25rem 1.5rem 0.5rem;
+        scroll-padding: 0 1.5rem;
+    }
+
+    .spotlight-visual .role-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pricing-grid:not(.pricing-grid-1col) {
+        @include swipe-row(86%);
+        // room for the "Best value" badge, which sits above the card
+        padding-top: 1.1rem;
+        align-items: stretch;
+    }
+
+    .demo-steps {
+        margin-top: 2rem;
+        padding-top: 1.75rem;
+    }
+
+    .demo-steps-title {
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .steps {
+        @include swipe-row(72%);
+        flex-direction: row;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .step {
+        max-width: none;
+        padding: 1.5rem 1.25rem;
+        background: var(--bg-surface-alt);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+    }
+
+    .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 0.95rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .step-connector {
+        display: none;
+    }
+
+    // A scroll row clips anything outside it, so drop the lift and the soft shadows (they were cut into
+    // hard grey bands) and let the borders outline the cards
+    .feature-card,
+    .role-card,
+    .demo-card,
+    .pricing-card,
+    .pricing-card.featured {
+        box-shadow: none;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    .pricing-card.featured {
+        border-width: 2px;
+    }
+
+    .swipe-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 0.6rem;
+
+        span {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--border-color);
+            transition: width 0.25s ease, background-color 0.25s ease;
+        }
+
+        span.active {
+            width: 18px;
+            background: var(--accent-primary);
+        }
+    }
+
+    // inside the role boxes the dots are a grid item, so pull them up past the box's 2rem gap
+    .spotlight > .swipe-dots {
+        margin-top: -1.4rem;
+    }
+}
+
+/* Dots only exist for the phone rows; wider screens show the cards in a grid */
+@media (min-width: 701px) {
+    .swipe-dots {
+        display: none;
+    }
 }

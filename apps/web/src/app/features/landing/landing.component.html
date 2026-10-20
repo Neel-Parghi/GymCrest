@@ -111,7 +111,7 @@
         <li><i class="fas fa-check"></i> Members get a focused app for workouts, meals and progress.</li>
       </ul>
     </div>
-    <div class="spotlight-visual">
+    <div class="spotlight-visual" #rolesRow>
       <div class="role-card">
         <div class="icon-wrapper navy"><i class="fas fa-crown"></i></div>
         <div>
@@ -134,9 +134,12 @@
         </div>
       </div>
     </div>
+    <div class="swipe-dots" [appSwipeDots]="rolesRow" #rolesRowDots="swipeDots">
+      @for (i of rolesRowDots.indexes(); track i) { <span [class.active]="i === rolesRowDots.active()"></span> }
+    </div>
   </div>
 
-  <div class="feature-grid">
+  <div class="feature-grid" #featureRow>
     <div class="feature-card">
       <div class="icon-wrapper navy"><i class="fas fa-id-card"></i></div>
       <h3>Members &amp; memberships</h3>
@@ -169,6 +172,9 @@
       <p>Track equipment and maintenance, manage stock, and sell supplements or merchandise with emailed receipts.</p>
     </div>
   </div>
+  <div class="swipe-dots" [appSwipeDots]="featureRow" #featureRowDots="swipeDots">
+    @for (i of featureRowDots.indexes(); track i) { <span [class.active]="i === featureRowDots.active()"></span> }
+  </div>
 </section>
 
 <section id="members" class="features members">
@@ -185,7 +191,7 @@
       </ul>
       <a routerLink="/register" [queryParams]="{ as: 'member' }" class="btn btn-primary">Create your free account</a>
     </div>
-    <div class="spotlight-visual">
+    <div class="spotlight-visual" #memberRow>
       <div class="role-card">
         <div class="icon-wrapper blue"><i class="fas fa-dumbbell"></i></div>
         <div>
@@ -208,33 +214,9 @@
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="how-it-works">
-  <div class="section-header">
-    <div class="eyebrow">How it works</div>
-    <h2>Up and running in an afternoon.</h2>
-    <p>No onboarding calls. Set up your gym, bring in your people and start the same day.</p>
-  </div>
-  <div class="steps">
-    <div class="step">
-      <div class="step-number">01</div>
-      <h3>Set up your gym</h3>
-      <p>Add your branches, membership plans and pricing, and connect Razorpay to take payments.</p>
-    </div>
-    <div class="step-connector"></div>
-    <div class="step">
-      <div class="step-number">02</div>
-      <h3>Add members &amp; team</h3>
-      <p>Onboard members and invite staff and trainers. Everyone gets their own login and portal.</p>
-    </div>
-    <div class="step-connector"></div>
-    <div class="step">
-      <div class="step-number">03</div>
-      <h3>Run and grow</h3>
-      <p>Billing, check-ins and renewal reminders work from day one, so you can focus on your members.</p>
-    </div>
+    <div class="swipe-dots" [appSwipeDots]="memberRow" #memberRowDots="swipeDots">
+      @for (i of memberRowDots.indexes(); track i) { <span [class.active]="i === memberRowDots.active()"></span> }
+    </div>
   </div>
 </section>
 
@@ -244,7 +226,7 @@
     <h2>Look around before you sign up.</h2>
     <p>Open a ready-made demo gym, no account needed. The demo is shared, so please don't enter anything personal.</p>
   </div>
-  <div class="demo-grid">
+  <div class="demo-grid" #demoRow>
     <div class="demo-card">
       <div class="icon-wrapper navy"><i class="fas fa-crown"></i></div>
       <h3>Gym owner demo</h3>
@@ -267,6 +249,35 @@
       </ul>
       <a routerLink="/login" [queryParams]="{ demo: 'member' }" class="btn btn-outline btn-full">Open member demo</a>
     </div>
+  </div>
+  <div class="swipe-dots" [appSwipeDots]="demoRow" #demoRowDots="swipeDots">
+    @for (i of demoRowDots.indexes(); track i) { <span [class.active]="i === demoRowDots.active()"></span> }
+  </div>
+
+  <div class="demo-steps">
+    <h3 class="demo-steps-title">Then, up and running in an afternoon</h3>
+    <div class="steps" #stepsRow>
+      <div class="step">
+        <div class="step-number">01</div>
+        <h3>Set up your gym</h3>
+        <p>Add your branches, membership plans and pricing, and connect Razorpay to take payments.</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h3>Add members &amp; team</h3>
+        <p>Onboard members and invite staff and trainers. Everyone gets their own login and portal.</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h3>Run and grow</h3>
+        <p>Billing, check-ins and renewal reminders work from day one, so you can focus on your members.</p>
+      </div>
+    </div>
+    <div class="swipe-dots" [appSwipeDots]="stepsRow" #stepsRowDots="swipeDots">
+      @for (i of stepsRowDots.indexes(); track i) { <span [class.active]="i === stepsRowDots.active()"></span> }
+    </div>
   </div>
 </section>
 
@@ -306,7 +317,7 @@
       </p>
     }
     @default {
-      <div class="pricing-grid" [class.pricing-grid-2col]="paidPlans().length === 2"
+      <div class="pricing-grid" #pricingRow [class.pricing-grid-2col]="paidPlans().length === 2"
         [class.pricing-grid-1col]="paidPlans().length === 1">
         @for (plan of paidPlans(); track plan.id; let last = $last) {
           <div class="pricing-card" [class.featured]="last && paidPlans().length > 1">
@@ -343,6 +354,9 @@
           <p class="plans-status">Gym plans are being updated. <a routerLink="/register" [queryParams]="{ as: 'owner' }">Register your gym</a> to get started.</p>
         }
       </div>
+      <div class="swipe-dots" [appSwipeDots]="pricingRow" #pricingRowDots="swipeDots">
+        @for (i of pricingRowDots.indexes(); track i) { <span [class.active]="i === pricingRowDots.active()"></span> }
+      </div>
     }
   }
 </section>

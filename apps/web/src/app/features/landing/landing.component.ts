@@ -9,6 +9,7 @@ import { TestPaymentNoticeComponent } from '../../shared/components/test-payment
 import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
 import { PlatformStatusService } from '../../core/services/platform-status.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { SwipeDotsDirective } from './swipe-dots.directive';
 
 interface HeroMessage {
   lead: string;
@@ -38,7 +39,7 @@ const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent, TestPaymentNoticeComponent],
+  imports: [RouterLink, BrandLogoComponent, HeroPreviewComponent, TestPaymentNoticeComponent, SwipeDotsDirective],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
