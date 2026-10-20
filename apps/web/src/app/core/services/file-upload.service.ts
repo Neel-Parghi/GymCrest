@@ -11,7 +11,8 @@ import { compressImage } from '../../shared/utils/image-compressor';
 export class FileUploadService extends BaseApiService {
 
   uploadFile(file: File, folder: string = 'general'): Observable<ApiResponse<{ url: string }>> {
-    return from(compressImage(file)).pipe(
+    const compressed = folder === 'logos' ? compressImage(file, 512, 0.9, file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png') : compressImage(file);
+    return from(compressed).pipe(
       switchMap(compressedFile => {
         const formData = new FormData();
         formData.append('file', compressedFile);

@@ -30,6 +30,14 @@ body {
   margin-bottom: 24px !important;
 }
 
+.invoice-banner-header .brand .brand-logo {
+  display: block;
+  max-width: 160px;
+  max-height: 56px;
+  margin-bottom: 10px;
+  object-fit: contain;
+}
+
 .invoice-banner-header .brand .name {
   font-size: 1.6rem !important;
   font-weight: 900 !important;

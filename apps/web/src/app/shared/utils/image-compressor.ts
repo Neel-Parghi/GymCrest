@@ -1,4 +1,5 @@
-export function compressImage(file: File, maxDimension = 1200, quality = 0.75): Promise<File> {
+
+export function compressImage(file: File, maxDimension = 1200, quality = 0.75, outputType: 'image/jpeg' | 'image/png' = 'image/jpeg'): Promise<File> {
   return new Promise((resolve) => {
     // Only compress image files
     if (!file.type.startsWith('image/')) {
@@ -40,10 +41,9 @@ export function compressImage(file: File, maxDimension = 1200, quality = 0.75): 
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              // Convert to standard JPEG format
-              const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+              const newName = file.name.replace(/\.[^/.]+$/, "") + (outputType === 'image/png' ? ".png" : ".jpg");
               const compressedFile = new File([blob], newName, {
-                type: 'image/jpeg',
+                type: outputType,
                 lastModified: Date.now()
               });
               resolve(compressedFile);
@@ -51,7 +51,7 @@ export function compressImage(file: File, maxDimension = 1200, quality = 0.75): 
               resolve(file);
             }
           },
-          'image/jpeg',
+          outputType,
           quality
         );
       };

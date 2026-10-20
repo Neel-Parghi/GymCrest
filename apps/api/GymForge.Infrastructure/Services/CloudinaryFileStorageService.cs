@@ -2,6 +2,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using GymForge.Application.Modules.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 
 namespace GymForge.Infrastructure.Services
 {
@@ -39,15 +40,22 @@ namespace GymForge.Infrastructure.Services
             {
                 File = new FileDescription(fileName, fileStream),
                 Folder = $"gymcrest/{folder}",
-                PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(fileName)}"
+                PublicId = $"{Guid.NewGuid()}_{SafeName(fileName)}"
             };
 
             // Photos are shrunk to fit 1200px and stored as JPEG quality 75 by Cloudinary while uploading,
             // so untrusted images are never decoded on this server. GIFs keep their animation.
             if (CompressedExtensions.Contains(extension))
             {
-                uploadParams.Transformation = new Transformation().Width(MaxDimension).Height(MaxDimension).Crop("limit").Quality(JpegQuality);
-                uploadParams.Format = "jpg";
+                if (folder == "logos")
+                {
+                    uploadParams.Transformation = new Transformation().Width(MaxDimension).Height(MaxDimension).Crop("limit");
+                }
+                else
+                {
+                    uploadParams.Transformation = new Transformation().Width(MaxDimension).Height(MaxDimension).Crop("limit").Quality(JpegQuality);
+                    uploadParams.Format = "jpg";
+                }
             }
 
             ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
@@ -58,6 +66,12 @@ namespace GymForge.Infrastructure.Services
             }
 
             return uploadResult.SecureUrl.ToString();
+        }
+
+        private static string SafeName(string fileName)
+        {
+            string name = Regex.Replace(Path.GetFileNameWithoutExtension(fileName), "[^A-Za-z0-9_-]+", "-").Trim('-');
+            return string.IsNullOrEmpty(name) ? "file" : name[..Math.Min(name.Length, 60)];
         }
 
         public async Task DeleteFileAsync(string fileUrl)

@@ -14,10 +14,12 @@ namespace GymForge.Api.Controllers.Common
         private static readonly HashSet<string> AllowedFolders = ["general", "equipment", "logos", "products"];
 
         private readonly IFileStorageService _fileStorageService;
+        private readonly ILogger<FileUploadController> _logger;
 
-        public FileUploadController(IFileStorageService fileStorageService)
+        public FileUploadController(IFileStorageService fileStorageService, ILogger<FileUploadController> logger)
         {
             _fileStorageService = fileStorageService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -50,8 +52,9 @@ namespace GymForge.Api.Controllers.Common
 
                 return Ok(new { url = fileUrl });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Upload to folder {Folder} failed", folder);
                 return StatusCode(500, "Upload failed. Please try again.");
             }
         }
