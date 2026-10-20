@@ -713,3 +713,12 @@ $status-gradient: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
     align-items: flex-start;
   }
 }
+
+.switch-box {
+  margin-top: 20px;
+}
+
+// The maintenance switch turns red when on; this one is a normal on/off: green when on
+.food-switch input:checked + .slider {
+  background-color: #10b981 !important;
+}

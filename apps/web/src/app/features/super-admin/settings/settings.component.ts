@@ -49,6 +49,7 @@ export class SettingsComponent implements OnInit {
       supportPhone: ['', [Validators.maxLength(FIELD_LIMITS.PHONE), phoneValidator]],
       supportEmail: ['', [Validators.email, Validators.maxLength(FIELD_LIMITS.EMAIL)]],
       isMaintenanceMode: [false],
+      isFoodSearchEnabled: [true],
       maintenanceStartTime: [null],
       maintenanceEndTime: [null],
       termsUrl: ['', [Validators.maxLength(FIELD_LIMITS.URL), urlValidator]],

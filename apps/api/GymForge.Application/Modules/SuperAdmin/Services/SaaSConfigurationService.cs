@@ -33,6 +33,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
                 SupportPhone = config.SupportPhone,
                 SupportEmail = config.SupportEmail,
                 IsMaintenanceMode = config.IsMaintenanceMode,
+                IsFoodSearchEnabled = config.IsFoodSearchEnabled,
                 TermsUrl = config.TermsUrl,
                 PrivacyUrl = config.PrivacyUrl,
                 MaintenanceStartTime = config.MaintenanceStartTime,
@@ -57,6 +58,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
             config.SupportPhone = configDto.SupportPhone;
             config.SupportEmail = configDto.SupportEmail;
             config.IsMaintenanceMode = configDto.IsMaintenanceMode;
+            config.IsFoodSearchEnabled = configDto.IsFoodSearchEnabled;
             config.TermsUrl = configDto.TermsUrl;
             config.PrivacyUrl = configDto.PrivacyUrl;
             config.MaintenanceStartTime = configDto.MaintenanceStartTime;

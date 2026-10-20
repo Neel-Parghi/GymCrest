@@ -1,4 +1,5 @@
 using GymForge.Application.Modules.Diet.Interfaces;
+using GymForge.Application.Modules.SuperAdmin.Interfaces;
 using GymForge.Contracts.DietTracking;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,13 @@ namespace GymForge.Api.Controllers.User
 
         private readonly IDietTrackingService _dietTrackingService;
         private readonly INutritionApiService _nutritionApiService;
+        private readonly IPlatformStatusService _platformStatus;
 
-        public UserDietTrackingController(IDietTrackingService dietTrackingService, INutritionApiService nutritionApiService)
+        public UserDietTrackingController(IDietTrackingService dietTrackingService, INutritionApiService nutritionApiService, IPlatformStatusService platformStatus)
         {
             _dietTrackingService = dietTrackingService;
             _nutritionApiService = nutritionApiService;
+            _platformStatus = platformStatus;
         }
 
         private Guid GetMemberId()
@@ -71,6 +74,10 @@ namespace GymForge.Api.Controllers.User
 
             if (query.Length > MaxFoodSearchLength)
                 return BadRequest($"Please keep the description under {MaxFoodSearchLength} characters.");
+
+            // Switched off by the super admin (e.g. to stop AI lookup costs)
+            if (!(await _platformStatus.GetStatusAsync()).FoodSearchEnabled)
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new { code = "FOOD_SEARCH_OFF", message = "Food search is temporarily unavailable." });
 
             FoodNutritionDto? result = await _nutritionApiService.GetNutritionForFoodAsync(query);
             if (result == null)

@@ -194,6 +194,20 @@
             }
           </div>
 
+          <div class="maintenance-box-premium switch-box" [class.switch-off]="!settingsForm.get('isFoodSearchEnabled')?.value">
+            <div class="box-main">
+              <div class="box-info">
+                <h4><i class="fas fa-utensils"></i> AI Food Search</h4>
+                <p>Members can type a meal like "paneer paratha and curd" to get its nutrition. This uses the paid AI
+                  lookup. Turn it off to stop the cost: members see "temporarily unavailable" and can still enter food by hand.</p>
+              </div>
+              <label class="switch-premium food-switch">
+                <input type="checkbox" formControlName="isFoodSearchEnabled" aria-label="AI food search">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
           <div class="maintenance-box-premium demo-data-box">
             <div class="box-main">
               <div class="box-info">

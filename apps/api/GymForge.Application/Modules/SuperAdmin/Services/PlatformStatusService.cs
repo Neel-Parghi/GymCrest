@@ -35,6 +35,7 @@ namespace GymForge.Application.Modules.SuperAdmin.Services
                 SupportEmail = string.IsNullOrWhiteSpace(config?.SupportEmail) ? null : config.SupportEmail,
                 SupportPhone = string.IsNullOrWhiteSpace(config?.SupportPhone) ? null : config.SupportPhone,
                 GracePeriodDays = Math.Max(config?.GracePeriodDays ?? 0, 0),
+                FoodSearchEnabled = config?.IsFoodSearchEnabled ?? true,
                 MaintenanceActive = config != null && config.IsMaintenanceMode
                     && (config.MaintenanceStartTime == null || now >= config.MaintenanceStartTime)
                     && (config.MaintenanceEndTime == null || now < config.MaintenanceEndTime),

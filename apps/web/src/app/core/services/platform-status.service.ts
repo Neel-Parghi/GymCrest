@@ -9,6 +9,7 @@ const EMPTY_STATUS: PlatformStatus = {
   supportEmail: null,
   supportPhone: null,
   gracePeriodDays: 0,
+  foodSearchEnabled: true,
   maintenanceActive: false,
   maintenanceStartTime: null,
   maintenanceEndTime: null

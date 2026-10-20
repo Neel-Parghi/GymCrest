@@ -1937,6 +1937,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                     b.Property<string>("GstNo")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsFoodSearchEnabled")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsMaintenanceMode")
                         .HasColumnType("boolean");
 
@@ -1998,6 +2001,7 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                             CreatedOn = new DateTime(2026, 4, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Currency = "INR",
                             GracePeriodDays = 7,
+                            IsFoodSearchEnabled = true,
                             IsMaintenanceMode = false,
                             PlatformName = "GymCrest",
                             SubscriptionTarget = 100,
