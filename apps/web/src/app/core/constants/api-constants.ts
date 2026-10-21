@@ -1,7 +1,7 @@
 import { environment } from '../../../environments/environment';
 
 export const API_CONSTANTS = {
-  BASE_URL: environment.apiUrl,
+  BASE_URL: 'https://gymforge-lx4w.onrender.com/api/',
 
   PLATFORM: {
     STATUS: 'public/platform-status',
