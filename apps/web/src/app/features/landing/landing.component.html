@@ -134,9 +134,12 @@
         </div>
       </div>
     </div>
-    <div class="swipe-dots" [appSwipeDots]="rolesRow" #rolesRowDots="swipeDots">
-      @for (i of rolesRowDots.indexes(); track i) { <span [class.active]="i === rolesRowDots.active()"></span> }
-    </div>
+    <div class="swipe-dots" [appSwipeDots]="rolesRow" #rolesRowDots="swipeDots">
+
+      @for (i of rolesRowDots.indexes(); track i) { <span [class.active]="i === rolesRowDots.active()"></span> }
+
+    </div>
+
   </div>
 
   <div class="feature-grid" #featureRow>
@@ -156,11 +159,11 @@
       <h3>Renewal reminders</h3>
       <p>Your own "expiring soon" and "expired" messages go out automatically, in the app and by email.</p>
     </div>
-    <div class="feature-card">
+    <!-- <div class="feature-card">
       <div class="icon-wrapper navy"><i class="fas fa-calendar-check"></i></div>
       <h3>Desk check-in</h3>
       <p>Verify members at the front desk by card or search, with expired memberships flagged instantly.</p>
-    </div>
+    </div> -->
     <div class="feature-card">
       <div class="icon-wrapper blue"><i class="fas fa-users-gear"></i></div>
       <h3>Staff, trainers &amp; branches</h3>
@@ -172,9 +175,12 @@
       <p>Track equipment and maintenance, manage stock, and sell supplements or merchandise with emailed receipts.</p>
     </div>
   </div>
-  <div class="swipe-dots" [appSwipeDots]="featureRow" #featureRowDots="swipeDots">
-    @for (i of featureRowDots.indexes(); track i) { <span [class.active]="i === featureRowDots.active()"></span> }
-  </div>
+  <div class="swipe-dots" [appSwipeDots]="featureRow" #featureRowDots="swipeDots">
+
+    @for (i of featureRowDots.indexes(); track i) { <span [class.active]="i === featureRowDots.active()"></span> }
+
+  </div>
+
 </section>
 
 <section id="members" class="features members">
@@ -214,9 +220,12 @@
         </div>
       </div>
     </div>
-    <div class="swipe-dots" [appSwipeDots]="memberRow" #memberRowDots="swipeDots">
-      @for (i of memberRowDots.indexes(); track i) { <span [class.active]="i === memberRowDots.active()"></span> }
-    </div>
+    <div class="swipe-dots" [appSwipeDots]="memberRow" #memberRowDots="swipeDots">
+
+      @for (i of memberRowDots.indexes(); track i) { <span [class.active]="i === memberRowDots.active()"></span> }
+
+    </div>
+
   </div>
 </section>
 
@@ -250,9 +259,12 @@
       <a routerLink="/login" [queryParams]="{ demo: 'member' }" class="btn btn-outline btn-full">Open member demo</a>
     </div>
   </div>
-  <div class="swipe-dots" [appSwipeDots]="demoRow" #demoRowDots="swipeDots">
-    @for (i of demoRowDots.indexes(); track i) { <span [class.active]="i === demoRowDots.active()"></span> }
-  </div>
+  <div class="swipe-dots" [appSwipeDots]="demoRow" #demoRowDots="swipeDots">
+
+    @for (i of demoRowDots.indexes(); track i) { <span [class.active]="i === demoRowDots.active()"></span> }
+
+  </div>
+
 
   <div class="demo-steps">
     <h3 class="demo-steps-title">Then, up and running in an afternoon</h3>
@@ -275,9 +287,12 @@
         <p>Billing, check-ins and renewal reminders work from day one, so you can focus on your members.</p>
       </div>
     </div>
-    <div class="swipe-dots" [appSwipeDots]="stepsRow" #stepsRowDots="swipeDots">
-      @for (i of stepsRowDots.indexes(); track i) { <span [class.active]="i === stepsRowDots.active()"></span> }
-    </div>
+    <div class="swipe-dots" [appSwipeDots]="stepsRow" #stepsRowDots="swipeDots">
+
+      @for (i of stepsRowDots.indexes(); track i) { <span [class.active]="i === stepsRowDots.active()"></span> }
+
+    </div>
+
   </div>
 </section>
 
@@ -354,9 +369,12 @@
           <p class="plans-status">Gym plans are being updated. <a routerLink="/register" [queryParams]="{ as: 'owner' }">Register your gym</a> to get started.</p>
         }
       </div>
-      <div class="swipe-dots" [appSwipeDots]="pricingRow" #pricingRowDots="swipeDots">
-        @for (i of pricingRowDots.indexes(); track i) { <span [class.active]="i === pricingRowDots.active()"></span> }
-      </div>
+      <div class="swipe-dots" [appSwipeDots]="pricingRow" #pricingRowDots="swipeDots">
+
+        @for (i of pricingRowDots.indexes(); track i) { <span [class.active]="i === pricingRowDots.active()"></span> }
+
+      </div>
+
     }
   }
 </section>

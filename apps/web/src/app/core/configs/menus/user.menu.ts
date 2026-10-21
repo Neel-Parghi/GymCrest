@@ -13,12 +13,12 @@ export const UserMenu: NavItem[] = [
         route: '/user/dashboard',
         roles: ['User']
     },
-    {
-        label: 'Winter Arc (beta)',
-        icon: 'fa-solid fa-snowflake',
-        route: '/user/winter-arc',
-        roles: ['User']
-    },
+    // {
+    //     label: 'Winter Arc (beta)',
+    //     icon: 'fa-solid fa-snowflake',
+    //     route: '/user/winter-arc',
+    //     roles: ['User']
+    // },
     {
         label: 'Fitness',
         isHeading: true,
