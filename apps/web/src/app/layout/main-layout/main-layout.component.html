@@ -25,6 +25,10 @@
             <span class="brand-subtext" [title]="portalLabel">{{ portalLabel }}</span>
           </div>
           }
+          } @else if (gymBrand?.logoUrl && !gymLogoFailed) {
+          <img class="brand-icon" [src]="gymBrand!.logoUrl" [alt]="gymBrand!.name + ' logo'" (error)="gymLogoFailed = true">
+          } @else {
+          <img class="brand-icon" src="favicon.svg" alt="GymCrest">
           }
         </div>
         <button class="toggle-icon-btn" (click)="toggleSidebar()">
