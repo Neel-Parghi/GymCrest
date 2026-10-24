@@ -73,34 +73,6 @@
       </div>
     </div>
 
-    <!-- Confirm & pay -->
-    <div class="checkout-backdrop" *ngIf="selectedPlan as plan" (click)="cancelChoice()">
-      <div class="checkout-card" role="dialog" aria-modal="true" aria-labelledby="checkout-title" (click)="$event.stopPropagation()">
-        <h3 id="checkout-title">Confirm your plan</h3>
-        <dl class="checkout-summary">
-          <div><dt>Plan</dt><dd>{{ plan.name }}</dd></div>
-          <div><dt>Duration</dt><dd>{{ plan.durationInDays > 0 ? plan.durationInDays : 30 }} days</dd></div>
-          <div><dt>Active until</dt><dd>{{ activeUntil(plan) | date: 'd MMM y' }}</dd></div>
-          <div class="total"><dt>Total</dt><dd>₹{{ plan.price | number:'1.0-2' }}</dd></div>
-        </dl>
-        <p class="checkout-note">
-          <i class="fa-solid fa-lock"></i>
-          Secure payment via Razorpay. Your plan activates as soon as the payment is confirmed.
-        </p>
-        <app-test-payment-notice />
-        <p class="checkout-message" *ngIf="checkoutMessage" [class.error]="checkoutMessage.tone === 'error'" role="status">
-          {{ checkoutMessage.text }}
-        </p>
-        <div class="checkout-actions">
-          <button type="button" class="ghost-btn" (click)="cancelChoice()" [disabled]="isPaying">Back</button>
-          <button type="button" class="pay-btn" (click)="pay()" [disabled]="isPaying">
-            <span *ngIf="!isPaying">Pay ₹{{ plan.price | number:'1.0-2' }}</span>
-            <span *ngIf="isPaying" class="btn-spinner-box"><span class="btn-spinner"></span> Opening payment…</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Empty State -->
     <div class="empty-state" *ngIf="isOwner && !loading && plans.length === 0">
       <i class="fa-solid fa-circle-exclamation warning-icon"></i>
@@ -112,6 +84,32 @@
       <button class="logout-btn" (click)="logout()">
         <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout of Account
       </button>
+    </div>
+  </div>
+  <div class="checkout-backdrop" *ngIf="selectedPlan as plan" (click)="cancelChoice()">
+    <div class="checkout-card" role="dialog" aria-modal="true" aria-labelledby="checkout-title" (click)="$event.stopPropagation()">
+      <h3 id="checkout-title">Confirm your plan</h3>
+      <dl class="checkout-summary">
+        <div><dt>Plan</dt><dd>{{ plan.name }}</dd></div>
+        <div><dt>Duration</dt><dd>{{ plan.durationInDays > 0 ? plan.durationInDays : 30 }} days</dd></div>
+        <div><dt>Active until</dt><dd>{{ activeUntil(plan) | date: 'd MMM y' }}</dd></div>
+        <div class="total"><dt>Total</dt><dd>₹{{ plan.price | number:'1.0-2' }}</dd></div>
+      </dl>
+      <p class="checkout-note">
+        <i class="fa-solid fa-lock"></i>
+        Secure payment via Razorpay. Your plan activates as soon as the payment is confirmed.
+      </p>
+      <app-test-payment-notice />
+      <p class="checkout-message" *ngIf="checkoutMessage" [class.error]="checkoutMessage.tone === 'error'" role="status">
+        {{ checkoutMessage.text }}
+      </p>
+      <div class="checkout-actions">
+        <button type="button" class="ghost-btn" (click)="cancelChoice()" [disabled]="isPaying">Back</button>
+        <button type="button" class="pay-btn" (click)="pay()" [disabled]="isPaying">
+          <span *ngIf="!isPaying">Pay ₹{{ plan.price | number:'1.0-2' }}</span>
+          <span *ngIf="isPaying" class="btn-spinner-box"><span class="btn-spinner"></span> Opening payment…</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
