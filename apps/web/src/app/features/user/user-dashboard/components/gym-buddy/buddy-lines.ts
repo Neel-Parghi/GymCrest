@@ -1,4 +1,5 @@
 import { BuddyFacts } from '../../../../../core/models/user-dashboard.model';
+import { dayPart } from '../../../../../shared/utils/greeting';
 
 /** One thing the buddy says, with the Font Awesome icon shown beside it. */
 export interface BuddyLine {
@@ -7,8 +8,9 @@ export interface BuddyLine {
 }
 
 function hello(name: string, hour: number): string {
-  if (hour < 12) return `Morning, ${name}!`;
-  if (hour >= 18) return `Evening, ${name}!`;
+  const part = dayPart(hour);
+  if (part === 'morning') return `Morning, ${name}!`;
+  if (part === 'evening') return `Evening, ${name}!`;
   return `Hey ${name}!`;
 }
 

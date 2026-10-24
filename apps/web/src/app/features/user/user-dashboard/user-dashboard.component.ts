@@ -24,6 +24,7 @@ import {
   ActivityRing, BuddyEvent, BuddyFacts, DailyRoutineItem, GoalRing, MacroProgress, NutritionToday, RoutineForm, TodayWorkout,
   UserDashboardSummary, WeekDay, WeekDayState
 } from '../../../core/models/user-dashboard.model';
+import { greetingFor } from '../../../shared/utils/greeting';
 
 const WEEK_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const RING_RADII = { calories: 58, active: 44, goal: 30 };
@@ -56,7 +57,7 @@ export class UserDashboardComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   readonly today = new Date();
-  readonly greeting = this.greetingFor(this.today.getHours());
+  readonly greeting = greetingFor(this.today.getHours());
   readonly isFirstTime = signal(false);
 
   private readonly profile = toSignal(this.authService.userProfile$, { initialValue: null });
@@ -394,12 +395,6 @@ export class UserDashboardComponent implements OnInit {
     const radius = RING_RADII[key];
     const circumference = 2 * Math.PI * radius;
     return { key, radius, dash: `${(circumference * pct / 100).toFixed(1)} ${circumference.toFixed(1)}` };
-  }
-
-  private greetingFor(hour: number): string {
-    if (hour < 12) return 'Good morning';
-    if (hour < 19) return 'Good afternoon';
-    return 'Good evening';
   }
 
   startTodaysWorkout(): void {
