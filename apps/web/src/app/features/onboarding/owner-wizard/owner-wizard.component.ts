@@ -16,7 +16,6 @@ import { ValidationMessage } from "../../../shared/components/validation-message
 import { DateTimePickerComponent } from '../../../shared/components/date-time-picker/date-time-picker.component';
 import { TimePickerComponent } from '../../../shared/components/time-picker/time-picker.component';
 import { CONSTANTS } from '../../../core/constants/constants';
-import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
 import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
 import { take } from 'rxjs';
 
@@ -25,7 +24,7 @@ declare var Razorpay: any;
 @Component({
   selector: 'app-owner-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ValidationMessage, DateTimePickerComponent, TimePickerComponent, BrandLogoComponent],
+  imports: [CommonModule, ReactiveFormsModule, ValidationMessage, DateTimePickerComponent, TimePickerComponent],
   templateUrl: './owner-wizard.component.html',
   styleUrls: ['./owner-wizard.component.scss']
 })
