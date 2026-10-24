@@ -49,6 +49,8 @@ export class SubscriptionExpiredComponent implements OnInit {
   /** Plan picked for the confirm step; payment only starts from there. */
   selectedPlan: PricingPlan | null = null;
   isPaying = false;
+  /** Popup closed without a success callback: asking the server whether the payment went through anyway. */
+  confirming = false;
   checkoutMessage: { tone: 'error' | 'info'; text: string } | null = null;
 
   ngOnInit(): void {
@@ -64,6 +66,11 @@ export class SubscriptionExpiredComponent implements OnInit {
     this.gymService.getMyGym(true).subscribe({
       next: (gymRes) => {
         this.gym = gymRes?.data || null;
+        // Already active (e.g. the webhook activated it, then the page was refreshed): nothing to pay
+        if (this.gym?.hasActiveSubscription) {
+          this.router.navigate(['/gym-owner/dashboard']);
+          return;
+        }
         this.pricingService.getAllPlans(true).subscribe({
           next: (plansRes) => {
             this.plans = plansRes?.data?.filter(p => p.isActive && !p.isTrial) || [];
@@ -110,17 +117,32 @@ export class SubscriptionExpiredComponent implements OnInit {
       description: `${plan.name} plan ${this.awaitingFirstPayment ? 'activation' : 'renewal'}`,
       prefill: { name: this.gym.ownerName, email: this.gym.email }
     }).subscribe(outcome => {
-      this.isPaying = false;
       if (outcome.status === 'paid') {
-        this.notification.success(CONSTANTS.SUBSCRIPTION_EXPIRED.ACCESS_RESTORED.replace('{name}', plan.name));
-        this.gymService.clearMyGymCache();
-        this.router.navigate(['/gym-owner/dashboard']);
-      } else if (outcome.status === 'dismissed') {
-        this.checkoutMessage = { tone: 'info', text: `Payment was cancelled. Your plan has not been ${this.awaitingFirstPayment ? 'activated' : 'renewed'}.` };
-      } else {
-        this.checkoutMessage = { tone: 'error', text: outcome.message ?? 'Payment failed. Please try again.' };
+        this.activated(plan);
+        return;
       }
+      // Some payment methods (UPI/QR) can complete without the popup reporting it; the webhook then
+      // activates the plan. Check with the server before telling the owner it didn't work.
+      this.confirming = true;
+      this.gymService.confirmSubscriptionActive().subscribe(active => {
+        this.confirming = false;
+        this.isPaying = false;
+        if (active) {
+          this.activated(plan);
+        } else if (outcome.status === 'dismissed') {
+          this.checkoutMessage = { tone: 'info', text: `Payment was cancelled. Your plan has not been ${this.awaitingFirstPayment ? 'activated' : 'renewed'}.` };
+        } else {
+          this.checkoutMessage = { tone: 'error', text: outcome.message ?? 'Payment failed. Please try again.' };
+        }
+      });
     });
+  }
+
+  private activated(plan: PricingPlan): void {
+    this.isPaying = false;
+    this.notification.success(CONSTANTS.SUBSCRIPTION_EXPIRED.ACCESS_RESTORED.replace('{name}', plan.name));
+    this.gymService.clearMyGymCache();
+    this.router.navigate(['/gym-owner/dashboard']);
   }
 
   logout() {

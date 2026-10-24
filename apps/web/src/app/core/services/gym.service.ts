@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { BaseApiService } from "./base-api.service";
 import { API_CONSTANTS } from "../constants/api-constants";
-import { Observable, Subject, shareReplay, tap, catchError, of } from "rxjs";
+import { Observable, Subject, shareReplay, tap, catchError, of, timer, concatMap, map, takeWhile, last } from "rxjs";
 import { ApiResponse } from "../../shared/models/api-response.model";
 import { OnboardGymRequest, GymOwnerResponse, GymListResponse, UpdateGymOwnerRequest, UpdateMyGymRequest, BranchDto } from "../../shared/models/gym.model";
 import { PagedResponse } from "../../shared/models/paged-response.model";
@@ -51,6 +51,19 @@ export class GymService extends BaseApiService {
 
     clearMyGymCache(): void {
         this.myGymCache$ = null;
+    }
+
+    /**
+     * Whether the gym's plan is active, asking the server a few times. Razorpay's webhook can activate a plan
+     * a moment after the checkout popup closes without reporting success, so one check is not enough.
+     */
+    confirmSubscriptionActive(attempts = 4, intervalMs = 2000): Observable<boolean> {
+        return timer(0, intervalMs).pipe(
+            concatMap(() => this.getMyGym(true)),
+            map(res => !!res?.data?.hasActiveSubscription),
+            takeWhile((active, i) => !active && i < attempts - 1, true),
+            last()
+        );
     }
 
     clearMyBranchesCache(): void {
