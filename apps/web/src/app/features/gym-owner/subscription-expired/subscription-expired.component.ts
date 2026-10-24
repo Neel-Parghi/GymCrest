@@ -9,7 +9,7 @@ import { NotificationService } from '../../../core/services/notification.service
 import { CONSTANTS } from '../../../core/constants/constants';
 import { TestPaymentNoticeComponent } from '../../../shared/components/test-payment-notice/test-payment-notice.component';
 import { SupportContactComponent } from '../../../shared/components/support-contact/support-contact.component';
-import { PricingPlan } from '../../../shared/models/pricing.model';
+import { PricingPlan, planLimitsLabel, planPeriodLabel } from '../../../shared/models/pricing.model';
 import { GymListResponse } from '../../../shared/models/gym.model';
 
 @Component({
@@ -33,6 +33,18 @@ export class SubscriptionExpiredComponent implements OnInit {
   plans: PricingPlan[] = [];
   gym: GymListResponse | null = null;
   loading = true;
+
+  readonly periodLabel = planPeriodLabel;
+  readonly limitsLabel = planLimitsLabel;
+
+  get awaitingFirstPayment(): boolean {
+    return !!this.gym?.awaitingFirstPayment;
+  }
+
+  isBestValue(plan: PricingPlan): boolean {
+    if (this.plans.length < 2) return false;
+    return plan.durationInDays === Math.max(...this.plans.map(p => p.durationInDays));
+  }
 
   /** Plan picked for the confirm step; payment only starts from there. */
   selectedPlan: PricingPlan | null = null;
@@ -95,7 +107,7 @@ export class SubscriptionExpiredComponent implements OnInit {
     this.planCheckout.checkout({
       gymId: this.gym.id,
       planId: plan.id,
-      description: `${plan.name} plan renewal`,
+      description: `${plan.name} plan ${this.awaitingFirstPayment ? 'activation' : 'renewal'}`,
       prefill: { name: this.gym.ownerName, email: this.gym.email }
     }).subscribe(outcome => {
       this.isPaying = false;
@@ -104,7 +116,7 @@ export class SubscriptionExpiredComponent implements OnInit {
         this.gymService.clearMyGymCache();
         this.router.navigate(['/gym-owner/dashboard']);
       } else if (outcome.status === 'dismissed') {
-        this.checkoutMessage = { tone: 'info', text: 'Payment was cancelled. Your plan has not been renewed.' };
+        this.checkoutMessage = { tone: 'info', text: `Payment was cancelled. Your plan has not been ${this.awaitingFirstPayment ? 'activated' : 'renewed'}.` };
       } else {
         this.checkoutMessage = { tone: 'error', text: outcome.message ?? 'Payment failed. Please try again.' };
       }

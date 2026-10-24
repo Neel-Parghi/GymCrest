@@ -37,6 +37,8 @@ namespace GymCrest.Contracts.Gym.Management
         public bool IsTrialPlan { get; set; }
         public string? PaymentStatus { get; set; }
         public bool HasActiveSubscription => !string.IsNullOrEmpty(PlanName);
+        
+        public bool AwaitingFirstPayment { get; set; }
 
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }

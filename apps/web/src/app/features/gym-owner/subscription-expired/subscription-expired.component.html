@@ -7,11 +7,16 @@
   <div class="paywall-container">
     <!-- Header Block -->
     <div class="paywall-header">
-      <div class="icon-frame">
-        <i class="fa-solid fa-lock shadow-icon"></i>
+      <div class="icon-frame" [class.setup]="awaitingFirstPayment">
+        <i class="fa-solid shadow-icon" [class.fa-lock]="!awaitingFirstPayment" [class.fa-rocket]="awaitingFirstPayment"></i>
       </div>
-      <h2>Access Suspended</h2>
+      <h2>{{ awaitingFirstPayment ? 'Finish setting up your gym' : 'Access Suspended' }}</h2>
       <ng-container *ngIf="isOwner; else staffNotice">
+        <ng-container *ngIf="awaitingFirstPayment; else lapsed">
+          <p class="subtitle"><strong>{{ gym?.gymName }}</strong> is set up. Choose a plan to activate it.</p>
+          <p class="instruction">Your dashboard opens as soon as the payment goes through.</p>
+        </ng-container>
+        <ng-template #lapsed>
         <p class="subtitle" *ngIf="gym?.isTrialPlan">
           Your free trial for <strong>{{ gym?.gymName }}</strong> has ended.
         </p>
@@ -20,6 +25,7 @@
         </p>
         <p class="instruction">Choose one of our premium tiers below to activate your account and restore immediate
           access.</p>
+        </ng-template>
       </ng-container>
       <ng-template #staffNotice>
         <p class="subtitle">Your gym's GymCrest subscription has expired or is inactive.</p>
@@ -38,34 +44,26 @@
 
     <!-- Plans Matrix Grid -->
     <div class="plans-grid" *ngIf="isOwner && !loading && plans.length > 0">
-      <div class="plan-card" *ngFor="let plan of plans" [class.popular]="plan.price > 40">
-        <div class="popular-badge" *ngIf="plan.price > 40">Popular Choice</div>
+      <div class="plan-card" *ngFor="let plan of plans" [class.popular]="isBestValue(plan)">
+        <div class="popular-badge" *ngIf="isBestValue(plan)">Best value</div>
 
         <div class="plan-header">
           <h3 class="plan-name">{{ plan.name }}</h3>
           <div class="price-box">
             <span class="currency">₹</span>
             <span class="amount">{{ plan.price | number:'1.0-2' }}</span>
-            <span class="period">/mo</span>
+            <span class="period">{{ periodLabel(plan) }}</span>
           </div>
         </div>
 
         <div class="plan-features">
-          <div class="feature-item">
+          <div class="feature-item" *ngIf="limitsLabel(plan)">
             <i class="fa-solid fa-circle-check"></i>
-            <span>Up to {{ plan.maxBranches ?? 0 }} Branch {{ (plan.maxBranches ?? 0) > 1 ? 'Locations' : 'Location' }}</span>
+            <span>{{ limitsLabel(plan) }}</span>
           </div>
-          <div class="feature-item">
+          <div class="feature-item" *ngFor="let feature of plan.features ?? []">
             <i class="fa-solid fa-circle-check"></i>
-            <span>Up to {{ plan.maxMembers ?? 0 }} Active Members</span>
-          </div>
-          <div class="feature-item">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>SaaS Core Dashboard & Analytics</span>
-          </div>
-          <div class="feature-item">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>24/7 Premium Support Access</span>
+            <span>{{ feature }}</span>
           </div>
         </div>
 

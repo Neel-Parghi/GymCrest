@@ -243,7 +243,9 @@ namespace GymCrest.Infrastructure.Repositories
                         .FirstOrDefault(),
                     PaymentStatus = _dbContext.SaaSPaymentTransactions
                         .Any(t => t.GymId == g.Id && t.Status == "Paid") ? "Paid" :
-                        (_dbContext.SubscriptionRecords.Any(s => s.GymId == g.Id) ? "Pending" : "Unpaid")
+                        (_dbContext.SubscriptionRecords.Any(s => s.GymId == g.Id) ? "Pending" : "Unpaid"),
+                    AwaitingFirstPayment = !_dbContext.SaaSPaymentTransactions.Any(t => t.GymId == g.Id && t.Status == "Paid")
+                        && !_dbContext.SubscriptionRecords.Any(s => s.GymId == g.Id && (s.IsActive || s.IsTrial))
                 })
                 .FirstOrDefaultAsync();
         }
