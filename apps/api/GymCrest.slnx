@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="GymCrest.Api/GymCrest.Api.csproj" />
+  <Project Path="GymCrest.Application/GymCrest.Application.csproj" />
+  <Project Path="GymCrest.Contracts/GymCrest.Contracts.csproj" Id="624b0713-d6e9-4a47-af0b-e17cbbb4db32" />
+  <Project Path="GymCrest.Domain/GymCrest.Domain.csproj" />
+  <Project Path="GymCrest.Infrastructure/GymCrest.Infrastructure.csproj" />
+  <Project Path="GymCrest.Shared/GymCrest.Shared.csproj" />
+</Solution>

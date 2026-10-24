@@ -1,8 +1,0 @@
-<Solution>
-  <Project Path="GymForge.Api/GymForge.Api.csproj" />
-  <Project Path="GymForge.Application/GymForge.Application.csproj" />
-  <Project Path="GymForge.Contracts/GymForge.Contracts.csproj" Id="624b0713-d6e9-4a47-af0b-e17cbbb4db32" />
-  <Project Path="GymForge.Domain/GymForge.Domain.csproj" />
-  <Project Path="GymForge.Infrastructure/GymForge.Infrastructure.csproj" />
-  <Project Path="GymForge.Shared/GymForge.Shared.csproj" />
-</Solution>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Compile Remove="ValueObjects\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="ValueObjects\**" />
+    <None Remove="Models\**" />
+    <None Remove="ValueObjects\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GymCrest.Contracts\GymCrest.Contracts.csproj" />
+    <ProjectReference Include="..\GymCrest.Shared\GymCrest.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
