@@ -48,7 +48,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Build
-        run: dotnet build GymForge.Api/GymForge.Api.csproj -c Release
+        run: dotnet build GymCrest.Api/GymCrest.Api.csproj -c Release
 
       - name: Install EF Core tools
         run: dotnet tool install --global dotnet-ef --version 10.0.*
@@ -58,4 +58,4 @@ jobs:
       - name: Check for missing EF migrations
         env:
           ConnectionStrings__DefaultConnection: Host=localhost;Database=ci;Username=ci;Password=ci
-        run: dotnet ef migrations has-pending-model-changes --project GymForge.Infrastructure --startup-project GymForge.Api --no-build --configuration Release
+        run: dotnet ef migrations has-pending-model-changes --project GymCrest.Infrastructure --startup-project GymCrest.Api --no-build --configuration Release

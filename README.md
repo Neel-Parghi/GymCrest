@@ -71,16 +71,16 @@ Log in with either of these accounts to explore the product without signing up:
 ## 📁 Repository Structure
 
 ```
-GymForge/
+GymCrest/
 ├── apps/
 │   ├── web/       # Angular frontend (public website + member, trainer, gym-owner, super-admin portals)
 │   └── api/        # .NET Web API
-│       ├── GymForge.Api/              # Controllers, Program.cs, startup config
-│       ├── GymForge.Application/      # Business logic, services, DI wiring
-│       ├── GymForge.Domain/           # Entities, enums, repository interfaces
-│       ├── GymForge.Infrastructure/   # EF Core, external API clients, repositories
-│       ├── GymForge.Contracts/        # Request/response DTOs shared across layers
-│       └── GymForge.Shared/           # Cross-cutting enums/constants
+│       ├── GymCrest.Api/              # Controllers, Program.cs, startup config
+│       ├── GymCrest.Application/      # Business logic, services, DI wiring
+│       ├── GymCrest.Domain/           # Entities, enums, repository interfaces
+│       ├── GymCrest.Infrastructure/   # EF Core, external API clients, repositories
+│       ├── GymCrest.Contracts/        # Request/response DTOs shared across layers
+│       └── GymCrest.Shared/           # Cross-cutting enums/constants
 └── docs/
     └── business-logic/    # In-depth write-ups of core domains (roles, billing, workout/diet planning, onboarding)
 ```
@@ -99,13 +99,13 @@ If you want to understand *why* something works the way it does (not just what t
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/Neel-Parghi/GymForge.git
-cd GymForge
+git clone https://github.com/Neel-Parghi/GymCrest.git
+cd GymCrest
 ```
 > **Windows:** some file paths are long (up to ~160 characters). If the clone fails with *Filename too long*, run `git config --global core.longpaths true` (or clone into a short folder such as `C:\code`) and clone again.
 
 ### 2. Backend setup (`apps/api`)
-Create `apps/api/GymForge.Api/appsettings.Development.json` (gitignored, safe for real secrets):
+Create `apps/api/GymCrest.Api/appsettings.Development.json` (gitignored, safe for real secrets):
 ```json
 {
   "ConnectionStrings": {
@@ -126,9 +126,9 @@ Create `apps/api/GymForge.Api/appsettings.Development.json` (gitignored, safe fo
 
 Trust the local HTTPS certificate (once per machine), apply migrations and run the **https** profile:
 ```bash
-cd apps/api/GymForge.Api
+cd apps/api/GymCrest.Api
 dotnet dev-certs https --trust
-dotnet ef database update --project ../GymForge.Infrastructure --startup-project .
+dotnet ef database update --project ../GymCrest.Infrastructure --startup-project .
 dotnet run --launch-profile https
 ```
 The API runs at `https://localhost:7184` (also `http://localhost:5250`); the web app's dev config calls the HTTPS address. The API also applies any pending migrations itself on startup.
@@ -158,7 +158,7 @@ App runs at `http://localhost:4200` (the public website at `/`, the app at `/log
 ## 🤝 Contributing
 
 1. Branch from `main` (e.g. `feature/<short-name>`), commit, push and open a pull request into `main`.
-2. **CI must pass** (`.github/workflows/ci.yml`): it builds the Angular app, builds the API, and fails if an EF entity changed without a migration (`dotnet ef migrations add <Name> --project GymForge.Infrastructure --startup-project GymForge.Api` from `apps/api`).
+2. **CI must pass** (`.github/workflows/ci.yml`): it builds the Angular app, builds the API, and fails if an EF entity changed without a migration (`dotnet ef migrations add <Name> --project GymCrest.Infrastructure --startup-project GymCrest.Api` from `apps/api`).
 3. Never commit secrets: `.env`, `appsettings.Development.json` and `*.sql` dumps are gitignored for a reason.
 
 If you're exploring the code and have questions, the `docs/business-logic/` folder is the best starting point before diving into the source.

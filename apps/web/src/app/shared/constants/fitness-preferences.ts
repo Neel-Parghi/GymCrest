@@ -1,4 +1,4 @@
-/** Canonical member preference ids; they mirror GymForge.Shared.Constants.FitnessPreferences on the API. */
+/** Canonical member preference ids; they mirror GymCrest.Shared.Constants.FitnessPreferences on the API. */
 
 export type FitnessGoalId = 'weight_loss' | 'muscle_gain' | 'endurance' | 'flexibility' | 'general_fitness';
 export type DietType = 'veg' | 'eggetarian' | 'non_veg' | 'vegan';

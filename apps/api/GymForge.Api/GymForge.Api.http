@@ -1,6 +1,0 @@
-@GymForge.Api_HostAddress = http://localhost:5250
-
-GET {{GymForge.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
