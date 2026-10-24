@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FIELD_LIMITS } from '../../../../shared/constants/validation.constants';
 import { SlideDrawerComponent } from "../../../../shared/components/slide-drawer/slide-drawer.component";
 import { ValidationMessage } from '../../../../shared/components/validation-message/validation-message.component';
-import { PricingPlan, PricingPlanCreateRequest } from '../../../../shared/models/pricing.model';
+import { PricingPlan, featuresToText, textToFeatures } from '../../../../shared/models/pricing.model';
 
 @Component({
   selector: 'app-plan-details-drawer',
@@ -35,6 +35,7 @@ export class PlanDetailsDrawerComponent implements OnChanges {
       durationInDays: [null, [Validators.required, Validators.min(1)]],
       maxBranches: [null],
       maxMembers: [null],
+      featuresText: [''],
       isTrial: [false],
       isActive: [true]
     });
@@ -50,6 +51,7 @@ export class PlanDetailsDrawerComponent implements OnChanges {
         durationInDays: this.planContext.durationInDays,
         maxBranches: this.planContext.maxBranches || null,
         maxMembers: this.planContext.maxMembers || null,
+        featuresText: featuresToText(this.planContext.features),
         isTrial: this.planContext.isTrial,
         isActive: this.planContext.isActive
       });
@@ -81,6 +83,7 @@ export class PlanDetailsDrawerComponent implements OnChanges {
         durationInDays: this.planContext.durationInDays,
         maxBranches: this.planContext.maxBranches || null,
         maxMembers: this.planContext.maxMembers || null,
+        featuresText: featuresToText(this.planContext.features),
         isTrial: this.planContext.isTrial,
         isActive: this.planContext.isActive
       });
@@ -90,9 +93,11 @@ export class PlanDetailsDrawerComponent implements OnChanges {
 
   save() {
     if (this.editForm.valid && this.isEditing && this.planContext) {
+      const { featuresText, ...rest } = this.editForm.value;
       const updatedPlan: PricingPlan = {
         ...this.planContext,
-        ...this.editForm.value
+        ...rest,
+        features: textToFeatures(featuresText)
       };
       this.savePlan.emit(updatedPlan);
       this.isEditing = false;

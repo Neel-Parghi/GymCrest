@@ -1831,6 +1831,9 @@ namespace GymForge.Infrastructure.Persistence.Migrations
                     b.Property<int>("DurationInDays")
                         .HasColumnType("integer");
 
+                    b.PrimitiveCollection<string[]>("Features")
+                        .HasColumnType("text[]");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
