@@ -922,6 +922,63 @@ section, header.hero {
         margin-right: 0.35rem;
         color: var(--accent-primary);
     }
+
+    .install-item {
+        position: relative;
+    }
+
+    .install-link {
+        padding: 0;
+        border: none;
+        background: none;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        text-decoration: underline dotted;
+        text-underline-offset: 4px;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--accent-primary);
+        }
+    }
+
+    .install-hint {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 5;
+        width: max-content;
+        max-width: min(280px, 80vw);
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.35);
+        color: var(--slate-700);
+        font-size: 0.82rem;
+        line-height: 1.45;
+
+        i {
+            margin: 0 0.1rem;
+        }
+    }
+
+    // Phones: the item sits mid-row, so centre the hint under the whole list instead
+    @media (max-width: 700px) {
+        position: relative;
+
+        .install-item {
+            position: static;
+        }
+
+        .install-hint {
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: min(300px, calc(100vw - 32px));
+            text-align: center;
+        }
+    }
 }
 
 .cta-center {
@@ -1317,6 +1374,11 @@ section, header.hero {
 .hero-content {
     position: relative;
     z-index: 1;
+}
+
+// The open install hint has to sit above the hero preview's floating cards (same z-index, later in the DOM)
+.hero-content:has(.install-hint) {
+    z-index: 2;
 }
 
 .hero-pill {

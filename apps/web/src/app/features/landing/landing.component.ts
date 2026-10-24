@@ -10,6 +10,7 @@ import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
 import { PlatformStatusService } from '../../core/services/platform-status.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SwipeDotsDirective } from './swipe-dots.directive';
+import { PwaInstallService } from '../../core/services/pwa-install.service';
 
 interface HeroMessage {
   lead: string;
@@ -43,7 +44,10 @@ const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'menuOpen.set(false); closeTour()' }
+  host: {
+    '(document:keydown.escape)': 'menuOpen.set(false); closeTour(); installHint.set(false)',
+    '(document:click)': 'onDocumentClick($event)'
+  }
 })
 export class LandingComponent implements OnInit {
   private readonly pricingService = inject(PricingService);
@@ -54,6 +58,10 @@ export class LandingComponent implements OnInit {
 
   readonly year = new Date().getFullYear();
   readonly menuOpen = signal(false);
+
+  private readonly pwaInstall = inject(PwaInstallService);
+  readonly installMode = this.pwaInstall.mode;
+  readonly installHint = signal(false);
 
   readonly heroMessages: HeroMessage[] = [
     {
@@ -122,6 +130,18 @@ export class LandingComponent implements OnInit {
 
   closeTour(): void {
     this.tour.set(null);
+  }
+
+  onInstall(): void {
+    if (this.installMode() === 'prompt') {
+      this.pwaInstall.install();
+    } else {
+      this.installHint.update(open => !open);
+    }
+  }
+
+  onDocumentClick(event: MouseEvent): void {
+    if (this.installHint() && !(event.target as HTMLElement).closest('.install-item')) this.installHint.set(false);
   }
 
   telHref(phone: string): string {
