@@ -1,16 +1,13 @@
 <div class="auth-page-wrapper full-screen-wizard">
-  <!-- Top Navigation Bar -->
-  <header class="auth-header">
-    <app-brand-logo class="brand-logo" />
-    <div class="header-actions"></div>
-  </header>
-
   <main class="auth-main full-screen">
     <div class="wizard-layout">
       <!-- Left Sidebar: Vertical Stepper -->
       <aside class="wizard-sidebar">
         <div class="sidebar-header">
-          <p class="sidebar-subtitle">Setup your workspace</p>
+          <div class="logo">
+            <i class="fi fi-rr-gym"></i> GymCrest
+          </div>
+          <p class="sidebar-subtitle">Gym Setup</p>
         </div>
 
         <div class="stepper-vertical">
@@ -73,6 +70,7 @@
       <div class="wizard-main">
         <div class="wizard-content-wrapper" #scroller>
           <div class="wizard-content-inner">
+            <span class="step-count">Step {{ currentStep }} of {{ totalSteps }}</span>
 
             <form [formGroup]="gymForm" class="onboarding-form">
 
@@ -345,12 +343,15 @@
                     }
                     <div class="plan-header">
                       <h3>{{ plan.name }}</h3>
-                      <div class="price">₹{{ plan.price | number:'1.0-2' }}<span>/month</span></div>
+                      <div class="price">₹{{ plan.price | number:'1.0-2' }}<span>{{ periodLabel(plan) }}</span></div>
                     </div>
                     <ul class="plan-features">
-                      <li>Up to {{ plan.maxBranches || 'Unlimited' }} Branches</li>
-                      <li>Member Management</li>
-                      <li>Billing & Payments</li>
+                      @if (limitsLabel(plan)) {
+                      <li>{{ limitsLabel(plan) }}</li>
+                      }
+                      @for (feature of plan.features ?? []; track $index) {
+                      <li>{{ feature }}</li>
+                      }
                     </ul>
                   </div>
                   }
@@ -387,7 +388,7 @@
                   <h4>3. Subscription Plan</h4>
                   <div class="summary-grid">
                     <div><span>Plan:</span> {{ getSelectedPlanName() }}</div>
-                    <div><span>Price:</span> ₹{{ getSelectedPlanPrice() | number:'1.0-2' }}/month</div>
+                    <div><span>Price:</span> ₹{{ getSelectedPlanPrice() | number:'1.0-2' }}{{ getSelectedPlanPeriod() }}</div>
                   </div>
                 </div>
               </div>
@@ -440,14 +441,4 @@
       </div>
     </div>
   </main>
-
-  <!-- Footer -->
-  <footer class="auth-footer">
-    <app-brand-logo class="footer-logo" />
-    <div class="copyright">© 2026 GYMCREST. ALL RIGHTS RESERVED.</div>
-    <div class="footer-links">
-      <a routerLink="/privacy-policy">Privacy Policy</a>
-      <a routerLink="/terms-of-service">Terms of Service</a>
-    </div>
-  </footer>
 </div>

@@ -5,6 +5,7 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { StaffService } from '../../../core/services/staff.service';
 import { BillingService } from '../../../core/services/billing.service';
 import { ToastrService } from 'ngx-toastr';
+import { dayPart, greetingFor } from '../../../shared/utils/greeting';
 
 @Component({
   selector: 'app-trainer-dashboard',
@@ -41,20 +42,10 @@ export class TrainerDashboardComponent implements OnInit {
   todaySessions: any[] = [];
 
   ngOnInit(): void {
-    const hour = new Date().getHours();
-    if (hour < 12) {
-      this.greeting = 'Good morning';
-      this.greetingIcon = 'fa-sun';
-      this.greetingTheme = 'theme-morning';
-    } else if (hour < 18) {
-      this.greeting = 'Good afternoon';
-      this.greetingIcon = 'fa-cloud-sun';
-      this.greetingTheme = 'theme-afternoon';
-    } else {
-      this.greeting = 'Good evening';
-      this.greetingIcon = 'fa-moon';
-      this.greetingTheme = 'theme-evening';
-    }
+    const part = dayPart();
+    this.greeting = greetingFor();
+    this.greetingIcon = { morning: 'fa-sun', afternoon: 'fa-cloud-sun', evening: 'fa-moon' }[part];
+    this.greetingTheme = `theme-${part}`;
 
     this.authService.userProfile$.subscribe(profile => {
       if (profile) {

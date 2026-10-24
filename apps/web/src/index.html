@@ -68,6 +68,9 @@
 
       // Installed app behaves like a native app: no pinch / double-tap zoom.
       // The website in a normal browser keeps zoom for accessibility.
+      // Keep the browser's install offer for the landing page's "Install as an app" button (PwaInstallService)
+      window.addEventListener('beforeinstallprompt', function (e) { window.__installPrompt = e; });
+
       var installed = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches ||
         matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true;
       if (installed) {

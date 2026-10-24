@@ -1,256 +1,20 @@
+@use 'breakpoints' as bp;
+@use '../wizard-shell';
 @import '../../auth/auth-shared.scss';
 
-.full-screen-wizard {
-  padding: 0;
-  width: 100vw;
-
-  .auth-main.full-screen {
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-}
-
-.wizard-layout {
-  display: flex;
-  flex: 1;
-  width: 100%;
-  background: var(--bg-surface);
-  overflow: hidden;
-}
-
-.wizard-sidebar {
-  width: 320px;
-  background: var(--primary-navy);
-  color: white;
-  padding: 40px 32px;
-  display: flex;
-  flex-direction: column;
-
-  [data-theme="dark"] & {
-    background: var(--slate-800);
-  }
-
-  .sidebar-header {
-    margin-bottom: 48px;
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: white;
-      margin-bottom: 8px;
-
-      i {
-        color: var(--accent-color);
-      }
-    }
-
-    .sidebar-subtitle {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.875rem;
-      margin: 0;
-    }
-  }
-
-  .stepper-vertical {
-    display: flex;
-    flex-direction: column;
-    padding-left: 8px;
-
-    .step-item {
-      display: flex;
-      position: relative;
-      padding-bottom: 40px;
-      cursor: default;
-
-      &:last-child {
-        padding-bottom: 0;
-      }
-
-      .step-circle {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.6);
-        z-index: 2;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .step-content {
-        margin-left: 20px;
-        padding-top: 6px;
-        position: relative;
-        z-index: 2;
-
-        .step-title {
-          font-weight: 600;
-          font-size: 1.05rem;
-          color: rgba(255, 255, 255, 0.7);
-          margin-bottom: 6px;
-          transition: all 0.3s ease;
-        }
-
-        .step-desc {
-          font-size: 0.8rem;
-          color: rgba(255, 255, 255, 0.5);
-          transition: all 0.3s ease;
-        }
-      }
-
-      .step-connector {
-        position: absolute;
-        top: 36px;
-        left: 17px;
-        bottom: 0;
-        width: 2px;
-        background: rgba(255, 255, 255, 0.15);
-        z-index: 1;
-        transition: background 0.4s ease;
-      }
-
-      &:hover:not(.active):not(.completed) {
-        .step-circle {
-          background: rgba(255, 255, 255, 0.15);
-          border-color: rgba(255, 255, 255, 0.4);
-          color: rgba(255, 255, 255, 0.9);
-        }
-
-        .step-title {
-          color: rgba(255, 255, 255, 0.9);
-        }
-      }
-
-      &.active {
-
-        // Add a subtle highlight behind the active text
-        &::before {
-          content: '';
-          position: absolute;
-          top: -10px;
-          bottom: 20px;
-          left: -10px;
-          right: -20px;
-          background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
-          border-radius: 8px;
-          z-index: 0;
-        }
-
-        .step-circle {
-          background: #ffffff;
-          border-color: #ffffff;
-          color: var(--primary-navy);
-          box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 0 6px rgba(255, 255, 255, 0.15);
-          transform: scale(1.1);
-          font-weight: 700;
-        }
-
-        .step-title {
-          color: #ffffff;
-          font-size: 1.15rem;
-          font-weight: 700;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .step-desc {
-          color: rgba(255, 255, 255, 0.95);
-        }
-      }
-
-      &.completed {
-        .step-circle {
-          background: var(--success-color);
-          border-color: var(--success-color);
-          color: white;
-          box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        }
-
-        .step-title {
-          color: white;
-        }
-
-        .step-desc {
-          color: rgba(255, 255, 255, 0.8);
-        }
-
-        .step-connector {
-          background: var(--success-color);
-          box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-        }
-      }
-    }
-  }
-}
-
-.wizard-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--bg-surface);
-}
-
-.wizard-content-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 20px;
-  padding-bottom: 32px;
-}
-
+// Owner steps are long forms: keep them at a readable width and give headings room
 .wizard-content-inner {
-  display: flex;
-  flex-direction: column;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.wizard-footer-static {
-  background: var(--bg-surface);
-  padding: 16px 48px;
-  z-index: 10;
-}
-
-.wizard-footer-inner {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  max-width: 960px;
 }
 
 .step-pane {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 0.4s ease-out forwards;
-
   h1,
   h2 {
     margin-bottom: 8px;
-    color: var(--text-primary);
-    font-weight: 700;
   }
 
   .subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 40px;
-    font-size: 1.1rem;
+    margin-bottom: 32px;
   }
 }
 
@@ -568,14 +332,24 @@ form.onboarding-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+
+  @include bp.mobile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 
   &.lg {
     grid-column: span 2;
+
+    @include bp.mobile {
+      grid-column: auto;
+    }
   }
 
   &.checkbox-group {
@@ -815,18 +589,6 @@ form.onboarding-form {
   padding: 8px 16px;
   font-size: 0.85rem;
 }
-
-.btn-logout-danger {
-  color: #dc2626;
-  background: transparent;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 
 .bg-setup-profile {
   background-image: url('/images/owner-wizard/setup_profile.webp');

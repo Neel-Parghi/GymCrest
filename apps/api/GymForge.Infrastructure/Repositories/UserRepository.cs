@@ -173,7 +173,8 @@ namespace GymForge.Infrastructure.Repositories
             if (user == null) return summary;
 
             summary.UserName = user.FirstName;
-            summary.Greeting = DateTime.Now.Hour < 12 ? "Good morning" : (DateTime.Now.Hour < 17 ? "Good afternoon" : "Good evening");
+            int istHour = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AppTimeZone.India).Hour;
+            summary.Greeting = istHour < 12 ? "Good morning" : (istHour < 18 ? "Good afternoon" : "Good evening");
 
             summary.ShowGymBuddy = user.Preference?.ShowGymBuddy ?? true;
             summary.GoalTitle = FitnessGoals.Normalize(user.Preference?.PrimaryGoal);

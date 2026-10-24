@@ -49,14 +49,29 @@
       <button type="button" class="demo-link tour-link" (click)="openTour()"><i class="fas fa-film"></i> Watch the 26-second tour</button>
     </div>
     <ul class="hero-highlights">
-      <li><i class="fas fa-id-card"></i> Memberships &amp; renewals</li>
+      <li><i class="fas fa-id-card"></i> Manage Memberships</li>
       <li><i class="fas fa-file-invoice"></i> Billing &amp; Razorpay</li>
       <li><i class="fas fa-calendar-check"></i> Desk check-in</li>
       <li><i class="fas fa-dumbbell"></i> Workout &amp; diet plans</li>
     </ul>
     <ul class="trust-points">
       <li><i class="fas fa-gift"></i> Free for users</li>
-      <li><i class="fas fa-download"></i> Install as an app</li>
+      @if (installMode() !== 'installed') {
+        <li class="install-item">
+          <button type="button" class="install-link" (click)="onInstall()" [attr.aria-expanded]="installMode() === 'prompt' ? null : installHint()">
+            <i class="fas fa-download"></i> Install as an app
+          </button>
+          @if (installHint()) {
+            <div class="install-hint" role="status">
+              @if (installMode() === 'ios') {
+                Tap <i class="fas fa-arrow-up-from-bracket"></i> <b>Share</b>, then <b>Add to Home Screen</b>.
+              } @else {
+                Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>. Works best in Chrome, Edge or Safari.
+              }
+            </div>
+          }
+        </li>
+      }
       <li><i class="fas fa-location-dot"></i> Made in India</li>
     </ul>
   </div>
@@ -348,7 +363,7 @@
                 class="period">{{ periodLabel(plan) }}</span>
             </div>
             <div class="pricing-gst">{{ billingNote(plan) }}</div>
-            <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-full"
+            <a routerLink="/register" [queryParams]="{ as: 'owner', plan: plan.id }" class="btn btn-full"
               [class.btn-primary]="last && paidPlans().length > 1" [class.btn-outline]="!(last && paidPlans().length > 1)">
               Register your gym
             </a>
