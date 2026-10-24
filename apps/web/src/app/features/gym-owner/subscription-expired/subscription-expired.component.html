@@ -107,7 +107,7 @@
         <button type="button" class="ghost-btn" (click)="cancelChoice()" [disabled]="isPaying">Back</button>
         <button type="button" class="pay-btn" (click)="pay()" [disabled]="isPaying">
           <span *ngIf="!isPaying">Pay ₹{{ plan.price | number:'1.0-2' }}</span>
-          <span *ngIf="isPaying" class="btn-spinner-box"><span class="btn-spinner"></span> Opening payment…</span>
+          <span *ngIf="isPaying" class="btn-spinner-box"><span class="btn-spinner"></span> {{ confirming ? 'Confirming payment…' : 'Opening payment…' }}</span>
         </button>
       </div>
     </div>

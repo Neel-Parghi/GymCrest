@@ -426,9 +426,7 @@ export class OwnerWizardComponent implements OnInit {
       theme: { color: CONSTANTS.PAYMENT.RAZORPAY.THEME_COLOR },
       modal: {
         ondismiss: () => {
-          this.ngZone.run(() => {
-            this.isProcessingPayment = false;
-          });
+          this.ngZone.run(() => this.checkActivatedAfterClose());
         }
       }
     };
@@ -445,19 +443,49 @@ export class OwnerWizardComponent implements OnInit {
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
     }).subscribe({
-      next: () => {
-        localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
-        this.toastr.success('Welcome to GymCrest!');
-        this.authService.refreshToken().subscribe(() => {
-          this.profileService.getProfile(true).subscribe(() => {
-            this.router.navigate(['/gym-owner/dashboard']);
-          });
-        });
-      },
-      error: () => {
+      next: () => this.finishOnboarding(),
+      // The webhook can still activate the plan when this check fails, so ask before reporting a failure
+      error: () => this.gymService.confirmSubscriptionActive().subscribe(active => {
+        if (active) {
+          this.finishOnboarding();
+          return;
+        }
         this.toastr.error('Payment verification failed. Please try again or contact support.');
         this.isSubmitting = false;
         this.isProcessingPayment = false;
+      })
+    });
+  }
+
+  /**
+   * The popup closed without a success callback. Some methods (UPI/QR) still complete and the webhook activates
+   * the plan, so check before letting the owner pay again (which would charge them twice).
+   */
+  private checkActivatedAfterClose() {
+    this.isSubmitting = true;
+    this.gymService.confirmSubscriptionActive().subscribe(active => {
+      if (active) {
+        this.finishOnboarding();
+        return;
+      }
+      this.isSubmitting = false;
+      this.isProcessingPayment = false;
+    });
+  }
+
+  /** Plan is paid: fetch a token that carries the new gym, then open the dashboard. */
+  private finishOnboarding() {
+    this.isSubmitting = true;
+    localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
+    this.toastr.success('Welcome to GymCrest!');
+    this.gymService.clearMyGymCache();
+    const openDashboard = () => this.router.navigate(['/gym-owner/dashboard']);
+    this.authService.refreshToken().subscribe({
+      next: () => this.profileService.getProfile(true).subscribe({ next: openDashboard, error: openDashboard }),
+      // Without a fresh token the guards would send the owner back here; signing in again picks up the new gym
+      error: () => {
+        this.toastr.info('Your plan is active. Please sign in again to open your dashboard.');
+        this.authService.logout();
       }
     });
   }
