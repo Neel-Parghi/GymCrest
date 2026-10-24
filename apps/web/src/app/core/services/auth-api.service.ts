@@ -64,7 +64,7 @@ export class AuthApiService extends BaseApiService {
 
   login(credentials: LoginRequestDto, rememberMe: boolean = false): Observable<ApiResponse<TokenResponseDto>> {
     return this.post<ApiResponse<TokenResponseDto>>(API_CONSTANTS.AUTH.LOGIN, credentials).pipe(
-      tap((res) => this.saveTokens(res, rememberMe))
+      tap((res) => this.startSession(res, rememberMe))
     );
   }
 
@@ -74,8 +74,13 @@ export class AuthApiService extends BaseApiService {
 
   verifyOtp(data: VerifyOtpRequestDto): Observable<ApiResponse<TokenResponseDto>> {
     return this.post<ApiResponse<TokenResponseDto>>(API_CONSTANTS.AUTH.VERIFY_OTP, data).pipe(
-      tap((res) => this.saveTokens(res, true))
+      tap((res) => this.startSession(res, true))
     );
+  }
+
+  private startSession(res: ApiResponse<TokenResponseDto>, rememberMe: boolean): void {
+    this.saveTokens(res, rememberMe);
+    if (this.userProfileSubject.value) this.userProfileSubject.next(null);
   }
 
   resendOtp(data: ResendOtpRequestDto): Observable<ApiResponse<null>> {

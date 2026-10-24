@@ -77,6 +77,7 @@ export interface GymListResponse {
   isTrialPlan: boolean;
   paymentStatus: string;
   hasActiveSubscription: boolean;
+  awaitingFirstPayment?: boolean;
   createdOn?: string;
 }
 
