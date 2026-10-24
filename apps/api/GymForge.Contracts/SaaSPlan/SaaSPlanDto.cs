@@ -15,6 +15,8 @@
         public int? MaxBranches { get; set; }
         public int? MaxMembers { get; set; }
 
+        public string[]? Features { get; set; }
+
         public DateTime CreateedAt { get; set; }
 
         public bool IsActive { get; set; }
