@@ -49,6 +49,12 @@
     min-height: 100px;
   }
 
+  .field-hint {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
   &.flex-row {
     flex-direction: row !important;
     align-items: center;

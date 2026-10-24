@@ -356,13 +356,9 @@
               @if (limitsLabel(plan)) {
                 <li><i class="fas fa-check"></i> {{ limitsLabel(plan) }}</li>
               }
-              <li><i class="fas fa-check"></i> Members, plans &amp; renewals</li>
-              <li><i class="fas fa-check"></i> Billing, invoices &amp; Razorpay payments</li>
-              <li><i class="fas fa-check"></i> Desk check-in &amp; attendance</li>
-              <li><i class="fas fa-check"></i> Staff &amp; trainer accounts</li>
-              <li><i class="fas fa-check"></i> Workout &amp; diet plan builder</li>
-              <li><i class="fas fa-check"></i> Announcements &amp; renewal reminders</li>
-              <li><i class="fas fa-check"></i> Inventory &amp; shop sales</li>
+              @for (feature of plan.features ?? []; track $index) {
+                <li><i class="fas fa-check"></i> {{ feature }}</li>
+              }
             </ul>
           </div>
         } @empty {

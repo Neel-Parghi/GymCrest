@@ -6,7 +6,7 @@ import { PricingService } from '../../../../core/services/pricing.service';
 import { ValidationMessage } from '../../../../shared/components/validation-message/validation-message.component';
 import { ConfirmationPopupComponent } from "../../../../shared/components/confirmation-popup/confirmation-popup.component";
 import { ApiResponse } from '../../../../shared/models/api-response.model';
-import { PricingPlan } from '../../../../shared/models/pricing.model';
+import { PricingPlan, textToFeatures } from '../../../../shared/models/pricing.model';
 
 @Component({
   selector: 'app-add-pricing',
@@ -36,6 +36,7 @@ export class AddPricing {
       durationInDays: [30, [Validators.required, Validators.min(1)]],
       maxBranches: [null],
       maxMembers: [null],
+      featuresText: [''],
       isTrial: [false],
       isActive: [true]
     });
@@ -48,7 +49,8 @@ export class AddPricing {
     }
 
     this.isSubmitting = true;
-    const payload = this.pricingForm.value;
+    const { featuresText, ...rest } = this.pricingForm.value;
+    const payload = { ...rest, features: textToFeatures(featuresText) };
 
     this.pricingService.addPlan(payload).subscribe({
       next: (res: ApiResponse<PricingPlan>) => {
