@@ -32,8 +32,8 @@ interface TourVideo {
 
 /** Phones get the 9:16 cut, wider screens the 16:9 one. */
 const TOUR_VIDEOS: Record<'vertical' | 'landscape', TourVideo> = {
-  vertical: { src: 'videos/gymcrest-tour-vertical.mp4', poster: 'images/landing/tour-poster-vertical.webp', vertical: true },
-  landscape: { src: 'videos/gymcrest-tour.mp4', poster: 'images/landing/tour-poster.webp', vertical: false }
+  vertical: { src: 'videos/gymcrest-tour-vertical-v2.mp4', poster: 'images/landing/tour-poster-vertical-v2.webp', vertical: true },
+  landscape: { src: 'videos/gymcrest-tour-v2.mp4', poster: 'images/landing/tour-poster-v2.webp', vertical: false }
 };
 
 @Component({
