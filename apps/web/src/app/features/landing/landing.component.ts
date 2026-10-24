@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-logo.component';
 import { HeroPreviewComponent } from './hero-preview/hero-preview.component';
 import { PricingService } from '../../core/services/pricing.service';
-import { PricingPlan } from '../../shared/models/pricing.model';
+import { PricingPlan, planLimitsLabel, planPeriodLabel } from '../../shared/models/pricing.model';
 import { TestPaymentNoticeComponent } from '../../shared/components/test-payment-notice/test-payment-notice.component';
 import { PAYMENTS_TEST_MODE } from '../../core/constants/constants';
 import { PlatformStatusService } from '../../core/services/platform-status.service';
@@ -169,11 +169,7 @@ export class LandingComponent implements OnInit {
   }
 
   periodLabel(plan: PricingPlan): string {
-    const days = plan.durationInDays;
-    if (days >= 360 && days <= 366) return '/year';
-    if (days >= 28 && days <= 31) return '/month';
-    if (days % 30 === 0) return `/${days / 30} months`;
-    return `/${days} days`;
+    return planPeriodLabel(plan);
   }
 
   billingNote(plan: PricingPlan): string {
@@ -186,10 +182,7 @@ export class LandingComponent implements OnInit {
   }
 
   limitsLabel(plan: PricingPlan): string {
-    const parts: string[] = [];
-    if (plan.maxMembers) parts.push(`Up to ${this.formatInr(plan.maxMembers)} members`);
-    if (plan.maxBranches) parts.push(`${plan.maxBranches} ${plan.maxBranches === 1 ? 'branch' : 'branches'}`);
-    return parts.join(' · ');
+    return planLimitsLabel(plan);
   }
 
   formatInr(value: number): string {

@@ -343,12 +343,15 @@
                     }
                     <div class="plan-header">
                       <h3>{{ plan.name }}</h3>
-                      <div class="price">₹{{ plan.price | number:'1.0-2' }}<span>/month</span></div>
+                      <div class="price">₹{{ plan.price | number:'1.0-2' }}<span>{{ periodLabel(plan) }}</span></div>
                     </div>
                     <ul class="plan-features">
-                      <li>Up to {{ plan.maxBranches || 'Unlimited' }} Branches</li>
-                      <li>Member Management</li>
-                      <li>Billing & Payments</li>
+                      @if (limitsLabel(plan)) {
+                      <li>{{ limitsLabel(plan) }}</li>
+                      }
+                      @for (feature of plan.features ?? []; track $index) {
+                      <li>{{ feature }}</li>
+                      }
                     </ul>
                   </div>
                   }
@@ -385,7 +388,7 @@
                   <h4>3. Subscription Plan</h4>
                   <div class="summary-grid">
                     <div><span>Plan:</span> {{ getSelectedPlanName() }}</div>
-                    <div><span>Price:</span> ₹{{ getSelectedPlanPrice() | number:'1.0-2' }}/month</div>
+                    <div><span>Price:</span> ₹{{ getSelectedPlanPrice() | number:'1.0-2' }}{{ getSelectedPlanPeriod() }}</div>
                   </div>
                 </div>
               </div>

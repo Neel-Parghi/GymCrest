@@ -49,7 +49,7 @@
       <button type="button" class="demo-link tour-link" (click)="openTour()"><i class="fas fa-film"></i> Watch the 26-second tour</button>
     </div>
     <ul class="hero-highlights">
-      <li><i class="fas fa-id-card"></i> Memberships &amp; renewals</li>
+      <li><i class="fas fa-id-card"></i> Manage Memberships</li>
       <li><i class="fas fa-file-invoice"></i> Billing &amp; Razorpay</li>
       <li><i class="fas fa-calendar-check"></i> Desk check-in</li>
       <li><i class="fas fa-dumbbell"></i> Workout &amp; diet plans</li>
@@ -363,7 +363,7 @@
                 class="period">{{ periodLabel(plan) }}</span>
             </div>
             <div class="pricing-gst">{{ billingNote(plan) }}</div>
-            <a routerLink="/register" [queryParams]="{ as: 'owner' }" class="btn btn-full"
+            <a routerLink="/register" [queryParams]="{ as: 'owner', plan: plan.id }" class="btn btn-full"
               [class.btn-primary]="last && paidPlans().length > 1" [class.btn-outline]="!(last && paidPlans().length > 1)">
               Register your gym
             </a>

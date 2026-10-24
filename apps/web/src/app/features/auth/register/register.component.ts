@@ -7,6 +7,7 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { BrandLogoComponent } from '../../../shared/components/brand-logo/brand-logo.component';
+import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
 
 @Component({
   selector: 'app-register',
@@ -54,12 +55,27 @@ export class RegisterComponent {
     const as = this.route.snapshot.queryParamMap.get('as');
     if (as === 'owner') this.selectedRole = 'GymOwner';
     else if (as === 'member') this.selectedRole = 'User';
+    this.rememberIntendedPlan();
   }
 
   setRole(role: 'User' | 'GymOwner' | null) {
     this.selectedRole = role;
     const as = role === 'GymOwner' ? 'owner' : role === 'User' ? 'member' : null;
-    this.router.navigate([], { relativeTo: this.route, queryParams: { as }, replaceUrl: true });
+    const plan = role === 'GymOwner' ? this.route.snapshot.queryParamMap.get('plan') : null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: { as, plan }, replaceUrl: true });
+    this.rememberIntendedPlan();
+  }
+
+  /**
+   * Sign-up goes register → verify → login → onboarding, so the plan clicked on the pricing card is kept
+   * in storage for the onboarding plan step. Only for owners; switching to a member account forgets it.
+   */
+  private rememberIntendedPlan(): void {
+    const plan = this.route.snapshot.queryParamMap.get('plan');
+    try {
+      if (this.selectedRole === 'GymOwner' && plan) localStorage.setItem(STORAGE_KEYS.INTENDED_PLAN, plan);
+      else if (this.selectedRole === 'User') localStorage.removeItem(STORAGE_KEYS.INTENDED_PLAN);
+    } catch { /* storage blocked: the owner just picks the plan again */ }
   }
 
   onSubmit() {

@@ -2,7 +2,9 @@
 export const STORAGE_KEYS = {
   OWNER_WIZARD_DRAFT: 'gymcrest_ownerWizardDraft',
   USER_WIZARD_DRAFT: 'gymcrest_userWizardDraft_v2',
-  COPIED_WORKOUT_SPLIT: 'gymcrest_copied_workout_split'
+  COPIED_WORKOUT_SPLIT: 'gymcrest_copied_workout_split',
+  /** Plan an owner picked on the landing pricing cards, preselected at the onboarding plan step. */
+  INTENDED_PLAN: 'gymcrest_intendedPlan'
 } as const;
 
 /** Keys written before the rebrand, mapped to their new names. */

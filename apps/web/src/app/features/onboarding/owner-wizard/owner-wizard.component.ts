@@ -5,7 +5,7 @@ import { FIELD_LIMITS } from '../../../shared/constants/validation.constants';
 import { phoneValidator, urlValidator, gstValidator, postalCodeValidator, registrationNumberValidator } from '../../../shared/validators/custom-validators';
 import { Router } from '@angular/router';
 import { PricingService } from '../../../core/services/pricing.service';
-import { PricingPlan } from '../../../shared/models/pricing.model';
+import { PricingPlan, planLimitsLabel, planPeriodLabel } from '../../../shared/models/pricing.model';
 import { ToastrService } from 'ngx-toastr';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { UserService } from '../../../core/services/user.service';
@@ -249,6 +249,7 @@ export class OwnerWizardComponent implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.plans = res.data.filter(p => p.isActive);
+          this.applyIntendedPlan();
         }
         this.isLoadingPlans = false;
       },
@@ -259,9 +260,22 @@ export class OwnerWizardComponent implements OnInit {
     });
   }
 
+  readonly periodLabel = planPeriodLabel;
+  readonly limitsLabel = planLimitsLabel;
+
   selectPlan(id: string) {
     this.selectedPlanId = id;
     this.saveDraft();
+  }
+
+  /** Preselects the plan picked on the landing pricing card, unless a plan was already chosen in this wizard. */
+  private applyIntendedPlan(): void {
+    try {
+      const intended = localStorage.getItem(STORAGE_KEYS.INTENDED_PLAN);
+      if (!intended) return;
+      localStorage.removeItem(STORAGE_KEYS.INTENDED_PLAN);
+      if (!this.selectedPlanId && this.plans.some(p => p.id === intended)) this.selectPlan(intended);
+    } catch { /* storage blocked */ }
   }
 
   isCurrentStepValid(): boolean {
@@ -329,6 +343,11 @@ export class OwnerWizardComponent implements OnInit {
   getSelectedPlanPrice(): number {
     return this.plans.find(p => p.id === this.selectedPlanId)?.price || 0;
   }
+  getSelectedPlanPeriod(): string {
+    const plan = this.plans.find(p => p.id === this.selectedPlanId);
+    return plan ? planPeriodLabel(plan) : '';
+  }
+
 
   processPayment() {
     this.isProcessingPayment = true;
