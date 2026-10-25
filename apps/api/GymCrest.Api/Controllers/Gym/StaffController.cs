@@ -23,6 +23,7 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpPost]
+        [BlockDemoAccount]
         public async Task<ActionResult> AddStaff([FromBody] AddStaffRequest request)
         {
             if (GymId == null) return Unauthorized();
@@ -61,6 +62,7 @@ namespace GymCrest.Api.Controllers.Gym
         [Authorize(Roles = "GymOwner,Staff")]
         [AuthorizeResource(OwnedResource.Staff)]
         [HttpPut("{id}")]
+        [BlockDemoAccount]
         public async Task<ActionResult> UpdateStaff(Guid id, [FromBody] AddStaffRequest request)
         {
             try

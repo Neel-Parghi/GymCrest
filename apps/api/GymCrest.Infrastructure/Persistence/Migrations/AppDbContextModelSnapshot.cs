@@ -23,7 +23,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Address", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +69,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.AnnouncementTemplate", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.AnnouncementTemplate", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -120,7 +120,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("AnnouncementTemplates");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.AttendanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.AttendanceLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -169,7 +169,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("AttendanceLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Branch", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Branch", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,7 +221,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Branches");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.CustomInvoice", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.CustomInvoice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -295,7 +295,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("CustomInvoices");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DailyRoutine", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DailyRoutine", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,7 +339,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("DailyRoutines");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DailyRoutineCompletion", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DailyRoutineCompletion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -375,7 +375,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("DailyRoutineCompletions");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -430,7 +430,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("DietLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietPlan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietPlan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -499,7 +499,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("DietPlans");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietPlanMeal", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietPlanMeal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -554,7 +554,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("DietPlanMeals");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Equipment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Equipment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -624,7 +624,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Equipment");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Exercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Exercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -692,7 +692,67 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Exercises");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Gym", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("GymId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("UserEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserRole")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsResolved", "CreatedOn");
+
+                    b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("GymCrest.Domain.Entities.Gym", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -780,7 +840,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Gyms");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymAnnouncement", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymAnnouncement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -827,7 +887,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("GymAnnouncements");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymConfiguration", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymConfiguration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -865,7 +925,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("GymConfigurations");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymHoliday", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymHoliday", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -905,7 +965,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("GymHolidays");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymMember", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymMember", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1004,7 +1064,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("GymMembers");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymPlan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymPlan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1063,7 +1123,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("GymPlans");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.InventoryItem", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.InventoryItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1129,7 +1189,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("InventoryItems");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.LoggedExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.LoggedExercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1170,7 +1230,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("LoggedExercises");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.LoggedSet", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.LoggedSet", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1210,7 +1270,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("LoggedSets");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MaintenanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MaintenanceLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1270,7 +1330,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MaintenanceLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MasterExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MasterExercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1335,7 +1395,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MasterExercises");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MealLogEntry", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MealLogEntry", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1396,7 +1456,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MealLogEntries");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberDietAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberDietAssignment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1442,7 +1502,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MemberDietAssignments");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberMeasurement", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberMeasurement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1555,7 +1615,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MemberMeasurements");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberPlanAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberPlanAssignment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1599,7 +1659,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MemberPlanAssignments");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberSubscription", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberSubscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1665,7 +1725,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MemberSubscriptions");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberWorkoutScheduleDay", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberWorkoutScheduleDay", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1706,7 +1766,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("MemberWorkoutScheduleDays");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.PTAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.PTAssignment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1754,7 +1814,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("PTAssignments");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.PaymentRecord", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.PaymentRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1813,7 +1873,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("PaymentRecords");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Plan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Plan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1865,7 +1925,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Plans");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1911,7 +1971,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SaaSConfiguration", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SaaSConfiguration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2014,7 +2074,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SaaSPaymentTransaction", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SaaSPaymentTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2072,7 +2132,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("SaaSPaymentTransactions");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SaleTransaction", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SaleTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2131,7 +2191,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("SaleTransactions");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Staff", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Staff", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2225,7 +2285,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Staff");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffAttendanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffAttendanceLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2274,7 +2334,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("StaffAttendanceLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffPayoutLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffPayoutLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2333,7 +2393,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("StaffPayoutLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffPayrollRule", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffPayrollRule", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2381,7 +2441,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("StaffPayrollRules");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SubscriptionRecord", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SubscriptionRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2433,7 +2493,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("SubscriptionRecords");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.User", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2483,7 +2543,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserNotification", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserNotification", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2534,7 +2594,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("UserNotifications");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserPreference", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserPreference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2576,6 +2636,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Property<int?>("TargetCalories")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("TargetCaloriesBurn")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("TargetCarbs")
                         .HasColumnType("integer");
 
@@ -2608,7 +2671,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("UserPreferences");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserProfile", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2662,7 +2725,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("UserProfiles");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserSecurity", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserSecurity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2712,7 +2775,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("UserSecurities");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2777,7 +2840,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("WorkoutPlans");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlanDay", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlanDay", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2820,7 +2883,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("WorkoutPlanDays");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlanExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlanExercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2870,7 +2933,7 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("WorkoutPlanExercises");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutSessionLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutSessionLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2923,13 +2986,13 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.ToTable("WorkoutSessionLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.AnnouncementTemplate", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.AnnouncementTemplate", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2940,14 +3003,14 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.AttendanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.AttendanceLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2958,15 +3021,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Branch", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Branch", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Address", "Address")
+                    b.HasOne("GymCrest.Domain.Entities.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany("Branches")
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2977,25 +3040,25 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.CustomInvoice", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.CustomInvoice", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.Staff", "Trainer")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "Trainer")
                         .WithMany()
                         .HasForeignKey("TrainerId");
 
@@ -3008,9 +3071,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DailyRoutine", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DailyRoutine", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3019,9 +3082,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DailyRoutineCompletion", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DailyRoutineCompletion", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3030,9 +3093,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.User", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3041,9 +3104,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietPlanMeal", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietPlanMeal", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.DietPlan", "DietPlan")
+                    b.HasOne("GymCrest.Domain.Entities.DietPlan", "DietPlan")
                         .WithMany("Meals")
                         .HasForeignKey("DietPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3052,13 +3115,13 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("DietPlan");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Equipment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Equipment", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3069,13 +3132,13 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Gym", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Gym", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Address", "Address")
+                    b.HasOne("GymCrest.Domain.Entities.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("GymForge.Domain.Entities.User", "Owner")
+                    b.HasOne("GymCrest.Domain.Entities.User", "Owner")
                         .WithMany("Gyms")
                         .HasForeignKey("OwnerUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3086,13 +3149,13 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymAnnouncement", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymAnnouncement", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3103,24 +3166,24 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymConfiguration", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymConfiguration", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithOne("Configuration")
-                        .HasForeignKey("GymForge.Domain.Entities.GymConfiguration", "GymId")
+                        .HasForeignKey("GymCrest.Domain.Entities.GymConfiguration", "GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymHoliday", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymHoliday", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3131,23 +3194,23 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymMember", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymMember", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Address", "Address")
+                    b.HasOne("GymCrest.Domain.Entities.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
@@ -3160,13 +3223,13 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.InventoryItem", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.InventoryItem", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3177,9 +3240,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Gym");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.LoggedExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.LoggedExercise", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.WorkoutSessionLog", "WorkoutSessionLog")
+                    b.HasOne("GymCrest.Domain.Entities.WorkoutSessionLog", "WorkoutSessionLog")
                         .WithMany("LoggedExercises")
                         .HasForeignKey("WorkoutSessionLogId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3188,9 +3251,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("WorkoutSessionLog");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.LoggedSet", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.LoggedSet", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.LoggedExercise", "LoggedExercise")
+                    b.HasOne("GymCrest.Domain.Entities.LoggedExercise", "LoggedExercise")
                         .WithMany("LoggedSets")
                         .HasForeignKey("LoggedExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3199,9 +3262,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("LoggedExercise");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MaintenanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MaintenanceLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Equipment", "Equipment")
+                    b.HasOne("GymCrest.Domain.Entities.Equipment", "Equipment")
                         .WithMany("MaintenanceLogs")
                         .HasForeignKey("EquipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3210,9 +3273,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Equipment");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MealLogEntry", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MealLogEntry", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.DietLog", "DietLog")
+                    b.HasOne("GymCrest.Domain.Entities.DietLog", "DietLog")
                         .WithMany("MealEntries")
                         .HasForeignKey("DietLogId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3221,20 +3284,20 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("DietLog");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberDietAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberDietAssignment", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.DietPlan", "DietPlan")
+                    b.HasOne("GymCrest.Domain.Entities.DietPlan", "DietPlan")
                         .WithMany()
                         .HasForeignKey("DietPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -3246,23 +3309,23 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberMeasurement", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberMeasurement", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany("Measurements")
                         .HasForeignKey("MemberId");
 
-                    b.HasOne("GymForge.Domain.Entities.Staff", "RecordedBy")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "RecordedBy")
                         .WithMany()
                         .HasForeignKey("RecordedById")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GymForge.Domain.Entities.User", null)
+                    b.HasOne("GymCrest.Domain.Entities.User", null)
                         .WithMany("Measurements")
                         .HasForeignKey("UserId1");
 
@@ -3273,19 +3336,19 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberPlanAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberPlanAssignment", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GymForge.Domain.Entities.WorkoutPlan", "WorkoutPlan")
+                    b.HasOne("GymCrest.Domain.Entities.WorkoutPlan", "WorkoutPlan")
                         .WithMany()
                         .HasForeignKey("WorkoutPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3298,15 +3361,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("WorkoutPlan");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberSubscription", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberSubscription", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.GymPlan", "GymPlan")
+                    b.HasOne("GymCrest.Domain.Entities.GymPlan", "GymPlan")
                         .WithMany()
                         .HasForeignKey("GymPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany("Subscriptions")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3317,15 +3380,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberWorkoutScheduleDay", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberWorkoutScheduleDay", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.MemberPlanAssignment", "MemberPlanAssignment")
+                    b.HasOne("GymCrest.Domain.Entities.MemberPlanAssignment", "MemberPlanAssignment")
                         .WithMany("CustomScheduleDays")
                         .HasForeignKey("MemberPlanAssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
+                    b.HasOne("GymCrest.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
                         .WithMany()
                         .HasForeignKey("WorkoutPlanDayId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -3335,15 +3398,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("WorkoutPlanDay");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.PTAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.PTAssignment", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.Staff", "Trainer")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "Trainer")
                         .WithMany("PTAssignments")
                         .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3354,19 +3417,19 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.PaymentRecord", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.PaymentRecord", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3379,9 +3442,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3390,15 +3453,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SaaSPaymentTransaction", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SaaSPaymentTransaction", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.SubscriptionRecord", "Subscription")
+                    b.HasOne("GymCrest.Domain.Entities.SubscriptionRecord", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3409,25 +3472,25 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SaleTransaction", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SaleTransaction", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.InventoryItem", "InventoryItem")
+                    b.HasOne("GymCrest.Domain.Entities.InventoryItem", "InventoryItem")
                         .WithMany()
                         .HasForeignKey("InventoryItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3442,19 +3505,19 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Staff", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Staff", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
@@ -3465,20 +3528,20 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffAttendanceLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffAttendanceLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.Staff", "Staff")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3491,9 +3554,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffPayoutLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffPayoutLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Staff", "Staff")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3502,9 +3565,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.StaffPayrollRule", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.StaffPayrollRule", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Staff", "Staff")
+                    b.HasOne("GymCrest.Domain.Entities.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3513,15 +3576,15 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.SubscriptionRecord", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.SubscriptionRecord", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.Plan", "Plan")
+                    b.HasOne("GymCrest.Domain.Entities.Plan", "Plan")
                         .WithMany("SubscriptionRecords")
                         .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3532,19 +3595,19 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserNotification", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserNotification", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Branch", "Branch")
+                    b.HasOne("GymCrest.Domain.Entities.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
-                    b.HasOne("GymForge.Domain.Entities.Gym", "Gym")
+                    b.HasOne("GymCrest.Domain.Entities.Gym", "Gym")
                         .WithMany()
                         .HasForeignKey("GymId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3557,26 +3620,26 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserPreference", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserPreference", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithOne("Preference")
-                        .HasForeignKey("GymForge.Domain.Entities.UserPreference", "UserId")
+                        .HasForeignKey("GymCrest.Domain.Entities.UserPreference", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserProfile", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserProfile", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Address", "Address")
+                    b.HasOne("GymCrest.Domain.Entities.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithOne("Profile")
-                        .HasForeignKey("GymForge.Domain.Entities.UserProfile", "UserId")
+                        .HasForeignKey("GymCrest.Domain.Entities.UserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3585,20 +3648,20 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.UserSecurity", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.UserSecurity", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithOne("Security")
-                        .HasForeignKey("GymForge.Domain.Entities.UserSecurity", "UserId")
+                        .HasForeignKey("GymCrest.Domain.Entities.UserSecurity", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlanDay", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlanDay", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.WorkoutPlan", "WorkoutPlan")
+                    b.HasOne("GymCrest.Domain.Entities.WorkoutPlan", "WorkoutPlan")
                         .WithMany("Days")
                         .HasForeignKey("WorkoutPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3607,14 +3670,14 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("WorkoutPlan");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlanExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlanExercise", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.Exercise", "Exercise")
+                    b.HasOne("GymCrest.Domain.Entities.Exercise", "Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("GymForge.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
+                    b.HasOne("GymCrest.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
                         .WithMany("Exercises")
                         .HasForeignKey("WorkoutPlanDayId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3625,14 +3688,14 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("WorkoutPlanDay");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutSessionLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutSessionLog", b =>
                 {
-                    b.HasOne("GymForge.Domain.Entities.GymMember", "Member")
+                    b.HasOne("GymCrest.Domain.Entities.GymMember", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GymForge.Domain.Entities.User", "User")
+                    b.HasOne("GymCrest.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -3642,56 +3705,56 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietLog", b =>
                 {
                     b.Navigation("MealEntries");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.DietPlan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.DietPlan", b =>
                 {
                     b.Navigation("Meals");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Equipment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Equipment", b =>
                 {
                     b.Navigation("MaintenanceLogs");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Gym", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Gym", b =>
                 {
                     b.Navigation("Branches");
 
                     b.Navigation("Configuration");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.GymMember", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.GymMember", b =>
                 {
                     b.Navigation("Measurements");
 
                     b.Navigation("Subscriptions");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.LoggedExercise", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.LoggedExercise", b =>
                 {
                     b.Navigation("LoggedSets");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.MemberPlanAssignment", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.MemberPlanAssignment", b =>
                 {
                     b.Navigation("CustomScheduleDays");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Plan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Plan", b =>
                 {
                     b.Navigation("SubscriptionRecords");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.Staff", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("PTAssignments");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.User", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.User", b =>
                 {
                     b.Navigation("Gyms");
 
@@ -3706,17 +3769,17 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Navigation("Security");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlan", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlan", b =>
                 {
                     b.Navigation("Days");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutPlanDay", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutPlanDay", b =>
                 {
                     b.Navigation("Exercises");
                 });
 
-            modelBuilder.Entity("GymForge.Domain.Entities.WorkoutSessionLog", b =>
+            modelBuilder.Entity("GymCrest.Domain.Entities.WorkoutSessionLog", b =>
                 {
                     b.Navigation("LoggedExercises");
                 });

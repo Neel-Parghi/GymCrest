@@ -66,6 +66,7 @@ namespace GymCrest.Api.Controllers.Gym
         // --- Sales ---
 
         [HttpPost("sales")]
+        [BlockDemoAccount]
         public async Task<ActionResult> RecordSale([FromBody] RecordSaleDto dto)
         {
             if (GymId == null) return Unauthorized();
@@ -83,6 +84,7 @@ namespace GymCrest.Api.Controllers.Gym
 
         [AuthorizeResource(OwnedResource.SaleTransaction)]
         [HttpPost("sales/{id}/receipt")]
+        [BlockDemoAccount]
         public async Task<ActionResult> SendReceipt(Guid id)
         {
             bool success = await _inventoryService.SendSaleReceiptAsync(id);

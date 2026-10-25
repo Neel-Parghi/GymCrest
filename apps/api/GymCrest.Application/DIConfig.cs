@@ -93,6 +93,8 @@ namespace GymCrest.Application
             
             services.AddScoped<IUserNotificationService, UserNotificationService>();
 
+            services.AddScoped<GymCrest.Application.Modules.Feedback.Interfaces.IFeedbackService, GymCrest.Application.Modules.Feedback.Services.FeedbackService>();
+
             services.AddScoped<GymCrest.Application.BackgroundJobs.AccountDeletionJob>();
 
             services.AddScoped<GymCrest.Application.BackgroundJobs.AutomatedNotificationJob>();

@@ -1,3 +1,4 @@
+using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Gym.Interfaces;
 using GymCrest.Contracts.Announcements;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +65,7 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpPost("{id}/test")]
+        [BlockDemoAccount]
         public async Task<IActionResult> TestTemplate(Guid id)
         {
             if (GymId == null)

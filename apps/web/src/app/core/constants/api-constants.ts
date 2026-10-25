@@ -7,6 +7,10 @@ export const API_CONSTANTS = {
     STATUS: 'public/platform-status',
   },
 
+  FEEDBACK: {
+    BASE: 'feedback',
+  },
+
   AUTH: {
     LOGIN: 'auth/login',
     REGISTER: 'auth/register',

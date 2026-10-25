@@ -66,6 +66,7 @@ namespace GymCrest.Api.Controllers.Gym
 
         [Authorize(Roles = "GymOwner")]
         [HttpPut]
+        [BlockDemoAccount]
         public async Task<IActionResult> UpdateMyGym([FromBody] GymCrest.Contracts.Gym.Owners.UpdateMyGymDto updateDto)
         {
             await _gymManagementService.UpdateMyGymAsync(UserId, updateDto);

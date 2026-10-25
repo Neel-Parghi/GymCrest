@@ -263,6 +263,8 @@ namespace GymCrest.Application.Modules.Users.Services
             User? user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) throw new Exception("User not found.");
 
+            double? weightKg = (await _userRepository.GetLatestBodyMetricsAsync(userId)).WeightKg;
+
             return new UserPreferenceDto
             {
                 PrimaryGoal = user.Preference?.PrimaryGoal == null ? null : FitnessGoals.Normalize(user.Preference.PrimaryGoal),
@@ -272,6 +274,8 @@ namespace GymCrest.Application.Modules.Users.Services
                 TargetCarbs = user.Preference?.TargetCarbs,
                 TargetFats = user.Preference?.TargetFats,
                 TargetTrainingTime = user.Preference?.TargetTrainingTime,
+                TargetCaloriesBurn = user.Preference?.TargetCaloriesBurn,
+                AutoCaloriesBurn = CalorieBurn.AutoDailyTarget(weightKg, user.Preference?.TargetTrainingTime ?? 60),
                 DietPreference = user.Preference?.DietPreference,
                 ActivityLevel = user.Preference?.ActivityLevel,
                 TrainingDaysPerWeek = user.Preference?.TrainingDaysPerWeek,
@@ -300,14 +304,17 @@ namespace GymCrest.Application.Modules.Users.Services
                     : null;
             }
             user.Preference.TargetWeight = dto.TargetWeight;
-            user.Preference.TargetCalories = dto.TargetCalories;
-            user.Preference.TargetProtein = dto.TargetProtein;
-            user.Preference.TargetCarbs = dto.TargetCarbs;
-            user.Preference.TargetFats = dto.TargetFats;
+            user.Preference.TargetCalories = dto.TargetCalories ?? user.Preference.TargetCalories;
+            user.Preference.TargetProtein = dto.TargetProtein ?? user.Preference.TargetProtein;
+            user.Preference.TargetCarbs = dto.TargetCarbs ?? user.Preference.TargetCarbs;
+            user.Preference.TargetFats = dto.TargetFats ?? user.Preference.TargetFats;
             user.Preference.TargetTrainingTime = dto.TargetTrainingTime;
+            user.Preference.TargetCaloriesBurn = dto.TargetCaloriesBurn > 0 ? dto.TargetCaloriesBurn : null;
             user.Preference.DietPreference = DietTypes.Normalize(dto.DietPreference) ?? user.Preference.DietPreference;
             user.Preference.ActivityLevel = ActivityLevels.Normalize(dto.ActivityLevel) ?? user.Preference.ActivityLevel;
-            user.Preference.TrainingDaysPerWeek = dto.TrainingDaysPerWeek ?? user.Preference.TrainingDaysPerWeek;
+            user.Preference.TrainingDaysPerWeek = dto.TrainingDaysPerWeek is int days
+                ? Math.Clamp(days, 1, 7)
+                : user.Preference.TrainingDaysPerWeek;
             user.Preference.EmailNotificationsEnabled = dto.EmailNotificationsEnabled ?? true;
             user.Preference.ShowGymBuddy = dto.ShowGymBuddy ?? true;
             user.Preference.ModifiedOn = DateTime.UtcNow;

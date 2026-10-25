@@ -1,0 +1,32 @@
+<div class="feedback-backdrop" (click)="close()">
+  <div class="feedback-card" role="dialog" aria-modal="true" aria-labelledby="feedback-title" (click)="$event.stopPropagation()">
+    <div class="feedback-head">
+      <h3 id="feedback-title">Send feedback</h3>
+      <button type="button" class="close-btn" (click)="close()" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    </div>
+    <p class="feedback-sub">Found a bug or have an idea? It goes straight to the GymCrest team.</p>
+
+    <div class="category-row" role="radiogroup" aria-label="Type">
+      @for (c of categories; track c.value) {
+        <button type="button" class="category-chip" role="radio" [attr.aria-checked]="category() === c.value"
+          [class.active]="category() === c.value" (click)="category.set(c.value)">
+          <i class="fas" [class]="c.icon"></i> {{ c.label }}
+        </button>
+      }
+    </div>
+
+    <textarea #messageBox rows="5" [maxlength]="maxLength" [ngModel]="message()" (ngModelChange)="message.set($event)"
+      [placeholder]="category() === 'Bug' ? 'What happened, and what did you expect?' : 'Tell us what you think'"></textarea>
+    <div class="feedback-meta">
+      <span><i class="fas fa-link"></i> The page you're on is attached</span>
+      <span>{{ message().length }}/{{ maxLength }}</span>
+    </div>
+
+    <div class="feedback-actions">
+      <button type="button" class="ghost-btn" (click)="close()" [disabled]="sending()">Cancel</button>
+      <button type="button" class="send-btn" (click)="send()" [disabled]="message().trim().length < 5 || sending()">
+        {{ sending() ? 'Sending…' : 'Send' }}
+      </button>
+    </div>
+  </div>
+</div>

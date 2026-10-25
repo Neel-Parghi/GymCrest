@@ -68,6 +68,10 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('./features/super-admin/profile/profile.component').then(m => m.ProfileComponent)
+      },
+      {
+        path: 'feedback',
+        loadComponent: () => import('./features/super-admin/feedback/feedback-list.component').then(m => m.FeedbackListComponent)
       }
     ]
   },

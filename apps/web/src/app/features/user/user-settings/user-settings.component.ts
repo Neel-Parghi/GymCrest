@@ -2,17 +2,19 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, debounceTime, filter, map, merge, of, scan, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, merge, of, scan, startWith, switchMap, take } from 'rxjs';
 import { UserService } from '../../../core/services/user.service';
+import { AuthApiService } from '../../../core/services/auth-api.service';
+import { MemberService } from '../../../core/services/member.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ConfirmationService } from '../../../core/services/confirmation.service';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
-import { KCAL_PER_GRAM, macroCalorieSplit } from '../../../shared/utils/nutrition';
+import { macroCalorieSplit } from '../../../shared/utils/nutrition';
 import {
   ACTIVITY_LEVELS, DIET_TYPES, DietType, FITNESS_GOALS, FitnessGoalId, goalLabel, toGoalId
 } from '../../../shared/constants/fitness-preferences';
 import {
-  DashboardForm, FitnessForm, FitnessValue, NotificationsForm, SuggestedTargets, UserPreferences
+  DashboardForm, FitnessForm, NotificationsForm, UserPreferences
 } from '../../../core/models/user-settings.model';
 
 const WEIGHT_STEP = 0.5;
@@ -29,17 +31,13 @@ export class UserSettingsComponent implements OnInit {
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
   private confirmationService = inject(ConfirmationService);
+  private authService = inject(AuthApiService);
+  private memberService = inject(MemberService);
   private destroyRef = inject(DestroyRef);
 
   readonly goals = FITNESS_GOALS;
   readonly dietTypes = DIET_TYPES;
   readonly activityOptions = ACTIVITY_LEVELS.map(a => ({ label: `${a.label} · ${a.hint}`, value: a.value }));
-
-  readonly macroFields = [
-    { key: 'targetProtein', label: 'Protein', tone: 'protein' },
-    { key: 'targetCarbs', label: 'Carbs', tone: 'carbs' },
-    { key: 'targetFats', label: 'Fats', tone: 'fats' }
-  ] as const;
 
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
@@ -50,11 +48,10 @@ export class UserSettingsComponent implements OnInit {
     activityLevel: new FormControl(null),
     dietPreference: new FormControl(null),
     targetWeight: new FormControl<number | null>(null, [Validators.min(0), Validators.max(500)]),
-    targetCalories: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10000)]),
     targetTrainingTime: new FormControl<number | null>(null, [Validators.min(0), Validators.max(600)]),
-    targetProtein: new FormControl<number | null>(null, [Validators.min(0), Validators.max(1000)]),
-    targetCarbs: new FormControl<number | null>(null, [Validators.min(0), Validators.max(1000)]),
-    targetFats: new FormControl<number | null>(null, [Validators.min(0), Validators.max(1000)])
+    // Empty = automatic burn goal
+    targetCaloriesBurn: new FormControl<number | null>(null, [Validators.min(50), Validators.max(5000)]),
+    trainingDaysPerWeek: new FormControl<number | null>(null, [Validators.min(1), Validators.max(7)])
   });
 
   readonly notificationsForm = new FormGroup<NotificationsForm>({
@@ -81,43 +78,41 @@ export class UserSettingsComponent implements OnInit {
     return this.fitnessForm.dirty || this.notificationsForm.dirty || this.dashboardForm.dirty;
   });
 
-  private readonly suggestedTargets = toSignal(
-    merge(this.fitnessForm.controls.primaryGoal.valueChanges, this.fitnessForm.controls.activityLevel.valueChanges).pipe(
-      filter(() => this.goalOrActivityChanged()),
-      debounceTime(250),
-      switchMap(() => {
-        const { primaryGoal, activityLevel } = this.fitnessForm.getRawValue();
-        if (!primaryGoal) return of(null);
-        return this.userService.getSuggestedTargets(primaryGoal, activityLevel).pipe(
-          map(res => (res?.data ?? null) as SuggestedTargets | null),
-          catchError(() => of(null))
-        );
-      })
+  /**
+   * What to eat comes from the active diet plan only (its meals add up to these numbers), so Settings shows it
+   * read-only instead of keeping a second target that could disagree. Reloaded after "Build new plans".
+   */
+  private readonly reloadDiet$ = new BehaviorSubject<void>(undefined);
+  readonly dietPlan = toSignal(
+    this.authService.userProfile$.pipe(
+      filter(profile => !!profile),
+      take(1),
+      switchMap(profile => this.reloadDiet$.pipe(
+        switchMap(() => this.memberService.getActiveDiet(profile!.id, true)),
+        map(res => {
+          const plan = res?.data?.dietPlan;
+          if (!plan) return null;
+          const split = macroCalorieSplit(plan.protein ?? 0, plan.carbs ?? 0, plan.fats ?? 0);
+          return {
+            name: plan.name,
+            calories: plan.calories,
+            macros: [
+              { label: 'Protein', tone: 'protein', grams: Math.round(plan.protein ?? 0), pct: split.protein },
+              { label: 'Carbs', tone: 'carbs', grams: Math.round(plan.carbs ?? 0), pct: split.carbs },
+              { label: 'Fats', tone: 'fats', grams: Math.round(plan.fats ?? 0), pct: split.fats }
+            ]
+          };
+        }),
+        catchError(() => of(null))
+      ))
     ),
-    { initialValue: null }
+    { initialValue: undefined }
   );
 
-  readonly suggestion = computed(() => {
-    const targets = this.suggestedTargets();
-    const f = this.fitness();
-    if (!targets || !this.goalOrActivityChanged()) return null;
-    const applied = f.targetCalories === targets.targetCalories && f.targetProtein === targets.targetProtein
-      && f.targetCarbs === targets.targetCarbs && f.targetFats === targets.targetFats;
-    return applied ? null : { ...targets, goal: goalLabel(f.primaryGoal) };
-  });
-
-  readonly macroCheck = computed(() => {
-    const f = this.fitness();
-    if (f.targetProtein == null && f.targetCarbs == null && f.targetFats == null) return null;
-    const kcal = Math.round(
-      (f.targetProtein ?? 0) * KCAL_PER_GRAM.protein +
-      (f.targetCarbs ?? 0) * KCAL_PER_GRAM.carbs +
-      (f.targetFats ?? 0) * KCAL_PER_GRAM.fats
-    );
-    const target = f.targetCalories ?? 0;
-    const matches = target > 0 && Math.abs(kcal - target) / target <= 0.05;
-    const note = target <= 0 ? '.' : matches ? ', matching your daily target.' : `. Your daily target is ${target} kcal.`;
-    return { kcal, target, matches, note, split: this.macroSplit(f) };
+  /** Goal, diet or activity changed: the current plans were built for the old ones. */
+  readonly plansOutdated = computed(() => {
+    this.formChanges();
+    return this.goalOrActivityChanged() || this.fitnessForm.controls.dietPreference.dirty;
   });
 
   ngOnInit(): void {
@@ -134,17 +129,27 @@ export class UserSettingsComponent implements OnInit {
     });
   }
 
+  /** Automatic burn goal per training minute (from the server, which knows the latest body weight). */
+  private autoBurnPerMinute = 0;
+
+  /** Placeholder for the burn goal box: the automatic value for the training time currently in the form. */
+  autoBurnHint(): number | null {
+    if (!this.autoBurnPerMinute) return null;
+    const minutes = this.fitnessForm.controls.targetTrainingTime.value || 60;
+    return Math.round(this.autoBurnPerMinute * minutes);
+  }
+
   private resetForms(data: UserPreferences): void {
+    const savedMinutes = data.targetTrainingTime || 60;
+    this.autoBurnPerMinute = data.autoCaloriesBurn ? data.autoCaloriesBurn / savedMinutes : 0;
     this.fitnessForm.reset({
       primaryGoal: toGoalId(data.primaryGoal),
       activityLevel: data.activityLevel ?? null,
       dietPreference: data.dietPreference ?? null,
       targetWeight: data.targetWeight ?? null,
-      targetCalories: data.targetCalories ?? null,
       targetTrainingTime: data.targetTrainingTime ?? null,
-      targetProtein: data.targetProtein ?? null,
-      targetCarbs: data.targetCarbs ?? null,
-      targetFats: data.targetFats ?? null
+      targetCaloriesBurn: data.targetCaloriesBurn ?? null,
+      trainingDaysPerWeek: data.trainingDaysPerWeek ?? null
     });
     this.notificationsForm.reset({
       emailNotifications: data.emailNotificationsEnabled ?? true
@@ -157,15 +162,6 @@ export class UserSettingsComponent implements OnInit {
     return primaryGoal.dirty || activityLevel.dirty;
   }
 
-  private macroSplit(f: FitnessValue): { tone: string; pct: number }[] {
-    const split = macroCalorieSplit(f.targetProtein ?? 0, f.targetCarbs ?? 0, f.targetFats ?? 0);
-    return [
-      { tone: 'protein', pct: split.protein },
-      { tone: 'carbs', pct: split.carbs },
-      { tone: 'fats', pct: split.fats }
-    ].filter(part => part.pct > 0);
-  }
-
   selectGoal(value: FitnessGoalId): void {
     const control = this.fitnessForm.controls.primaryGoal;
     control.markAsDirty();
@@ -176,19 +172,6 @@ export class UserSettingsComponent implements OnInit {
     const control = this.fitnessForm.controls.dietPreference;
     control.markAsDirty();
     control.setValue(value);
-  }
-
-  applySuggestion(): void {
-    const targets = this.suggestion();
-    if (!targets) return;
-    const { targetCalories, targetProtein, targetCarbs, targetFats } = this.fitnessForm.controls;
-    [targetCalories, targetProtein, targetCarbs, targetFats].forEach(control => control.markAsDirty());
-    this.fitnessForm.patchValue({
-      targetCalories: targets.targetCalories,
-      targetProtein: targets.targetProtein,
-      targetCarbs: targets.targetCarbs,
-      targetFats: targets.targetFats
-    });
   }
 
   stepWeight(direction: 1 | -1): void {
@@ -233,7 +216,7 @@ export class UserSettingsComponent implements OnInit {
     const confirmed = await this.confirmationService.confirm({
       title: 'Build new starter plans?',
       message: `We'll create a workout and diet plan for ${goalLabel(this.fitness().primaryGoal)} and make them your active plans. ` +
-        'Your current plans stay in your library, and your calorie and macro targets are updated to match.',
+        'Your current plans stay in your library. Your daily calories and macros then come from the new diet plan.',
       confirmText: 'Build plans',
       type: 'info'
     });
@@ -247,6 +230,7 @@ export class UserSettingsComponent implements OnInit {
           const data = (res as { data?: UserPreferences })?.data;
           if (data) this.resetForms(data);
         });
+        this.reloadDiet$.next();
         this.notificationService.success('New starter plans are ready.');
       },
       error: err => {

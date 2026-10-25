@@ -1,0 +1,48 @@
+<div class="feedback-page">
+  <div class="page-header">
+    <div class="header-info">
+      <h1>Feedback</h1>
+      <p>Bug reports and ideas sent from the app</p>
+    </div>
+    <button type="button" class="refresh-btn" (click)="load()" [disabled]="loading()">
+      <i class="fas fa-rotate-right"></i> Refresh
+    </button>
+  </div>
+
+  <div class="filter-tabs" role="tablist">
+    <button type="button" role="tab" [class.active]="filter() === 'open'" (click)="filter.set('open')">
+      Open <span class="count">{{ openCount() }}</span>
+    </button>
+    <button type="button" role="tab" [class.active]="filter() === 'resolved'" (click)="filter.set('resolved')">Resolved</button>
+    <button type="button" role="tab" [class.active]="filter() === 'all'" (click)="filter.set('all')">All</button>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Loading…</p>
+  } @else {
+    @for (item of visible(); track item.id) {
+      <article class="report" [class.resolved]="item.isResolved">
+        <div class="report-head">
+          <span class="category" [attr.data-category]="item.category">
+            <i class="fas" [class]="categoryIcon[item.category] || 'fa-comment'"></i> {{ item.category }}
+          </span>
+          <span class="when">{{ item.createdOn | date: 'd MMM y, h:mm a' }}</span>
+        </div>
+        <p class="message">{{ item.message }}</p>
+        <div class="report-meta">
+          @if (item.userEmail) { <span><i class="fas fa-user"></i> {{ item.userEmail }}@if (item.userRole) { · {{ item.userRole }} }</span> }
+          @if (item.pageUrl) { <span><i class="fas fa-link"></i> {{ item.pageUrl }}</span> }
+          @if (item.userAgent) { <span [title]="item.userAgent"><i class="fas fa-mobile-screen"></i> {{ device(item.userAgent) }}</span> }
+        </div>
+        <div class="report-actions">
+          <button type="button" class="resolve-btn" (click)="toggleResolved(item)">
+            <i class="fas" [class.fa-check]="!item.isResolved" [class.fa-rotate-left]="item.isResolved"></i>
+            {{ item.isResolved ? 'Reopen' : 'Mark resolved' }}
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <p class="status">{{ filter() === 'open' ? 'No open reports. Nice.' : 'Nothing here yet.' }}</p>
+    }
+  }
+</div>
