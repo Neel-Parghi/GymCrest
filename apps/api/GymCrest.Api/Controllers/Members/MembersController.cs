@@ -21,6 +21,7 @@ namespace GymCrest.Api.Controllers.Members
         }
 
         [HttpPost]
+        [BlockDemoAccount]
         public async Task<ActionResult> OnboardMember([FromBody] OnboardMemberRequest request)
         {
             if (GymId == null) return Unauthorized();
@@ -72,6 +73,7 @@ namespace GymCrest.Api.Controllers.Members
         [AuthorizeMemberAccess("id")]
         
         [HttpPut("{id}")]
+        [BlockDemoAccount]
         public async Task<ActionResult> UpdateMember(Guid id, [FromBody] OnboardMemberRequest request)
         {
             try

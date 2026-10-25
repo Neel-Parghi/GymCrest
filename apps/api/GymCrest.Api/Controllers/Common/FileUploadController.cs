@@ -1,3 +1,4 @@
+using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace GymCrest.Api.Controllers.Common
         }
 
         [HttpPost]
+        [BlockDemoAccount]
         public async Task<IActionResult> Upload(IFormFile file, [FromQuery] string folder = "general")
         {
             if (file == null || file.Length == 0)
