@@ -13,6 +13,7 @@ import { GymService } from '../../core/services/gym.service';
 import { GymSettingsService } from '../../core/services/gym-settings.service';
 import { AnnouncementService } from '../../core/services/announcement.service';
 import { UserNotificationApiService } from '../../core/services/user-notification-api.service';
+import { FeedbackDialogComponent } from '../../shared/components/feedback-dialog/feedback-dialog.component';
 import { TourService } from '../../core/services/tour.service';
 import { UserBottomNavComponent } from '../user-bottom-nav/user-bottom-nav.component';
 import { forkJoin, of } from 'rxjs';
@@ -22,7 +23,7 @@ import { BrandLogoComponent } from '../../shared/components/brand-logo/brand-log
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LoadingComponent, UserBottomNavComponent, BrandLogoComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LoadingComponent, UserBottomNavComponent, BrandLogoComponent, FeedbackDialogComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })
@@ -61,6 +62,7 @@ export class MainLayoutComponent implements OnInit {
   isStaffLocked = false;
   branches: any[] = [];
   isBranchDropdownOpen = false;
+  feedbackOpen = false;
 
   isNotificationsOpen = false;
   announcements: any[] = [];
@@ -260,7 +262,8 @@ export class MainLayoutComponent implements OnInit {
   get userInitials(): string {
     const profile = (this.authApiService as any).userProfileSubject?.value;
     if (profile) {
-      return `${profile.firstName[0]}${profile.lastName[0]}`.toUpperCase();
+      const initials = `${profile.firstName?.[0] ?? ''}${profile.lastName?.[0] ?? ''}`.toUpperCase();
+      if (initials) return initials;
     }
 
     const decoded = this.authApiService.decodeToken();

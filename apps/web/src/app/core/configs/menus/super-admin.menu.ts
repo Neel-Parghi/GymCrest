@@ -50,6 +50,18 @@ export const SuperAdminMenu: NavItem[] = [
         roles: ['SuperAdmin'],
     },
     {
+        label: 'SUPPORT',
+        icon: '',
+        roles: ['SuperAdmin'],
+        isHeading: true
+    },
+    {
+        label: 'Feedback',
+        icon: 'fa-solid fa-comment-dots',
+        route: '/super-admin/feedback',
+        roles: ['SuperAdmin']
+    },
+    {
         label: 'ACCOUNT',
         icon: '',
         roles: ['SuperAdmin'],

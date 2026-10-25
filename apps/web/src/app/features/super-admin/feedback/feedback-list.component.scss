@@ -1,0 +1,144 @@
+.feedback-page {
+  max-width: 900px;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 16px;
+
+  button {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+
+    &.active {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: rgba(37, 99, 235, 0.08);
+    }
+  }
+
+  .count {
+    margin-left: 4px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 0.75rem;
+  }
+}
+
+.status {
+  color: var(--text-muted);
+  padding: 24px 0;
+}
+
+.report {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+
+  &.resolved {
+    opacity: 0.65;
+  }
+}
+
+.report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--bg-color);
+  color: var(--text-main);
+
+  &[data-category='Bug'] {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  &[data-category='Idea'] {
+    background: #fffbeb;
+    color: #b45309;
+  }
+}
+
+.when {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.message {
+  margin: 10px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.report-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+
+  span {
+    word-break: break-all;
+  }
+
+  i {
+    margin-right: 4px;
+  }
+}
+
+.report-actions {
+  margin-top: 12px;
+}
+
+.resolve-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+}
