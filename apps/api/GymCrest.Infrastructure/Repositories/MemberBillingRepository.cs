@@ -162,6 +162,24 @@ namespace GymCrest.Infrastructure.Repositories
             await _dbContext.PaymentRecords.AddAsync(record);
         }
 
+        public async Task<Dictionary<Guid, List<string>>> GetPaymentMethodsBySourcesAsync(PaymentSourceType sourceType, IEnumerable<Guid> sourceIds)
+        {
+            List<Guid> ids = sourceIds.Distinct().ToList();
+            
+            if (ids.Count == 0) 
+                return [];
+
+            var rows = await _dbContext.PaymentRecords
+                .Where(x => x.SourceType == sourceType && ids.Contains(x.SourceId))
+                .OrderBy(x => x.PaidAt)
+                .Select(x => new { x.SourceId, x.PaymentMethod })
+                .ToListAsync();
+
+            return rows
+                .GroupBy(x => x.SourceId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.PaymentMethod).Where(m => !string.IsNullOrWhiteSpace(m)).Distinct().ToList());
+        }
+
         public async Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId)
         {
             return await _dbContext.PaymentRecords

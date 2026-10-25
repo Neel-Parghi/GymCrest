@@ -63,6 +63,8 @@ namespace GymCrest.Application.Modules.Gym.Services
             Branch? mainBranch = await _billingRepository.GetMainBranchAsync(gymId);
 
             IEnumerable<MemberSubscription> subscriptions = await _billingRepository.GetSubscriptionsByMonthAsync(gymId, startDate, endDate);
+            Dictionary<Guid, List<string>> subscriptionMethods = await _billingRepository.GetPaymentMethodsBySourcesAsync(
+                PaymentSourceType.Subscription, subscriptions.Select(s => s.Id));
 
             foreach (MemberSubscription sub in subscriptions)
             {
@@ -88,6 +90,7 @@ namespace GymCrest.Application.Modules.Gym.Services
                     DateIssued = sub.StartDate,
                     DueDate = sub.StartDate.AddDays(15),
                     Status = sub.PaymentStatus.ToString(),
+                    PaymentMethod = DescribePaymentMethods(subscriptionMethods.GetValueOrDefault(sub.Id), sub.AmountPaid),
                     MembershipNumber = sub.Member.MembershipNumber ?? string.Empty,
                     RealRecordId = sub.Id,
                     CreatedOn = sub.CreatedOn,
@@ -128,6 +131,8 @@ namespace GymCrest.Application.Modules.Gym.Services
                     DateIssued = tx!.TransactionDate,
                     DueDate = tx.TransactionDate,
                     Status = saleIsPaid ? "Paid" : "Pending",
+                    // Unpaid sales are stored as "Pending-<method>"
+                    PaymentMethod = saleIsPaid ? tx.PaymentMethod : $"{tx.PaymentMethod.Replace("Pending-", "")} (pending)",
                     MembershipNumber = tx?.Member?.MembershipNumber ?? string.Empty,
                     RealRecordId = tx!.Id,
                     CreatedOn = tx.CreatedOn,
@@ -314,6 +319,16 @@ namespace GymCrest.Application.Modules.Gym.Services
                 Notes = r.Notes,
                 PaidAt = r.PaidAt
             });
+        }
+
+        /// <summary>
+        /// Methods from the payment records (e.g. "UPI, Cash" when paid in parts). Payments taken before methods were
+        /// recorded show "Not recorded" rather than a guess.
+        /// </summary>
+        private static string DescribePaymentMethods(List<string>? methods, decimal amountPaid)
+        {
+            if (methods is { Count: > 0 }) return string.Join(", ", methods);
+            return amountPaid > 0 ? "Not recorded" : "Not paid yet";
         }
     }
 }
