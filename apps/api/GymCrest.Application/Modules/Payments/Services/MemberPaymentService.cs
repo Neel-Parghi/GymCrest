@@ -18,17 +18,20 @@ namespace GymCrest.Application.Modules.Payments.Services
         private readonly IGymMemberRepository _gymMemberRepository;
         private readonly IGymManagementRepository _gymManagementRepository;
         private readonly IGymPlanRepository _gymPlanRepository;
+        private readonly IMemberBillingRepository _billingRepository;
         private readonly IUnitOfWork _uow;
 
         public MemberPaymentService(
             IGymMemberRepository gymMemberRepository,
             IGymManagementRepository gymManagementRepository,
             IGymPlanRepository gymPlanRepository,
+            IMemberBillingRepository billingRepository,
             IUnitOfWork uow)
         {
             _gymMemberRepository = gymMemberRepository;
             _gymManagementRepository = gymManagementRepository;
             _gymPlanRepository = gymPlanRepository;
+            _billingRepository = billingRepository;
             _uow = uow;
         }
 
@@ -126,6 +129,20 @@ namespace GymCrest.Application.Modules.Payments.Services
             };
 
             await _gymMemberRepository.AddSubscriptionAsync(subscription);
+            await _billingRepository.AddPaymentRecordAsync(new PaymentRecord
+            {
+                Id = Guid.NewGuid(),
+                MemberId = member.Id,
+                SourceType = PaymentSourceType.Subscription,
+                SourceId = subscription.Id,
+                Amount = amountPaid,
+                PaymentMethod = "Online (Razorpay)",
+                Notes = $"Razorpay payment {request.RazorpayPaymentId}",
+                PaidAt = DateTime.UtcNow,
+                GymId = member.GymId,
+                BranchId = member.BranchId,
+                CreatedOn = DateTime.UtcNow
+            });
             await _uow.SaveChangesAsync();
 
             return new ApiResponse<PaymentVerificationResponse> {

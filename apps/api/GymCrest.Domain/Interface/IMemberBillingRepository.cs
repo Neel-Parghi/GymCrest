@@ -26,6 +26,7 @@ namespace GymCrest.Domain.Interface
         // Payment ledger methods
         Task AddPaymentRecordAsync(PaymentRecord record);
         Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId);
+        Task<Dictionary<Guid, List<string>>> GetPaymentMethodsBySourcesAsync(PaymentSourceType sourceType, IEnumerable<Guid> sourceIds);
 
         // Staff Payroll repository methods
         Task<IEnumerable<StaffPayrollRule>> GetPayrollRulesAsync(Guid gymId, Guid? branchId = null);
