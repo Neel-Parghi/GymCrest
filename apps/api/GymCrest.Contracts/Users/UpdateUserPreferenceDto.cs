@@ -9,6 +9,7 @@ namespace GymCrest.Contracts.Users
         public int? TargetCarbs { get; set; }
         public int? TargetFats { get; set; }
         public int? TargetTrainingTime { get; set; }
+        public int? TargetCaloriesBurn { get; set; }
         public string? DietPreference { get; set; }
         public string? ActivityLevel { get; set; }
         public int? TrainingDaysPerWeek { get; set; }
@@ -19,5 +20,6 @@ namespace GymCrest.Contracts.Users
 
     public class UserPreferenceDto : UpdateUserPreferenceDto
     {
+        public int AutoCaloriesBurn { get; set; }
     }
 }

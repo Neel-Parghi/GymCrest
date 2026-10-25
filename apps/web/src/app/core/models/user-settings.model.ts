@@ -6,11 +6,9 @@ export interface FitnessForm {
   activityLevel: FormControl<ActivityLevel | null>;
   dietPreference: FormControl<DietType | null>;
   targetWeight: FormControl<number | null>;
-  targetCalories: FormControl<number | null>;
   targetTrainingTime: FormControl<number | null>;
-  targetProtein: FormControl<number | null>;
-  targetCarbs: FormControl<number | null>;
-  targetFats: FormControl<number | null>;
+  targetCaloriesBurn: FormControl<number | null>;
+  trainingDaysPerWeek: FormControl<number | null>;
 }
 
 export interface NotificationsForm {
@@ -32,6 +30,10 @@ export interface UserPreferences {
   targetCarbs?: number | null;
   targetFats?: number | null;
   targetTrainingTime?: number | null;
+  /** Own daily burn goal; null = automatic. */
+  targetCaloriesBurn?: number | null;
+  /** What the automatic burn goal works out to (body weight × training time). */
+  autoCaloriesBurn?: number;
   emailNotificationsEnabled?: boolean;
   showGymBuddy?: boolean;
 }

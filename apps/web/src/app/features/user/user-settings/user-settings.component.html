@@ -20,7 +20,7 @@
       <section class="card" [formGroup]="fitnessForm">
         <div class="card-head">
           <h2>Fitness goals</h2>
-          <p>Your goal sets today's goal ring on the dashboard and the targets we suggest below.</p>
+          <p>Your goals shape the workout and diet plans we build for you.</p>
         </div>
 
         <div class="goal-grid" role="radiogroup" aria-label="Primary goal">
@@ -66,10 +66,13 @@
             </div>
           </div>
           <label class="field">
-            <span>Burn daily calories</span>
-            <span class="input-unit" [class.invalid]="fitnessForm.controls.targetCalories.invalid">
-              <input type="number" inputmode="numeric" formControlName="targetCalories" placeholder="e.g. 2200" min="0">
-              <span class="unit">kcal</span>
+            
+            <span>Calories to burn</span>
+            <span class="input-unit" [class.invalid]="fitnessForm.controls.targetCaloriesBurn.invalid">
+              <input type="number" inputmode="numeric" formControlName="targetCaloriesBurn" min="50"
+                [placeholder]="autoBurnHint() ? 'Auto · ' + autoBurnHint() : 'Auto'"
+                title="Your daily burn goal from training. Leave empty to work it out from your weight and training time.">
+              <span class="unit">kcal/day</span>
             </span>
           </label>
           <label class="field">
@@ -79,44 +82,43 @@
               <span class="unit">min/day</span>
             </span>
           </label>
+          <label class="field">
+            <span>Training days</span>
+            <span class="input-unit" [class.invalid]="fitnessForm.controls.trainingDaysPerWeek.invalid">
+              <input type="number" inputmode="numeric" formControlName="trainingDaysPerWeek" placeholder="e.g. 4" min="1" max="7"
+                title="How many days a week you train. Used when building new starter plans.">
+              <span class="unit">days/week</span>
+            </span>
+          </label>
         </div>
 
+        <!-- Read-only: calories and macros to eat come from the active diet plan, so there's one source -->
         <div class="macros">
-          <span class="sub-label">Macro targets</span>
-          <div class="macro-grid">
-            @for (m of macroFields; track m.key) {
-              <label class="field">
-                <span class="macro-name"><span class="dot" [attr.data-macro]="m.tone"></span>{{ m.label }}</span>
-                <span class="input-unit" [class.invalid]="fitnessForm.controls[m.key].invalid">
-                  <input type="number" inputmode="numeric" [formControlName]="m.key" placeholder="-" min="0">
-                  <span class="unit">g</span>
-                </span>
-              </label>
-            }
+          <div class="nutrition-head">
+            <span class="sub-label">Daily nutrition</span>
+            <a routerLink="/user/diet-planner" class="btn-link">{{ dietPlan() ? 'Open diet plan' : 'Choose a diet plan' }}</a>
           </div>
-
-          @if (macroCheck(); as check) {
-            @if (check.split.length) {
-              <div class="split-bar" aria-hidden="true">
-                @for (part of check.split; track part.tone) {
-                  <span [attr.data-macro]="part.tone" [style.flex-grow]="part.pct"></span>
-                }
+          @if (dietPlan(); as plan) {
+            <div class="nutrition-stats">
+              <div class="stat">
+                <span class="macro-name">Calories</span>
+                <strong>{{ plan.calories }} <small>kcal</small></strong>
               </div>
-            }
-            <p class="macro-note" [class.warn]="check.target > 0 && !check.matches">
-              Macros add up to <strong>{{ check.kcal }} kcal</strong>{{ check.note }}
-            </p>
-          }
-
-          @if (suggestion(); as tip) {
-            <div class="suggestion" role="status">
-              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-              <p>
-                Suggested for {{ tip.goal }}: <strong>{{ tip.targetCalories }} kcal</strong> ·
-                {{ tip.targetProtein }} g protein · {{ tip.targetCarbs }} g carbs · {{ tip.targetFats }} g fats
-              </p>
-              <button type="button" class="btn-link" (click)="applySuggestion()">Use these</button>
+              @for (m of plan.macros; track m.tone) {
+                <div class="stat">
+                  <span class="macro-name"><span class="dot" [attr.data-macro]="m.tone"></span>{{ m.label }}</span>
+                  <strong>{{ m.grams }} <small>g</small></strong>
+                </div>
+              }
             </div>
+            <div class="split-bar" aria-hidden="true">
+              @for (m of plan.macros; track m.tone) {
+                @if (m.pct > 0) { <span [attr.data-macro]="m.tone" [style.flex-grow]="m.pct"></span> }
+              }
+            </div>
+            <p class="macro-note">From your diet plan <strong>{{ plan.name }}</strong>. Change the plan or its meals to change these.</p>
+          } @else if (dietPlan() === null) {
+            <p class="macro-note">No diet plan yet. Build new plans below, or choose one in Nutrition.</p>
           }
         </div>
 
@@ -124,7 +126,9 @@
           <span class="toggle-text">
             <span class="toggle-title">Starter plans</span>
             <span class="toggle-desc">
-              @if (isDirty()) {
+              @if (plansOutdated()) {
+                Your plans were built for your previous goals. Save, then build new plans to match.
+              } @else if (isDirty()) {
                 Save your changes first, then build plans that match them.
               } @else {
                 Build a fresh workout and diet plan for your goal, diet and schedule.

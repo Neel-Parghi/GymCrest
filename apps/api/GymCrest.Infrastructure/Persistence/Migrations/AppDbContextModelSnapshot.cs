@@ -2636,6 +2636,9 @@ namespace GymCrest.Infrastructure.Persistence.Migrations
                     b.Property<int?>("TargetCalories")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("TargetCaloriesBurn")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("TargetCarbs")
                         .HasColumnType("integer");
 

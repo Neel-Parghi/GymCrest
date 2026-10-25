@@ -267,7 +267,9 @@ namespace GymCrest.Infrastructure.Repositories
             summary.StrengthSetsToday = todaySets.Count(s => !s.IsCardio);
             summary.CaloriesBurnedToday = (int)Math.Round(
                 bodyWeightKg * ((CardioMet * cardioMinutes) + (StrengthMet * strengthMinutes)) / 60.0);
-            summary.TargetCaloriesBurn = (int)Math.Round(bodyWeightKg * StrengthMet * summary.TargetTrainingTime / 60.0);
+            // The member's own goal if set, otherwise worked out from body weight and training time
+            summary.TargetCaloriesBurn = user.Preference?.TargetCaloriesBurn
+                ?? CalorieBurn.AutoDailyTarget(bodyWeightKg, summary.TargetTrainingTime);
 
             (int streak, bool streakAtRisk) = await CalculateWorkoutStreakAsync(userId, user.GymId, today);
             summary.WorkoutStreak = streak;
