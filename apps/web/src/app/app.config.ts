@@ -1,5 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { TitleStrategy, provideRouter, withInMemoryScrolling } from '@angular/router';
+import { TitleStrategy, provideRouter, withInMemoryScrolling, withNavigationErrorHandler } from '@angular/router';
+import { reloadOnStaleBuild } from './core/routing/stale-build-recovery';
 import { SeoTitleStrategy } from './core/seo/seo-title.strategy';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
@@ -12,7 +13,9 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    provideRouter(routes,
+      withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
+      withNavigationErrorHandler(reloadOnStaleBuild)),
     { provide: TitleStrategy, useClass: SeoTitleStrategy },
     provideHttpClient(withInterceptors([authInterceptor, loadingInterceptor]), withFetch()),
     provideAnimations(),
