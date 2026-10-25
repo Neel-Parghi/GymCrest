@@ -2,7 +2,7 @@
 export const LEGAL = {
   operator: 'Neel Parghi',
   location: 'Ahmedabad, Gujarat, India',
-  contactEmail: 'jnjarvis19@gmail.com',
+  contactEmail: 'gymcrest.support@gmail.com',
   jurisdiction: 'Ahmedabad, Gujarat',
   lastUpdated: '25 October 2026'
 } as const;
