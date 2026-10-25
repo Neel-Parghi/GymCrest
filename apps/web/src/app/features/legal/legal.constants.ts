@@ -4,5 +4,5 @@ export const LEGAL = {
   location: 'Ahmedabad, Gujarat, India',
   contactEmail: 'jnjarvis19@gmail.com',
   jurisdiction: 'Ahmedabad, Gujarat',
-  lastUpdated: '18 October 2026'
+  lastUpdated: '25 October 2026'
 } as const;
