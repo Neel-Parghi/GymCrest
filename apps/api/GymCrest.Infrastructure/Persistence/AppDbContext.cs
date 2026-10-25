@@ -113,6 +113,8 @@ namespace GymCrest.Infrastructure.Persistence
 
         public DbSet<MemberDietAssignment> MemberDietAssignments { get; set; }
 
+        public DbSet<Feedback> Feedbacks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -393,6 +395,17 @@ namespace GymCrest.Infrastructure.Persistence
             {
                 entity.HasIndex(x => x.GymId);
                 entity.HasIndex(x => x.BranchId);
+            });
+
+            modelBuilder.Entity<Feedback>(entity =>
+            {
+                entity.Property(f => f.Category).HasMaxLength(20);
+                entity.Property(f => f.Message).HasMaxLength(2000);
+                entity.Property(f => f.PageUrl).HasMaxLength(500);
+                entity.Property(f => f.UserAgent).HasMaxLength(300);
+                entity.Property(f => f.UserEmail).HasMaxLength(256);
+                entity.Property(f => f.UserRole).HasMaxLength(30);
+                entity.HasIndex(f => new { f.IsResolved, f.CreatedOn });
             });
 
             modelBuilder.Entity<UserNotification>(entity =>

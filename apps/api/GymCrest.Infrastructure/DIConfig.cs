@@ -110,6 +110,7 @@ namespace GymCrest.Infrastructure
             services.AddScoped<IGymAnnouncementRepository, GymAnnouncementRepository>();
             services.AddScoped<IAnnouncementTemplateRepository, AnnouncementTemplateRepository>();
             services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddMemoryCache();
             services.AddSingleton<IndianFoodDatabase>();
             services.AddHttpClient<GeminiFoodSearchProvider>(client => client.Timeout = TimeSpan.FromSeconds(25));
