@@ -33,8 +33,6 @@ const ROUTINE_PREVIEW = 5;
 const NUDGE_FROM_HOUR = 18;
 /** Daily cardio the weight-loss and endurance goal rings aim for. */
 const CARDIO_TARGET_MINUTES = 30;
-/** Sets the muscle-gain ring aims for when there's no planned workout to compare against. */
-const DEFAULT_SET_TARGET = 15;
 
 @Component({
   selector: 'app-user-dashboard',
@@ -124,10 +122,10 @@ export class UserDashboardComponent implements OnInit {
         const routines = this.routines();
         return routines.length
           ? this.goalProgress('Routines', this.doneRoutineCount(), routines.length, 'done')
-          : this.setsRing();
+          : this.exercisesRing();
       }
       default:
-        return this.setsRing();
+        return this.exercisesRing();
     }
   });
 
@@ -288,37 +286,40 @@ export class UserDashboardComponent implements OnInit {
 
     if (loggedToday && loggedAs) {
       const isRest = loggedAs === 'rest';
+      const planDay = this.planDayFor(plan, loggedToday.dayName);
       return {
         state: isRest ? 'rest' : 'done',
         planName,
         title: isRest ? 'Rest day logged' : loggedToday.dayName,
         muscles: '',
         exerciseCount: loggedToday.exercisesCompleted ?? 0,
-        setCount: loggedToday.totalSets ?? 0
+        setCount: loggedToday.totalSets ?? 0,
+        plannedExerciseCount: isRest ? 0 : planDay?.exercises?.length ?? loggedToday.loggedExercises?.length ?? 0
       };
     }
 
     // A workout planned for today from the calendar replaces the plan's usual day.
     if (loggedToday?.status === PLANNED_STATUS) {
       const exercises = loggedToday.loggedExercises ?? [];
-      const planDay = plan?.days?.find(d => d.dayName === loggedToday.dayName);
+      const planDay = this.planDayFor(plan, loggedToday.dayName);
       return {
         state: 'ready',
         planName,
         title: loggedToday.dayName,
         muscles: (planDay?.category ?? '').split(',').map(c => c.trim()).filter(Boolean).join(' · '),
         exerciseCount: exercises.length,
-        setCount: exercises.reduce((sum, ex) => sum + (ex.loggedSets?.length ?? 0), 0)
+        setCount: exercises.reduce((sum, ex) => sum + (ex.loggedSets?.length ?? 0), 0),
+        plannedExerciseCount: exercises.length
       };
     }
 
     if (!plan?.days?.length) {
-      return { state: 'none', planName, title: 'No workout plan yet', muscles: '', exerciseCount: 0, setCount: 0 };
+      return { state: 'none', planName, title: 'No workout plan yet', muscles: '', exerciseCount: 0, setCount: 0, plannedExerciseCount: 0 };
     }
 
     const day = resolveScheduledDay(plan.days, this.today);
     if (!day || day.isRestDay) {
-      return { state: 'rest', planName, title: 'Rest day', muscles: '', exerciseCount: 0, setCount: 0 };
+      return { state: 'rest', planName, title: 'Rest day', muscles: '', exerciseCount: 0, setCount: 0, plannedExerciseCount: 0 };
     }
 
     const exercises = day.exercises ?? [];
@@ -328,8 +329,15 @@ export class UserDashboardComponent implements OnInit {
       title: day.dayName,
       muscles: (day.category ?? '').split(',').map(c => c.trim()).filter(Boolean).join(' · '),
       exerciseCount: exercises.length,
-      setCount: exercises.reduce((sum, ex) => sum + exerciseSetCount(ex.sets), 0)
+      setCount: exercises.reduce((sum, ex) => sum + exerciseSetCount(ex.sets), 0),
+      plannedExerciseCount: exercises.length
     };
+  }
+
+  /** Logged sessions name the day "Push - Chest, Triceps" when the plan day has a category. */
+  private planDayFor(plan: ActivePlanView | null, loggedDayName: string) {
+    return plan?.days?.find(d =>
+      d.dayName === loggedDayName || (!!d.category && `${d.dayName} - ${d.category}` === loggedDayName));
   }
 
   private buildWeek(logs: WorkoutSessionLogDto[]): WeekDay[] {
@@ -377,14 +385,17 @@ export class UserDashboardComponent implements OnInit {
     };
   }
 
-  /** Strength sets done against today's planned workout; a rest day counts as complete. */
-  private setsRing(): GoalRing {
+  /**
+   * Exercises done against today's plan, e.g. 6 / 7 or 8 / 7 when extras were added. A rest day
+   * counts as complete; without a planned workout, any logged exercise fills the ring.
+   */
+  private exercisesRing(): GoalRing {
     const workout = this.todayWorkout();
-    const done = this.summary()?.strengthSetsToday ?? 0;
-    if (workout?.state === 'rest') return { label: 'Sets', pct: 100, value: 'Rest day', unit: '' };
-    if (workout?.state === 'done') return { label: 'Sets', pct: 100, value: `${done}`, unit: 'sets' };
-    const planned = workout?.state === 'ready' && workout.setCount > 0 ? workout.setCount : DEFAULT_SET_TARGET;
-    return this.goalProgress('Sets', done, planned, 'sets');
+    const done = this.summary()?.exercisesDoneToday ?? 0;
+    const planned = workout?.plannedExerciseCount ?? 0;
+    if (workout?.state === 'rest' && !done) return { label: 'Exercises', pct: 100, value: 'Rest day', unit: '' };
+    if (planned > 0) return this.goalProgress('Exercises', done, planned, 'done');
+    return { label: 'Exercises', pct: done > 0 ? 100 : 0, value: `${done}`, unit: 'done' };
   }
 
   private goalProgress(label: string, value: number, target: number, unit: string): GoalRing {

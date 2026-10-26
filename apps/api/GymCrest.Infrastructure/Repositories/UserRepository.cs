@@ -252,7 +252,7 @@ namespace GymCrest.Infrastructure.Repositories
                 .Where(e => !e.Skipped)
                 .SelectMany(e => e.LoggedSets
                     .Where(s => s.Completed)
-                    .Select(s => new { e.IsCardio, s.Reps }))
+                    .Select(s => new { ExerciseId = e.Id, e.IsCardio, s.Reps }))
                 .ToListAsync();
 
             // Cardio sets log their duration in minutes in the Reps field.
@@ -264,7 +264,8 @@ namespace GymCrest.Infrastructure.Repositories
 
             summary.ActiveTrainingTimeMinutes = (int)Math.Round(cardioMinutes + strengthMinutes);
             summary.CardioMinutesToday = (int)Math.Round(cardioMinutes);
-            summary.StrengthSetsToday = todaySets.Count(s => !s.IsCardio);
+            // An exercise counts as done once at least one of its sets is ticked off.
+            summary.ExercisesDoneToday = todaySets.Select(s => s.ExerciseId).Distinct().Count();
             summary.CaloriesBurnedToday = (int)Math.Round(
                 bodyWeightKg * ((CardioMet * cardioMinutes) + (StrengthMet * strengthMinutes)) / 60.0);
             // The member's own goal if set, otherwise worked out from body weight and training time

@@ -49,7 +49,7 @@ export interface UserDashboardSummary {
   caloriesBurnedToday: number;
   activeTrainingTimeMinutes: number;
   cardioMinutesToday: number;
-  strengthSetsToday: number;
+  exercisesDoneToday: number;
   workoutStreak: number;
   streakAtRisk: boolean;
   monthlySessionCount: number;
@@ -104,6 +104,8 @@ export interface TodayWorkout {
   muscles: string;
   exerciseCount: number;
   setCount: number;
+  /** Exercises the plan sets for today, kept after the workout is logged. */
+  plannedExerciseCount: number;
 }
 
 export type WeekDayState = 'done' | 'rest' | 'today' | 'missed' | 'upcoming';
