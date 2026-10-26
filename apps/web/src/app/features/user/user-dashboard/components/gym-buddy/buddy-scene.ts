@@ -86,7 +86,7 @@ function shadowTexture(): CanvasTexture {
 type Finish = 'soft' | 'gloss';
 
 /**
- * Builds "Forgie", a chibi gym coach (big head, headband, tank top, whistle), in a transparent canvas.
+ * Builds "Bolt", a chibi gym coach (big head, headband, tank top, whistle), in a transparent canvas.
  * It rises out of the background, waves hello, follows the pointer with its eyes, blinks, and flexes when tapped.
  */
 export function createBuddyScene(canvas: HTMLCanvasElement): BuddyScene {

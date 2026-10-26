@@ -32,7 +32,7 @@ function canRender3d(): boolean {
 }
 
 /**
- * "Forgie", the dashboard's gym buddy: a 3D chibi coach that pops up, waves hello and chats about
+ * "Bolt", the dashboard's gym buddy: a 3D chibi coach that pops up, waves hello and chats about
  * the member's day. Falls back to a flat SVG buddy without WebGL or with reduced motion.
  */
 @Component({

@@ -7,7 +7,7 @@
   <span class="visually-hidden" role="status" aria-live="polite">{{ bubbleOpen() ? line().text : '' }}</span>
 
   <button type="button" class="mascot" #mascot [class.is-3d]="use3d()" [class.hop]="hopping() && !use3d()"
-    [attr.data-state]="state() ?? 'loading'" (click)="poke()" aria-label="Forgie, your gym buddy. Tap for a pep talk, drag to move, double-tap to send home">
+    [attr.data-state]="state() ?? 'loading'" (click)="poke()" aria-label="Bolt, your gym buddy. Tap for a pep talk, drag to move, double-tap to send home">
     @if (use3d()) {
       <canvas #canvas aria-hidden="true"></canvas>
     } @else {

@@ -103,6 +103,9 @@ export class WorkoutSessionComponent {
 
   readonly current = computed(() => this.exercises()[this.currentIndex()] ?? null);
 
+  /** The workout as it was handed in, so leaving only warns about changes made since. */
+  private loadedState = '';
+
   readonly completedSetCount = computed(() =>
     this.exercises().reduce((sum, ex) => sum + (ex.skipped ? 0 : ex.sets.filter(s => s.completed).length), 0)
   );
@@ -176,6 +179,7 @@ export class WorkoutSessionComponent {
       this.form.push(this.exerciseGroup(ex.name, isCardio, !!ex.skipped, ex.sets ?? []), { emitEvent: false });
     }
     this.form.updateValueAndValidity();
+    this.loadedState = JSON.stringify(this.form.getRawValue());
 
     // Open on the first exercise with work left.
     const firstOpen = this.exercises().findIndex(e => !e.skipped && e.sets.some(s => !s.completed));
@@ -414,7 +418,8 @@ export class WorkoutSessionComponent {
   }
 
   async leave(): Promise<void> {
-    if (this.completedSetCount() > 0) {
+    const changed = JSON.stringify(this.form.getRawValue()) !== this.loadedState;
+    if (changed && this.completedSetCount() > 0) {
       const discard = await this.confirmation.confirm({
         title: 'Leave this workout?',
         message: 'Sets you have completed but not saved will be lost.',

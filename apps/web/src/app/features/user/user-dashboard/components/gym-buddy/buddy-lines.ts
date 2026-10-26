@@ -58,6 +58,6 @@ function factLines(f: BuddyFacts): BuddyLine[] {
 
 /** The buddy's script: hello, today's plan, then personal facts for each tap. */
 export function buddyLines(f: BuddyFacts, hour = new Date().getHours()): BuddyLine[] {
-  const greeting = f.isFirstTime ? `Hi ${f.firstName}! I'm Forgie, your gym buddy.` : hello(f.firstName, hour);
+  const greeting = f.isFirstTime ? `Hi ${f.firstName}! I'm Bolt, your gym buddy.` : hello(f.firstName, hour);
   return [{ text: greeting, icon: 'fa-hand' }, todayLine(f), ...factLines(f)];
 }
