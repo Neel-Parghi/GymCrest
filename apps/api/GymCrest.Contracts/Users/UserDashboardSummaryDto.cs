@@ -22,7 +22,7 @@ namespace GymCrest.Contracts.Users
         public int CaloriesBurnedToday { get; set; }
         public int ActiveTrainingTimeMinutes { get; set; }
         public int CardioMinutesToday { get; set; }
-        public int StrengthSetsToday { get; set; }
+        public int ExercisesDoneToday { get; set; }
         public int WorkoutStreak { get; set; }
         public bool StreakAtRisk { get; set; }
         
