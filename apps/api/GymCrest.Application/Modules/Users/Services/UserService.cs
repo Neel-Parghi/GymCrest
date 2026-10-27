@@ -111,6 +111,7 @@ namespace GymCrest.Application.Modules.Users.Services
 
             user.PasswordHash = _passwordService.HashPassword(setPasswordRequestDto.Password);
             user.Security.IsInvitationAccepted = true;
+            user.Security.IsEmailVerified = true;
             user.Security.InvitationToken = null;
             user.Security.InvitationExpiry = null;
             user.ModifiedOn = DateTime.UtcNow;
