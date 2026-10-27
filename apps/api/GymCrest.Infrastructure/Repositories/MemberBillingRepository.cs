@@ -77,14 +77,14 @@ namespace GymCrest.Infrastructure.Repositories
             await _dbContext.InventoryItems.AddAsync(item);
         }
 
-        public async Task<MemberSubscription?> GetSubscriptionByIdAsync(Guid recordId)
+        public async Task<MemberSubscription?> GetSubscriptionByIdAsync(Guid recordId, Guid gymId)
         {
-            return await _dbContext.MemberSubscriptions.FindAsync(recordId);
+            return await _dbContext.MemberSubscriptions.FirstOrDefaultAsync(s => s.Id == recordId && s.Member.GymId == gymId);
         }
 
-        public async Task<SaleTransaction?> GetTransactionByIdAsync(Guid recordId)
+        public async Task<SaleTransaction?> GetTransactionByIdAsync(Guid recordId, Guid gymId)
         {
-            return await _dbContext.SaleTransactions.FindAsync(recordId);
+            return await _dbContext.SaleTransactions.FirstOrDefaultAsync(t => t.Id == recordId && t.GymId == gymId);
         }
 
         public async Task<IEnumerable<StaffPayrollRule>> GetPayrollRulesAsync(Guid gymId, Guid? branchId = null)
@@ -132,9 +132,9 @@ namespace GymCrest.Infrastructure.Repositories
             await _dbContext.CustomInvoices.AddAsync(invoice);
         }
 
-        public async Task<CustomInvoice?> GetCustomInvoiceByIdAsync(Guid recordId)
+        public async Task<CustomInvoice?> GetCustomInvoiceByIdAsync(Guid recordId, Guid gymId)
         {
-            return await _dbContext.CustomInvoices.FindAsync(recordId);
+            return await _dbContext.CustomInvoices.FirstOrDefaultAsync(i => i.Id == recordId && i.GymId == gymId);
         }
 
         public async Task<IEnumerable<CustomInvoice>> GetCustomInvoicesByMonthAsync(Guid gymId, DateTime startDate, DateTime endDate)
@@ -180,10 +180,10 @@ namespace GymCrest.Infrastructure.Repositories
                 .ToDictionary(g => g.Key, g => g.Select(x => x.PaymentMethod).Where(m => !string.IsNullOrWhiteSpace(m)).Distinct().ToList());
         }
 
-        public async Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId)
+        public async Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId, Guid gymId)
         {
             return await _dbContext.PaymentRecords
-                .Where(x => x.SourceType == sourceType && x.SourceId == sourceId)
+                .Where(x => x.SourceType == sourceType && x.SourceId == sourceId && x.GymId == gymId)
                 .OrderByDescending(x => x.PaidAt)
                 .ToListAsync();
         }

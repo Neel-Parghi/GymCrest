@@ -73,7 +73,7 @@ namespace GymCrest.Api.Controllers.Gym
             if (GymId == null)
                 return Unauthorized();
 
-            IEnumerable<PaymentRecordDto> history = await _billingService.GetPaymentHistoryAsync(recordId);
+            IEnumerable<PaymentRecordDto> history = await _billingService.GetPaymentHistoryAsync(GymId.Value, recordId);
             return Ok(history);
         }
     }
