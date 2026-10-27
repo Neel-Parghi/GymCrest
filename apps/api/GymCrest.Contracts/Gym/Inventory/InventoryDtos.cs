@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
 
@@ -14,6 +15,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public int StockQuantity { get; set; }
         public int ReorderLevel { get; set; }
         public string? ImageUrl { get; set; }
+        [MaxLength(2000)]
         public string? Description { get; set; }
         public Guid? BranchId { get; set; }
 
@@ -35,6 +37,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public int StockQuantity { get; set; }
         public int ReorderLevel { get; set; }
         public string? ImageUrl { get; set; }
+        [MaxLength(2000)]
         public string? Description { get; set; }
         public Guid? BranchId { get; set; }
     }
@@ -102,6 +105,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public Guid? Id { get; set; }
         public Guid EquipmentId { get; set; }
         public string ServiceType { get; set; } = "Routine";
+        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
         public string TechnicianName { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
@@ -109,6 +113,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public DateTime? CompletedDate { get; set; }
         public decimal Cost { get; set; }
         public string Status { get; set; } = "In Progress";
+        [MaxLength(2000)]
         public string? Notes { get; set; }
     }
 
@@ -118,6 +123,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public Guid EquipmentId { get; set; }
         public string EquipmentName { get; set; } = string.Empty;
         public string ServiceType { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
         public string TechnicianName { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
@@ -125,6 +131,7 @@ namespace GymCrest.Contracts.Gym.Inventory
         public DateTime? CompletedDate { get; set; }
         public decimal Cost { get; set; }
         public string Status { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string? Notes { get; set; }
     }
 

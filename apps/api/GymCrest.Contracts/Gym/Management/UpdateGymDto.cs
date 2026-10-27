@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.Gym.Management
 {
     public class UpdateGymDto
@@ -8,6 +9,7 @@ namespace GymCrest.Contracts.Gym.Management
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? WebsiteUrl { get; set; }
+        [MaxLength(2000)]
         public string? Description { get; set; }
         public string? GstNumber { get; set; }
         public string? RegistrationNumber { get; set; }

@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.WorkoutPlan
 {
     public class WorkoutPlanDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
         public string Level { get; set; } = "Beginner";
         public string Goal { get; set; } = "Hypertrophy";
@@ -25,6 +27,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public int DayIndex { get; set; }
         public bool IsRestDay { get; set; }
         public string? Category { get; set; }
+        [MaxLength(2000)]
         public string? FreeTextNotes { get; set; }
         public List<WorkoutPlanExerciseDto> Exercises { get; set; } = [];
     }
@@ -37,6 +40,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public string ExerciseName { get; set; } = string.Empty;
         public int Sets { get; set; }
         public string Reps { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string? Notes { get; set; }
         public int SortOrder { get; set; }
     }
@@ -44,6 +48,7 @@ namespace GymCrest.Contracts.WorkoutPlan
     public class CreateWorkoutPlanRequest
     {
         public string Name { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
         public string Level { get; set; } = "Beginner";
         public string Goal { get; set; } = "Hypertrophy";
@@ -56,6 +61,7 @@ namespace GymCrest.Contracts.WorkoutPlan
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
         public string Level { get; set; } = "Beginner";
         public string Goal { get; set; } = "Hypertrophy";
@@ -70,6 +76,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public int DayIndex { get; set; }
         public bool IsRestDay { get; set; }
         public string? Category { get; set; }
+        [MaxLength(2000)]
         public string? FreeTextNotes { get; set; }
         public List<CreateWorkoutPlanExerciseDto> Exercises { get; set; } = [];
     }
@@ -80,6 +87,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public string ExerciseName { get; set; } = string.Empty;
         public int Sets { get; set; }
         public string Reps { get; set; } = string.Empty;
+        [MaxLength(2000)]
         public string? Notes { get; set; }
         public int SortOrder { get; set; }
     }

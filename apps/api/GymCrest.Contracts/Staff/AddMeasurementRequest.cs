@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.Staff
 {
     public class AddMeasurementRequest
@@ -22,6 +23,7 @@ namespace GymCrest.Contracts.Staff
         public double? RightThigh { get; set; }
         public double? LeftCalf { get; set; }
         public double? RightCalf { get; set; }
+        [MaxLength(2000)]
         public string? Notes { get; set; }
     }
 }

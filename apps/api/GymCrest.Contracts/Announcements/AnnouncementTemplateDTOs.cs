@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.Announcements
 {
     public class AnnouncementTemplateRequest
@@ -5,6 +6,7 @@ namespace GymCrest.Contracts.Announcements
         public string Name { get; set; } = string.Empty;
         public int Type { get; set; } // 0 = Custom, 1 = Inactivity, 2 = ExpiredMembership
         public string TitleTemplate { get; set; } = string.Empty;
+        [MaxLength(1000)]
         public string MessageTemplate { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
     }
@@ -17,6 +19,7 @@ namespace GymCrest.Contracts.Announcements
         public string Name { get; set; } = string.Empty;
         public int Type { get; set; }
         public string TitleTemplate { get; set; } = string.Empty;
+        [MaxLength(1000)]
         public string MessageTemplate { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public DateTime CreatedOn { get; set; }

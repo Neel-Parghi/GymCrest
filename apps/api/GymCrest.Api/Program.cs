@@ -11,15 +11,35 @@ using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.HttpOverrides;
+using GymCrest.Api.Validation;
+using Microsoft.AspNetCore.Mvc;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.Filters.Add<GymCrest.Api.Filters.BlockDemoDeletesFilter>())
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<GymCrest.Api.Filters.BlockDemoDeletesFilter>();
+        options.ModelValidatorProviders.Add(new SafeInputDefaultsValidatorProvider());
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
         options.JsonSerializerOptions.Converters.Add(new NullableDateTimeJsonConverter());
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            string message = context.ModelState.Values
+                .SelectMany(entry => entry.Errors)
+                .Select(error => string.IsNullOrEmpty(error.ErrorMessage) ? "The request contains an invalid value." : error.ErrorMessage)
+                .FirstOrDefault() ?? "The request is invalid.";
+
+            return new BadRequestObjectResult(new { StatusCode = StatusCodes.Status400BadRequest, Message = message, Success = false });
+        };
     });
+
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 1 * 1024 * 1024);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -146,26 +166,6 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0
             }));
 
-    options.OnRejected = async (context, token) =>
-    {
-        context.HttpContext.Response.StatusCode = 429;
-        await context.HttpContext.Response.WriteAsJsonAsync(new { message = "Too many requests. Please try again later." }, cancellationToken: token);
-    };
-});
-
-var app = builder.Build();
-
-// Automatically migrate database on startup
-using (var scope = app.Services.CreateScope())
-{
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(10),
-                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 0
-            }));
-
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         httpContext.Request.Path.StartsWithSegments("/api/health")
             ? RateLimitPartition.GetNoLimiter("health")
@@ -193,6 +193,26 @@ using (var scope = app.Services.CreateScope())
     options.AddPolicy("ExportPolicy", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: httpContext.User.FindFirst("userId")?.Value ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(10),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        await context.HttpContext.Response.WriteAsJsonAsync(new { message = "Too many requests. Please try again later." }, cancellationToken: token);
+    };
+});
+
+var app = builder.Build();
+
+// Automatically migrate database on startup
+using (var scope = app.Services.CreateScope())
+{
     var services = scope.ServiceProvider;
     try
     {

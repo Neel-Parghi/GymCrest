@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.GymPlans
 {
     public class GymPlanDto
@@ -8,6 +9,7 @@ namespace GymCrest.Contracts.GymPlans
 
         public string Name { get; set; } = string.Empty;
 
+        [MaxLength(2000)]
         public string? Description { get; set; }
 
         public decimal Price { get; set; }
