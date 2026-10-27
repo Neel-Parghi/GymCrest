@@ -8,6 +8,8 @@ namespace GymCrest.Domain.Interface
         Task<User?> GetUserByIdAsync(Guid userId);
         
         Task<Guid?> GetBranchIdByUserIdAsync(Guid userId);
+
+        Task<Guid?> GetGymIdByUserIdAsync(Guid userId);
         
         Task LinkUserToGymMembersAsync(User user);
         

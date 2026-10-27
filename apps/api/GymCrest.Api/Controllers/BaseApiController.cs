@@ -1,14 +1,16 @@
 using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Users.Interface;
-using GymCrest.Contracts.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GymCrest.Api.Controllers
 {
     [ApiController]
     [RequireActiveSubscription]
-    public abstract class BaseApiController : ControllerBase
+    public abstract class BaseApiController : ControllerBase, IAsyncActionFilter
     {
+        private Guid? _standaloneUserGymId;
+
         protected Guid UserId
         {
             get
@@ -26,17 +28,7 @@ namespace GymCrest.Api.Controllers
                 if (!string.IsNullOrEmpty(id))
                     return Guid.Parse(id);
 
-                if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("User"))
-                {
-                    IUserService? userService = HttpContext.RequestServices.GetService(typeof(IUserService)) as IUserService;
-                    if (userService != null)
-                    {
-                        UserProfileDto profile = userService.GetUserProfileAsync(UserId).GetAwaiter().GetResult();
-                        return profile?.GymId;
-                    }
-                }
-
-                return null;
+                return _standaloneUserGymId;
             }
         }
 
@@ -49,12 +41,24 @@ namespace GymCrest.Api.Controllers
                     string? queryValue = Request.Query["branchId"].ToString();
                     return string.IsNullOrEmpty(queryValue) ? null : Guid.Parse(queryValue);
                 }
-                
+
                 string? branchClaim = User.FindFirst("branchId")?.Value;
                 return string.IsNullOrEmpty(branchClaim) ? null : Guid.Parse(branchClaim);
             }
         }
 
         protected bool IsStandaloneUser => User.IsInRole("User");
+
+        [NonAction]
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            if (IsStandaloneUser && User.FindFirst("gymId") == null && UserId != Guid.Empty)
+            {
+                IUserService userService = HttpContext.RequestServices.GetRequiredService<IUserService>();
+                _standaloneUserGymId = await userService.GetUserGymIdAsync(UserId);
+            }
+
+            await next();
+        }
     }
 }

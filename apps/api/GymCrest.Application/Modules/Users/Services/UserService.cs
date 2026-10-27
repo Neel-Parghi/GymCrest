@@ -146,6 +146,8 @@ namespace GymCrest.Application.Modules.Users.Services
             await _emailService.SendInvitationEmailAsync(user.Email, $"{user.FirstName} {user.LastName}", token);
         }
 
+        public Task<Guid?> GetUserGymIdAsync(Guid userId) => _userRepository.GetGymIdByUserIdAsync(userId);
+
         public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
         {
             User? user = await _userRepository.GetUserByIdAsync(userId);

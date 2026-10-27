@@ -64,6 +64,14 @@ namespace GymCrest.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Guid?> GetGymIdByUserIdAsync(Guid userId)
+        {
+            return await _dbContext.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.GymId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task LinkUserToGymMembersAsync(User user)
         {
             string emailLower = user.Email.ToLower();
