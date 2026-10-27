@@ -7,6 +7,7 @@ using GymCrest.Contracts.Users;
 using GymCrest.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using GymCrest.Api.Filters;
 using GymCrest.Shared.Enums;
 
@@ -116,6 +117,8 @@ namespace GymCrest.Api.Controllers.User
         }
 
         [HttpPost("profile/upload-avatar")]
+        [EnableRateLimiting("UploadPolicy")]
+        [RequestSizeLimit(6 * 1024 * 1024)]
         [Authorize]
         [BlockDemoAccount]
         public async Task<IActionResult> UploadAvatar(IFormFile file)

@@ -2,6 +2,7 @@ using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GymCrest.Api.Controllers.Common
 {
@@ -24,6 +25,8 @@ namespace GymCrest.Api.Controllers.Common
         }
 
         [HttpPost]
+        [EnableRateLimiting("UploadPolicy")]
+        [RequestSizeLimit(6 * 1024 * 1024)]
         [BlockDemoAccount]
         public async Task<IActionResult> Upload(IFormFile file, [FromQuery] string folder = "general")
         {
