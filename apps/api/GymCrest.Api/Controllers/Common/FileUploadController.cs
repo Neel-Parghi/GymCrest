@@ -8,7 +8,7 @@ namespace GymCrest.Api.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "GymOwner,Staff")]
     public class FileUploadController : ControllerBase
     {
         private const long MaxUploadBytes = 5 * 1024 * 1024;

@@ -337,6 +337,13 @@ namespace GymCrest.Application.Modules.Users.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is empty");
 
+            if (file.Length > 5 * 1024 * 1024)
+                throw new ArgumentException("File is too large. The limit is 5 MB.");
+
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension is not (".jpg" or ".jpeg" or ".png" or ".gif" or ".webp"))
+                throw new ArgumentException("Invalid file type. Only JPG, PNG, GIF and WebP images are allowed.");
+
             using (Stream stream = file.OpenReadStream())
             {
                 return await _fileStorageService.SaveFileAsync(stream, file.FileName, "avatars");
