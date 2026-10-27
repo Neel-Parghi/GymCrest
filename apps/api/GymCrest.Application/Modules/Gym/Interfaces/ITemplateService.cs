@@ -14,6 +14,5 @@ namespace GymCrest.Application.Modules.Gym.Interfaces
         
         Task DeleteTemplateAsync(Guid id, Guid gymId);
 
-        Task TestTemplateAsync(Guid id, Guid gymId, Guid userId);
     }
 }

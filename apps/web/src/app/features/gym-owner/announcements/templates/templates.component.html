@@ -72,6 +72,12 @@
       </div>
     </div>
 
+    <div class="template-preview" *ngIf="isPreviewOpen">
+      <span class="preview-label"><i class="fa-solid fa-eye"></i> Preview with sample member</span>
+      <strong class="preview-title">{{ renderPreview(templateForm.get('titleTemplate')?.value) || 'No title yet' }}</strong>
+      <p class="preview-message">{{ renderPreview(templateForm.get('messageTemplate')?.value) || 'No message yet' }}</p>
+    </div>
+
     <div class="visibility-toggle-row">
       <div class="visibility-toggle-info">
         <i class="fa-solid" [ngClass]="templateForm.get('isActive')?.value ? 'fa-eye' : 'fa-eye-slash'"></i>
@@ -88,8 +94,9 @@
     </div>
   </div>
   <div drawer-footer class="drawer-actions">
-    <button class="btn-outline" type="button" *ngIf="editingTemplateId" (click)="testTemplate(editingTemplateId)">Test
-      Template</button>
+    <button class="btn-outline" type="button" (click)="togglePreview()">
+      {{ isPreviewOpen ? 'Hide Preview' : 'Preview' }}
+    </button>
     <button class="btn-outline" type="button" (click)="closeDrawer()">Cancel</button>
     <button class="btn-primary" type="button" [disabled]="templateForm.invalid || isSubmitting" (click)="onSubmit()">
       {{ editingTemplateId ? 'Update Template' : 'Save Template' }}

@@ -1,4 +1,3 @@
-using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Gym.Interfaces;
 using GymCrest.Contracts.Announcements;
 using Microsoft.AspNetCore.Authorization;
@@ -62,17 +61,6 @@ namespace GymCrest.Api.Controllers.Gym
             AnnouncementTemplateResponse result = await _templateService.UpdateTemplateAsync(id, request, GymId.Value, UserId);
 
             return Ok(result);
-        }
-
-        [HttpPost("{id}/test")]
-        [BlockDemoAccount]
-        public async Task<IActionResult> TestTemplate(Guid id)
-        {
-            if (GymId == null)
-                return BadRequest("GymId not found");
-
-            await _templateService.TestTemplateAsync(id, GymId.Value, UserId);
-            return Ok(new { message = "Test notification and email sent successfully." });
         }
 
         [HttpDelete("{id}")]

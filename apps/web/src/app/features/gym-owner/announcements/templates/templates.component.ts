@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TemplateService } from '../../../../core/services/template.service';
+import { GymService } from '../../../../core/services/gym.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ConfirmationService } from '../../../../core/services/confirmation.service';
 import { RouterModule } from '@angular/router';
@@ -24,8 +25,11 @@ export class TemplatesComponent implements OnInit {
   private templateService = inject(TemplateService);
   private notificationService = inject(NotificationService);
   private confirmationService = inject(ConfirmationService);
+  private gymService = inject(GymService);
 
   templates: any[] = [];
+  isPreviewOpen = false;
+  private previewGymName = 'Your Gym';
   templateForm: FormGroup;
   isSubmitting = false;
   isDrawerOpen = false;
@@ -51,6 +55,9 @@ export class TemplatesComponent implements OnInit {
   ngOnInit(): void {
     this.setupFormListeners();
     this.loadTemplates();
+    this.gymService.getMyGym().subscribe(res => {
+      if (res.data?.gymName) this.previewGymName = res.data.gymName;
+    });
   }
 
   setupFormListeners(): void {
@@ -103,6 +110,7 @@ export class TemplatesComponent implements OnInit {
       this.editingTemplateId = null;
       this.templateForm.reset({ type: 0, isActive: true }, { emitEvent: false });
     }
+    this.isPreviewOpen = false;
     this.isDrawerOpen = true;
   }
 
@@ -195,15 +203,20 @@ export class TemplatesComponent implements OnInit {
     });
   }
 
-  testTemplate(id: string): void {
-    this.templateService.testTemplate(id).subscribe({
-      next: () => {
-        this.notificationService.success('Test notification sent to your email and portal!');
-      },
-      error: () => {
-        this.notificationService.error('Failed to send test notification');
-      }
-    });
+  togglePreview(): void {
+    this.isPreviewOpen = !this.isPreviewOpen;
+  }
+
+  renderPreview(text: string | null): string {
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + 3);
+    const sample: Record<string, string> = {
+      UserName: 'Aarav Sharma',
+      GymName: this.previewGymName,
+      PlanName: 'Monthly Plan',
+      ExpiryDate: expiry.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    };
+    return (text || '').replace(/\{\{(\w+)\}\}/g, (match, key) => sample[key] ?? match);
   }
 
   getTemplateTypeName(type: number): string {
