@@ -14,18 +14,18 @@ namespace GymCrest.Domain.Interface
         Task<Branch?> GetMainBranchAsync(Guid gymId);
         Task<Gym?> GetGymByIdAsync(Guid gymId);
         Task AddInventoryItemAsync(InventoryItem item);
-        Task<MemberSubscription?> GetSubscriptionByIdAsync(Guid recordId);
-        Task<SaleTransaction?> GetTransactionByIdAsync(Guid recordId);
+        Task<MemberSubscription?> GetSubscriptionByIdAsync(Guid recordId, Guid gymId);
+        Task<SaleTransaction?> GetTransactionByIdAsync(Guid recordId, Guid gymId);
 
         // Custom Invoice methods
         Task AddCustomInvoiceAsync(CustomInvoice invoice);
-        Task<CustomInvoice?> GetCustomInvoiceByIdAsync(Guid recordId);
+        Task<CustomInvoice?> GetCustomInvoiceByIdAsync(Guid recordId, Guid gymId);
         Task<IEnumerable<CustomInvoice>> GetCustomInvoicesByMonthAsync(Guid gymId, DateTime startDate, DateTime endDate);
         Task<IEnumerable<CustomInvoice>> GetCustomInvoicesByTrainerAndMonthAsync(Guid trainerId, DateTime startDate, DateTime endDate);
 
         // Payment ledger methods
         Task AddPaymentRecordAsync(PaymentRecord record);
-        Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId);
+        Task<IEnumerable<PaymentRecord>> GetPaymentRecordsBySourceAsync(PaymentSourceType sourceType, Guid sourceId, Guid gymId);
         Task<Dictionary<Guid, List<string>>> GetPaymentMethodsBySourcesAsync(PaymentSourceType sourceType, IEnumerable<Guid> sourceIds);
 
         // Staff Payroll repository methods

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.SuperAdmin.Configuration
 {
     public class SaaSConfigurationDto
@@ -8,6 +9,7 @@ namespace GymCrest.Contracts.SuperAdmin.Configuration
         public decimal TaxPercentage { get; set; }
         public int GracePeriodDays { get; set; }
         public string Currency { get; set; } = "INR";
+        [MaxLength(2000)]
         public string? BillingAddress { get; set; }
         public string? GstNo { get; set; }
         public string? SupportPhone { get; set; }

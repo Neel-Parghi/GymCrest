@@ -4,6 +4,7 @@ using GymCrest.Contracts.Common;
 using GymCrest.Contracts.Members;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using GymCrest.Api.Filters;
 
 namespace GymCrest.Api.Controllers.Members
@@ -173,6 +174,7 @@ namespace GymCrest.Api.Controllers.Members
         }
 
         [HttpGet("export")]
+        [EnableRateLimiting("ExportPolicy")]
         [SkipResponseWrapper]
         public async Task<IActionResult> ExportMembers()
         {

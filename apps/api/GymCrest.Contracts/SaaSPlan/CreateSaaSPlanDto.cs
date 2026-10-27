@@ -1,9 +1,11 @@
-﻿namespace GymCrest.Contracts.SaaSPlan
+﻿using System.ComponentModel.DataAnnotations;
+namespace GymCrest.Contracts.SaaSPlan
 {
     public class CreateSaaSPlanDto
     {
         public string Name { get; set; } = string.Empty;
 
+        [MaxLength(2000)]
         public string? Description { get; set; }
 
         public decimal Price { get; set; }

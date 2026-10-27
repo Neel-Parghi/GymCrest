@@ -2,12 +2,13 @@ using GymCrest.Api.Filters;
 using GymCrest.Application.Modules.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GymCrest.Api.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "GymOwner,Staff")]
     public class FileUploadController : ControllerBase
     {
         private const long MaxUploadBytes = 5 * 1024 * 1024;
@@ -24,6 +25,8 @@ namespace GymCrest.Api.Controllers.Common
         }
 
         [HttpPost]
+        [EnableRateLimiting("UploadPolicy")]
+        [RequestSizeLimit(6 * 1024 * 1024)]
         [BlockDemoAccount]
         public async Task<IActionResult> Upload(IFormFile file, [FromQuery] string folder = "general")
         {

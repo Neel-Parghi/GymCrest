@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.Gym.Management
 {
     public class GymDto
     {
         public string Name { get; set; } = null!;
         public string? BrandName { get; set; }
+        [MaxLength(2000)]
         public string? Description { get; set; }
         public DateTime? EstablishedDate { get; set; }
 

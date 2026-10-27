@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using GymCrest.Contracts.Gym.Shared;
 using GymCrest.Shared.Enums;
 
@@ -14,7 +15,7 @@ namespace GymCrest.Contracts.Members
         string? EmergencyContactPhone,
         string? BloodGroup,
         AddressDto? Address,
-        string? MedicalConditions,
+        [MaxLength(2000)] string? MedicalConditions,
         List<string>? FitnessGoals,
         Guid GymPlanId,
         DateTime? StartDate = null,

@@ -17,6 +17,14 @@ namespace GymCrest.Api.Middlewares
             {
                 await _next(context);
             }
+            catch (BadHttpRequestException ex)
+            {
+                context.Response.StatusCode = ex.StatusCode;
+                string message = ex.StatusCode == StatusCodes.Status413PayloadTooLarge
+                    ? "The request is too large."
+                    : "The request is invalid.";
+                await context.Response.WriteAsJsonAsync(new { StatusCode = ex.StatusCode, Message = message, Success = false });
+            }
             catch (Exception ex)
             {
                 bool expected = ClientErrorMessage.IsExpected(ex);

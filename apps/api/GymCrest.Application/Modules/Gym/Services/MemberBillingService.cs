@@ -214,7 +214,7 @@ namespace GymCrest.Application.Modules.Gym.Services
             if (request.Amount <= 0)
                 return RecordPaymentResult.Fail("Payment amount must be greater than zero.");
 
-            MemberSubscription? subscription = await _billingRepository.GetSubscriptionByIdAsync(recordId);
+            MemberSubscription? subscription = await _billingRepository.GetSubscriptionByIdAsync(recordId, gymId);
             if (subscription != null)
             {
                 decimal balance = subscription.PricePaid - subscription.AmountPaid;
@@ -247,7 +247,7 @@ namespace GymCrest.Application.Modules.Gym.Services
                 return savedSub > 0 ? RecordPaymentResult.Ok() : RecordPaymentResult.Fail("Failed to save payment.");
             }
 
-            SaleTransaction? transaction = await _billingRepository.GetTransactionByIdAsync(recordId);
+            SaleTransaction? transaction = await _billingRepository.GetTransactionByIdAsync(recordId, gymId);
             if (transaction != null)
             {
                 bool isPending = transaction.PaymentMethod.StartsWith("Pending-");
@@ -263,7 +263,7 @@ namespace GymCrest.Application.Modules.Gym.Services
                 return savedTx > 0 ? RecordPaymentResult.Ok() : RecordPaymentResult.Fail("Failed to save payment.");
             }
 
-            CustomInvoice? invoice = await _billingRepository.GetCustomInvoiceByIdAsync(recordId);
+            CustomInvoice? invoice = await _billingRepository.GetCustomInvoiceByIdAsync(recordId, gymId);
             if (invoice != null)
             {
                 decimal balance = invoice.Amount - invoice.AmountPaid;
@@ -303,12 +303,12 @@ namespace GymCrest.Application.Modules.Gym.Services
             return RecordPaymentResult.Fail("Billing record not found.");
         }
 
-        public async Task<IEnumerable<PaymentRecordDto>> GetPaymentHistoryAsync(Guid recordId)
+        public async Task<IEnumerable<PaymentRecordDto>> GetPaymentHistoryAsync(Guid gymId, Guid recordId)
         {
-            IEnumerable<PaymentRecord> records = await _billingRepository.GetPaymentRecordsBySourceAsync(PaymentSourceType.Subscription, recordId);
+            IEnumerable<PaymentRecord> records = await _billingRepository.GetPaymentRecordsBySourceAsync(PaymentSourceType.Subscription, recordId, gymId);
             if (!records.Any())
             {
-                records = await _billingRepository.GetPaymentRecordsBySourceAsync(PaymentSourceType.CustomInvoice, recordId);
+                records = await _billingRepository.GetPaymentRecordsBySourceAsync(PaymentSourceType.CustomInvoice, recordId, gymId);
             }
 
             return records.Select(r => new PaymentRecordDto

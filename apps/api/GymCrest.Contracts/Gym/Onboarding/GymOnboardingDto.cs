@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using GymCrest.Contracts.Gym.Shared;
 
 namespace GymCrest.Contracts.Gym.Onboarding
@@ -6,6 +7,7 @@ namespace GymCrest.Contracts.Gym.Onboarding
     {
         public string Name { get; set; } = null!;
         public string? BrandName { get; set; }
+        [MaxLength(2000)]
         public string? Description { get; set; }
         public DateTime? EstablishedDate { get; set; }
 

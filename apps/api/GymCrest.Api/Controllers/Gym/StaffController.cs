@@ -22,6 +22,7 @@ namespace GymCrest.Api.Controllers.Gym
             _staffService = staffService;
         }
 
+        [Authorize(Roles = "GymOwner,Staff")]
         [HttpPost]
         [BlockDemoAccount]
         public async Task<ActionResult> AddStaff([FromBody] AddStaffRequest request)
@@ -43,6 +44,7 @@ namespace GymCrest.Api.Controllers.Gym
             }
         }
 
+        [Authorize(Roles = "GymOwner,Staff,Trainer")]
         [HttpGet]
         public async Task<ActionResult> GetGymStaff([FromQuery] PaginationParams pagination)
         {
@@ -90,13 +92,22 @@ namespace GymCrest.Api.Controllers.Gym
             return Ok(new { message = "Staff deleted successfully" });
         }
 
+        [Authorize(Roles = "GymOwner,Staff")]
+        [AuthorizeResource(OwnedResource.Staff)]
+        [AuthorizeMemberAccess]
         [HttpPost("{id}/assign-member/{memberId}")]
         public async Task<ActionResult> AssignTrainerToMember(Guid id, Guid memberId, [FromQuery] string? slot, [FromQuery] int? durationDays)
         {
+            if (durationDays is < 1 or > 3650)
+                return BadRequest(new { message = "Duration must be between 1 and 3650 days." });
+
             await _staffService.AssignTrainerToMemberAsync(id, memberId, slot, durationDays);
             return Ok(new { message = "Trainer assigned successfully" });
         }
 
+        [Authorize(Roles = "GymOwner,Staff,Trainer")]
+        [AuthorizeResource(OwnedResource.Staff)]
+        [AuthorizeMemberAccess]
         [HttpPost("{id}/deallocate-member/{memberId}")]
         public async Task<ActionResult> DeallocateTrainerFromMember(Guid id, Guid memberId)
         {
@@ -168,6 +179,7 @@ namespace GymCrest.Api.Controllers.Gym
             }
         }
 
+        [Authorize(Roles = "GymOwner,Staff,Trainer")]
         [HttpGet("attendance-logs")]
         public async Task<ActionResult> GetStaffAttendanceLogs([FromQuery] PaginationParams pagination, [FromQuery] Guid? staffId = null)
         {

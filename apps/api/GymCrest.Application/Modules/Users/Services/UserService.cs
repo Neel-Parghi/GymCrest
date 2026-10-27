@@ -111,6 +111,7 @@ namespace GymCrest.Application.Modules.Users.Services
 
             user.PasswordHash = _passwordService.HashPassword(setPasswordRequestDto.Password);
             user.Security.IsInvitationAccepted = true;
+            user.Security.IsEmailVerified = true;
             user.Security.InvitationToken = null;
             user.Security.InvitationExpiry = null;
             user.ModifiedOn = DateTime.UtcNow;
@@ -144,6 +145,8 @@ namespace GymCrest.Application.Modules.Users.Services
 
             await _emailService.SendInvitationEmailAsync(user.Email, $"{user.FirstName} {user.LastName}", token);
         }
+
+        public Task<Guid?> GetUserGymIdAsync(Guid userId) => _userRepository.GetGymIdByUserIdAsync(userId);
 
         public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
         {
@@ -333,6 +336,13 @@ namespace GymCrest.Application.Modules.Users.Services
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is empty");
+
+            if (file.Length > 5 * 1024 * 1024)
+                throw new ArgumentException("File is too large. The limit is 5 MB.");
+
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension is not (".jpg" or ".jpeg" or ".png" or ".gif" or ".webp"))
+                throw new ArgumentException("Invalid file type. Only JPG, PNG, GIF and WebP images are allowed.");
 
             using (Stream stream = file.OpenReadStream())
             {

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using GymCrest.Shared.Enums;
 
 namespace GymCrest.Contracts.Staff
@@ -10,6 +11,7 @@ namespace GymCrest.Contracts.Staff
         public string PhoneNumber { get; set; } = string.Empty;
         public StaffRole Role { get; set; }
         public List<string>? Specializations { get; set; }
+        [MaxLength(2000)]
         public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
         public string? InstagramUrl { get; set; }

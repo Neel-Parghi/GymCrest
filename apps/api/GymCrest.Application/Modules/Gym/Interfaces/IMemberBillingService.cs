@@ -7,6 +7,6 @@ namespace GymCrest.Application.Modules.Gym.Interfaces
         Task<MemberBillingOverviewDto> GetMemberBillingOverviewAsync(Guid gymId, Guid? branchId, string monthKey);
         Task<bool> CreateCustomInvoiceAsync(Guid gymId, Guid? branchId, CreateCustomInvoiceRequest request);
         Task<RecordPaymentResult> RecordPaymentAsync(Guid gymId, Guid? branchId, Guid recordId, RecordPaymentRequest request);
-        Task<IEnumerable<PaymentRecordDto>> GetPaymentHistoryAsync(Guid recordId);
+        Task<IEnumerable<PaymentRecordDto>> GetPaymentHistoryAsync(Guid gymId, Guid recordId);
     }
 }

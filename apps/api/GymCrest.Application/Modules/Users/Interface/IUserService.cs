@@ -20,6 +20,8 @@ namespace GymCrest.Application.Modules.Users.Interface
 
         Task<UserProfileDto> GetUserProfileAsync(Guid userId);
 
+        Task<Guid?> GetUserGymIdAsync(Guid userId);
+
         Task UpdateUserProfileAsync(Guid userId, UpdateUserProfileDto updateUserProfileDto);
 
         Task<UserProfileDto> GetMyProfileAsync();

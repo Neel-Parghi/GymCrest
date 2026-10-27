@@ -2,6 +2,7 @@
 using GymCrest.Application.Modules.SuperAdmin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GymCrest.Api.Controllers.SuperAdmin
 {
@@ -19,6 +20,7 @@ namespace GymCrest.Api.Controllers.SuperAdmin
         }
 
         [HttpGet("export")]
+        [EnableRateLimiting("ExportPolicy")]
         public async Task<IActionResult> ExportData([FromQuery] string type)
         {
             if (string.IsNullOrEmpty(type))

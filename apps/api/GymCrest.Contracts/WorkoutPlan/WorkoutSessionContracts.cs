@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.WorkoutPlan
 {
     public class WorkoutSessionLogDto
@@ -9,6 +10,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public int ExercisesCompleted { get; set; }
         public int TotalSets { get; set; }
         public string Status { get; set; } = "Completed";
+        [MaxLength(2000)]
         public string? Notes { get; set; }
         public List<LoggedExerciseDto> LoggedExercises { get; set; } = [];
     }
@@ -37,6 +39,7 @@ namespace GymCrest.Contracts.WorkoutPlan
         public DateTime Date { get; set; }
         public string DayName { get; set; } = string.Empty;
         public string Status { get; set; } = "Completed";
+        [MaxLength(2000)]
         public string? Notes { get; set; }
         public List<LogLoggedExerciseDto> LoggedExercises { get; set; } = [];
     }

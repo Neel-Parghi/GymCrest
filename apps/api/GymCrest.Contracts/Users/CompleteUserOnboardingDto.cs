@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace GymCrest.Contracts.Users
 {
     public class CompleteUserOnboardingDto
@@ -13,6 +14,7 @@ namespace GymCrest.Contracts.Users
         public string? DietPreference { get; set; }
         public int? TrainingDaysPerWeek { get; set; }
         public int? SessionLengthMinutes { get; set; }
+        [MaxLength(2000)]
         public string? Limitations { get; set; }
     }
 }
