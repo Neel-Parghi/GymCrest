@@ -437,8 +437,8 @@
 
     @include bp.mobile {
       flex: 0 0 auto;
-      min-width: 52px;
-      padding: 8px 10px;
+      min-width: 40px;
+      padding: 8px 9px;
     }
 
     .tab-day-short {
@@ -516,8 +516,8 @@
     @include bp.mobile {
       flex-direction: column;
       align-items: flex-start;
-      gap: 14px;
-      padding: 14px;
+      gap: 8px;
+      padding: 10px 12px;
     }
 
     .header-left {
@@ -843,6 +843,10 @@
   padding-top: 8px;
 
   @include bp.mobile {
+    .label-extra {
+      display: none;
+    }
+
     flex-wrap: wrap;
     gap: 10px;
   }
@@ -1035,6 +1039,11 @@
   border-bottom: 1px solid var(--border-color);
   gap: 16px;
 
+  @include bp.mobile {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
   .wizard-step-btn {
     background: transparent;
     border: none;
@@ -1046,6 +1055,11 @@
     border-radius: 20px;
     transition: all 0.25s ease;
     outline: none;
+
+    @include bp.mobile {
+      padding: 4px 8px;
+      gap: 6px;
+    }
 
     .step-num {
       width: 26px;
@@ -1059,6 +1073,12 @@
       align-items: center;
       justify-content: center;
       transition: all 0.25s ease;
+
+      @include bp.mobile {
+        width: 22px;
+        height: 22px;
+        font-size: 0.72rem;
+      }
     }
 
     .step-label {
@@ -1066,6 +1086,11 @@
       font-weight: 700;
       color: var(--slate-500);
       transition: all 0.25s ease;
+      white-space: nowrap;
+
+      @include bp.mobile {
+        font-size: 0.8rem;
+      }
     }
 
     &:hover {
@@ -1098,6 +1123,10 @@
     height: 2px;
     background: var(--slate-200);
     border-radius: 1px;
+
+    @include bp.mobile {
+      max-width: 32px;
+    }
   }
 }
 
@@ -1290,4 +1319,29 @@
   font-weight: 500;
   color: var(--slate-400);
   text-transform: none;
+}
+// Phones: keep the muscle pills on one swipeable row instead of wrapping into several.
+@include bp.mobile {
+  .panel-category-selector {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+
+    .muscle-pills-container {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .pill-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+    }
+  }
 }

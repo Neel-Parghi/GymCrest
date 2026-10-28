@@ -19,7 +19,7 @@
       <div class="wizard-step-line"></div>
       <button type="button" class="wizard-step-btn" [class.active]="activeStep === 'plan'" (click)="nextStep()">
         <span class="step-num">2</span>
-        <span class="step-label">Workout Plan Setup</span>
+        <span class="step-label">Create Plan</span>
       </button>
     </div>
 
@@ -197,7 +197,7 @@
 
                   <div class="panel-footer">
                     <button type="button" class="btn-link" (click)="addWeeklyExercise(dayIdx)">
-                      <i class="fa-solid fa-circle-plus"></i> Add Exercise
+                      <i class="fa-solid fa-circle-plus"></i> Add<span class="label-extra"> Exercise</span>
                     </button>
                     <div class="panel-copy-paste-actions">
                       <button type="button" class="btn-secondary-action btn-copy" (click)="copyWorkout(dayIdx)"
