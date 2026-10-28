@@ -181,7 +181,7 @@
                     title="Copy Workout">
                     <i class="fa-solid fa-copy"></i> Copy Workout
                   </button>
-                  <button type="button" class="btn-secondary-action btn-paste" (click)="pasteWorkout()"
+                  <button type="button" class="btn-secondary-action btn-paste" *ngIf="copiedWorkout" (click)="pasteWorkout()"
                     title="Paste Workout">
                     <i class="fa-solid fa-paste"></i> Paste Workout
                   </button>

@@ -144,12 +144,12 @@ export class SplitPlannerCreatorComponent implements OnInit {
       exercises: exercisesData
     };
 
-    localStorage.setItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT, JSON.stringify(this.copiedWorkout));
+    sessionStorage.setItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT, JSON.stringify(this.copiedWorkout));
     this.notification.success(CONSTANTS.WORKOUT_PLANNER_MODULE.SPLIT_COPY_SUCCESS);
   }
 
   pasteWorkout(dayIdx: number): void {
-    const raw = localStorage.getItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT);
+    const raw = sessionStorage.getItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT);
     if (!raw) {
       this.notification.warning(CONSTANTS.WORKOUT_PLANNER_MODULE.SPLIT_NO_CLIPBOARD);
       return;
@@ -194,6 +194,17 @@ export class SplitPlannerCreatorComponent implements OnInit {
     this.initSplitForm();
     if (this.editData) {
       this.populateFormWithEditData(this.editData);
+    }
+    this.copiedWorkout = this.readCopiedWorkout();
+  }
+
+  // A workout copied in any split/single-day creator is shared for this tab through sessionStorage.
+  private readCopiedWorkout(): any {
+    try {
+      const data = JSON.parse(sessionStorage.getItem(STORAGE_KEYS.COPIED_WORKOUT_SPLIT) || 'null');
+      return data?.exercises?.length ? data : null;
+    } catch {
+      return null;
     }
   }
 
