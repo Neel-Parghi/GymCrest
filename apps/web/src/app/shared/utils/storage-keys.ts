@@ -11,11 +11,12 @@ export const STORAGE_KEYS = {
 const PRE_REBRAND_KEYS: Record<string, string> = {
   gymForge_ownerWizardDraft: STORAGE_KEYS.OWNER_WIZARD_DRAFT,
   gymForge_userWizardDraft_v2: STORAGE_KEYS.USER_WIZARD_DRAFT,
-  gymforge_copied_workout_split: STORAGE_KEYS.COPIED_WORKOUT_SPLIT,
   elevatyon_ownerWizardDraft: STORAGE_KEYS.OWNER_WIZARD_DRAFT,
-  elevatyon_userWizardDraft_v2: STORAGE_KEYS.USER_WIZARD_DRAFT,
-  elevatyon_copied_workout_split: STORAGE_KEYS.COPIED_WORKOUT_SPLIT
+  elevatyon_userWizardDraft_v2: STORAGE_KEYS.USER_WIZARD_DRAFT
 };
+
+/** Copied workouts now live in sessionStorage; these old localStorage copies are just dropped. */
+const STALE_LOCAL_KEYS = ['gymforge_copied_workout_split', 'elevatyon_copied_workout_split', STORAGE_KEYS.COPIED_WORKOUT_SPLIT];
 
 /** Moves values saved under the old GymForge/Elevatyon keys so drafts survive the renames. Runs once per browser. */
 export function migratePreRebrandStorage(): void {
@@ -28,6 +29,7 @@ export function migratePreRebrandStorage(): void {
       }
       localStorage.removeItem(oldKey);
     }
+    STALE_LOCAL_KEYS.forEach(key => localStorage.removeItem(key));
   } catch {
     // Storage can be unavailable (private mode, blocked site data); nothing to migrate then.
   }

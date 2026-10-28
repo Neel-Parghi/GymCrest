@@ -35,7 +35,7 @@ export const GymOwnerMenu: NavItem[] = [
         label: 'Gym Plans',
         icon: 'fa-solid fa-receipt',
         route: '/gym-owner/plans',
-        roles: ['GymOwner'] // Gym Plans creation is restricted to Owner only
+        roles: ['GymOwner']
     },
     {
         label: 'Announcements',
@@ -59,7 +59,7 @@ export const GymOwnerMenu: NavItem[] = [
         label: 'My Gyms',
         icon: 'fa-solid fa-building',
         route: '/gym-owner/my-gyms',
-        roles: ['GymOwner'] // Branch setup and settings are restricted to Owner only
+        roles: ['GymOwner'] 
     },
     {
         label: 'Workout Library',

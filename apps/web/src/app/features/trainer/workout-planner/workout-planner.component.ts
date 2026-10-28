@@ -42,9 +42,8 @@ export class WorkoutPlannerComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   currentUserId = '';
-  activeTab: 'splits' | 'weekly' | 'daily' = 'splits';
+  activeTab: 'splits' | 'weekly' | 'daily' = 'weekly';
 
-  /** Gym-owner mode: bypass per-trainer edit ownership and expose the Assign action. Purely additive - defaults to false, so the trainer's own page is unaffected. */
   @Input() ownerMode: boolean = false;
   @Input() embedded: boolean = false;
   @Output() onAssign = new EventEmitter<any>();
@@ -133,11 +132,9 @@ export class WorkoutPlannerComponent implements OnInit {
     }
   }
 
-  // Details pop-up trigger
   openDetailsModal(planner: WorkoutPlan, type: 'split' | 'weekly' | 'daily'): void {
     if (type === 'daily') {
       const p = planner as DailyPlanner;
-      // Map standalone daily plan to a virtual 1-day split planner for timetable-modal compatibility
       this.selectedPlanner = {
         id: p.id,
         name: p.name,
@@ -168,7 +165,6 @@ export class WorkoutPlannerComponent implements OnInit {
     this.selectedPlanner = null;
   }
 
-  // Create triggers
   openCreatorModal(): void {
     if (this.activeTab === 'splits') {
       this.openCreateSplitModal();
@@ -180,18 +176,21 @@ export class WorkoutPlannerComponent implements OnInit {
   }
 
   openCreateSplitModal(): void { this.showCreateSplitModal = true; }
+  
   closeCreateSplitModal(): void {
     this.showCreateSplitModal = false;
     this.editingSplitPlan = null;
   }
 
   openCreateWeeklyModal(): void { this.showCreateWeeklyModal = true; }
+  
   closeCreateWeeklyModal(): void {
     this.showCreateWeeklyModal = false;
     this.editingWeeklyPlan = null;
   }
 
   openCreateDailyModal(): void { this.showCreateDailyModal = true; }
+  
   closeCreateDailyModal(): void {
     this.showCreateDailyModal = false;
     this.editingDailyPlan = null;
@@ -236,7 +235,6 @@ export class WorkoutPlannerComponent implements OnInit {
 
     if (!planner) return;
 
-    // Resolve back to the actual daily planner if virtual mapping was active
     if (type === 'daily') {
       const actual = this.dailyPlanners.find(p => p.id === planner.id);
       if (actual) {
@@ -247,7 +245,6 @@ export class WorkoutPlannerComponent implements OnInit {
     }
   }
 
-  // Child component save handlers
   onSplitCreated(plan: SplitPlanner): void {
     if (plan.id) {
       this.workoutPlanService.updatePlan(plan.id, plan).subscribe({

@@ -15,14 +15,16 @@
 
   <div class="toolbar">
     <div class="type-chips" role="tablist" aria-label="Plan types">
-      <button type="button" role="tab" class="type-chip" [class.active]="activeTab === 'splits'"
-        [attr.aria-selected]="activeTab === 'splits'" (click)="setTab('splits')">
-        Split plans <span class="count">{{ splitPlanners.length }}</span>
-      </button>
       <button type="button" role="tab" class="type-chip" [class.active]="activeTab === 'weekly'"
         [attr.aria-selected]="activeTab === 'weekly'" (click)="setTab('weekly')">
         Weekly plans <span class="count">{{ weeklyPlanners.length }}</span>
       </button>
+
+      <button type="button" role="tab" class="type-chip" [class.active]="activeTab === 'splits'"
+        [attr.aria-selected]="activeTab === 'splits'" (click)="setTab('splits')">
+        Split plans <span class="count">{{ splitPlanners.length }}</span>
+      </button>
+
       <button type="button" role="tab" class="type-chip" [class.active]="activeTab === 'daily'"
         [attr.aria-selected]="activeTab === 'daily'" (click)="setTab('daily')">
         Single day <span class="count">{{ dailyPlanners.length }}</span>

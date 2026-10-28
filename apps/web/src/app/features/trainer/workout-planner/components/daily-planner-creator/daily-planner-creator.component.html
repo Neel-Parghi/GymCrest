@@ -4,7 +4,7 @@
     <div class="modal-header">
       <div class="header-title-group">
         <i class="fa-solid fa-dumbbell"></i>
-        <h2>{{ editData ? 'Edit Standalone Workout' : 'New Standalone Workout' }}</h2>
+        <h2>{{ editData ? 'Edit Daily Plan' : 'New Daily Plan' }}</h2>
       </div>
       <button class="btn-close" (click)="onClose()"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -19,7 +19,7 @@
       <div class="wizard-step-line"></div>
       <button type="button" class="wizard-step-btn" [class.active]="activeStep === 'plan'" (click)="nextStep()">
         <span class="step-num">2</span>
-        <span class="step-label">Workout Plan Setup</span>
+        <span class="step-label">Create Plan</span>
       </button>
     </div>
 
@@ -174,14 +174,14 @@
 
               <div class="panel-footer">
                 <button type="button" class="btn-link" (click)="addDailyExercise()">
-                  <i class="fa-solid fa-circle-plus"></i> Add Exercise
+                  <i class="fa-solid fa-circle-plus"></i> Add<span class="label-extra"> Exercise</span>
                 </button>
                 <div class="panel-copy-paste-actions">
                   <button type="button" class="btn-secondary-action btn-copy" (click)="copyWorkout()"
                     title="Copy Workout">
                     <i class="fa-solid fa-copy"></i> Copy Workout
                   </button>
-                  <button type="button" class="btn-secondary-action btn-paste" (click)="pasteWorkout()"
+                  <button type="button" class="btn-secondary-action btn-paste" *ngIf="copiedWorkout" (click)="pasteWorkout()"
                     title="Paste Workout">
                     <i class="fa-solid fa-paste"></i> Paste Workout
                   </button>
