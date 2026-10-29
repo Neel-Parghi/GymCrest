@@ -61,6 +61,7 @@ export const CONSTANTS = {
         ACTIVE: 'Active',
         INACTIVE: 'Inactive',
         SEARCH: 'Search',
+        NO_GYM_YET: 'No gym yet',
     },
     //#endregion
 

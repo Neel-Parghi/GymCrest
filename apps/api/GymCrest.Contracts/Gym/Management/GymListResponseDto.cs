@@ -1,4 +1,5 @@
 using System;
+using GymCrest.Contracts.Gym.Shared;
 
 namespace GymCrest.Contracts.Gym.Management
 {
@@ -24,6 +25,17 @@ namespace GymCrest.Contracts.Gym.Management
         public DateTime? EstablishedDate { get; set; }
         public string? LogoUrl { get; set; }
         public string? BannerUrl { get; set; }
+        public AddressDto? Address { get; set; }
+
+        // Owner Link
+        public Guid OwnerId { get; set; }
+        public string? OwnerEmail { get; set; }
+        public string? OwnerPhone { get; set; }
+        public bool OwnerIsActive { get; set; }
+
+        // People Counts
+        public int MembersCount { get; set; }
+        public int StaffCount { get; set; }
 
         // Gym Tax and Billing Configuration Settings
         public string? InvoicePrefix { get; set; }
@@ -34,6 +46,7 @@ namespace GymCrest.Contracts.Gym.Management
         // Subscription Information
         public string? PlanName { get; set; }
         public DateTime? SubscriptionExpiry { get; set; }
+        public DateTime? SubscriptionStart { get; set; }
         public bool IsTrialPlan { get; set; }
         public string? PaymentStatus { get; set; }
         public bool HasActiveSubscription => !string.IsNullOrEmpty(PlanName);

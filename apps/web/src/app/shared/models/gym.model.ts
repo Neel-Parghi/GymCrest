@@ -64,6 +64,17 @@ export interface GymListResponse {
   establishedDate?: string;
   logoUrl?: string;
   bannerUrl?: string;
+  address?: Address | null;
+
+  // Owner link
+  ownerId?: string;
+  ownerEmail?: string;
+  ownerPhone?: string;
+  ownerIsActive?: boolean;
+
+  // People counts
+  membersCount?: number;
+  staffCount?: number;
 
   // New Billing & Settings
   invoicePrefix?: string;
@@ -73,6 +84,7 @@ export interface GymListResponse {
 
   // Subscription info
   planName?: string;
+  subscriptionStart?: string;
   subscriptionExpiry?: string;
   isTrialPlan: boolean;
   paymentStatus: string;
@@ -90,8 +102,22 @@ export interface GymOwnerResponse {
   phone: string;
   joinedDate: string;
   gymsOwned: number;
+  location?: string;
   invitationStatus: string;
   status: boolean;
+  isOnboarded?: boolean;
+  gyms?: OwnedGym[];
+  gymNames?: string;
+}
+
+export interface OwnedGym {
+  id: string;
+  gymName: string;
+  city?: string | null;
+  isActive: boolean;
+  isVerified: boolean;
+  branchesCount: number;
+  createdOn: string;
 }
 
 export interface UpdateGymOwnerRequest {

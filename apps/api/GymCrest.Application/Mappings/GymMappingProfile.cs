@@ -16,7 +16,11 @@ namespace GymCrest.Application.Mappings
             
             CreateMap<BranchDto, Branch>().ReverseMap();
 
-            CreateMap<UpdateGymDto, Gym>();
+            CreateMap<UpdateGymDto, Gym>()
+                .ForMember(dest => dest.InvoicePrefix, opt => opt.PreCondition(src => !string.IsNullOrWhiteSpace(src.InvoicePrefix)))
+                .ForMember(dest => dest.DefaultTaxRate, opt => opt.PreCondition(src => src.DefaultTaxRate.HasValue))
+                .ForMember(dest => dest.OverdueGraceDays, opt => opt.PreCondition(src => src.OverdueGraceDays.HasValue))
+                .ForMember(dest => dest.AutoEmailReceipts, opt => opt.PreCondition(src => src.AutoEmailReceipts.HasValue));
             CreateMap<UpdateMyGymDto, Gym>()
                 .ForMember(dest => dest.DefaultTaxRate, opt => opt.PreCondition(src => src.DefaultTaxRate.HasValue))
                 .ForMember(dest => dest.OverdueGraceDays, opt => opt.PreCondition(src => src.OverdueGraceDays.HasValue))

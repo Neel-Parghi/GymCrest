@@ -1,5 +1,6 @@
 using GymCrest.Contracts.Gym.Management;
 using GymCrest.Contracts.Gym.Owners;
+using GymCrest.Contracts.Gym.Shared;
 using GymCrest.Domain.Entities;
 using GymCrest.Domain.Interface;
 using GymCrest.Infrastructure.Persistence;
@@ -43,7 +44,8 @@ namespace GymCrest.Infrastructure.Repositories
                 query = query.Where(u => u.FirstName.ToLower().Contains(searchTerm) ||
                                        u.LastName.ToLower().Contains(searchTerm) ||
                                        u.Email.ToLower().Contains(searchTerm) ||
-                                       (u.Profile != null && u.Profile.Phone.ToLower().Contains(searchTerm)));
+                                       (u.Profile != null && u.Profile.Phone.ToLower().Contains(searchTerm)) ||
+                                       (u.Gyms != null && u.Gyms.Any(g => g.GymName.ToLower().Contains(searchTerm))));
             }
 
             int totalCount = await query.CountAsync();
@@ -57,10 +59,27 @@ namespace GymCrest.Infrastructure.Repositories
                 Email = u.Email,
                 Phone = u.Profile != null ? u.Profile.Phone : string.Empty,
                 GymsOwned = u.Gyms != null ? u.Gyms.Count : 0,
+                Location = u.Profile != null && u.Profile.Address != null
+                    ? u.Profile.Address.City
+                    : u.Gyms!.OrderBy(g => g.CreatedOn).Select(g => g.Address != null ? g.Address.City : string.Empty).FirstOrDefault() ?? string.Empty,
                 JoinedDate = u.CreatedOn,
                 Status = u.IsActive ? "Active" : "Inactive",
                 InvitationStatus = (u.Security != null && u.Security.IsInvitationAccepted) ? "Accepted" :
-                                     ((u.Security != null && u.Security.InvitationExpiry > DateTime.UtcNow) ? "Pending" : "Expired")
+                                     ((u.Security != null && u.Security.InvitationExpiry > DateTime.UtcNow) ? "Pending" : "Expired"),
+                IsOnboarded = u.Profile != null && u.Profile.IsOnboarded,
+                Gyms = u.Gyms!
+                    .OrderBy(g => g.CreatedOn)
+                    .Select(g => new OwnedGymDto
+                    {
+                        Id = g.Id,
+                        GymName = g.GymName,
+                        City = g.Address != null ? g.Address.City : null,
+                        IsActive = g.IsActive,
+                        IsVerified = g.IsVerified,
+                        BranchesCount = g.Branches != null ? g.Branches.Count : 0,
+                        CreatedOn = g.CreatedOn
+                    })
+                    .ToList()
             })
             .OrderByDescending(u => u.JoinedDate)
             .Skip((pageNumber - 1) * pageSize)
@@ -87,7 +106,9 @@ namespace GymCrest.Infrastructure.Repositories
                 searchTerm = searchTerm.ToLower();
                 query = query.Where(g => g.GymName.ToLower().Contains(searchTerm) ||
                                        (g.BrandName != null && g.BrandName.ToLower().Contains(searchTerm)) ||
-                                       (g.Email != null && g.Email.ToLower().Contains(searchTerm)));
+                                       (g.Email != null && g.Email.ToLower().Contains(searchTerm)) ||
+                                       (g.Owner.FirstName + " " + g.Owner.LastName).ToLower().Contains(searchTerm) ||
+                                       g.Owner.Email.ToLower().Contains(searchTerm));
             }
 
             int totalCount = await query.CountAsync();
@@ -101,6 +122,21 @@ namespace GymCrest.Infrastructure.Repositories
                     GymName = g.GymName,
                     BrandName = g.BrandName,
                     OwnerName = g.Owner.FirstName + " " + g.Owner.LastName,
+                    OwnerId = g.OwnerUserId,
+                    OwnerEmail = g.Owner.Email,
+                    OwnerPhone = g.Owner.Profile != null ? g.Owner.Profile.Phone : null,
+                    OwnerIsActive = g.Owner.IsActive,
+                    MembersCount = _dbContext.GymMembers.Count(m => m.GymId == g.Id),
+                    StaffCount = _dbContext.Staff.Count(s => s.GymId == g.Id),
+                    Address = g.Address == null ? null : new AddressDto
+                    {
+                        Line1 = g.Address.Address1,
+                        Line2 = g.Address.Address2,
+                        City = g.Address.City,
+                        State = g.Address.State,
+                        Country = g.Address.Country,
+                        PostalCode = g.Address.PostalCode
+                    },
                     Email = g.Email,
                     Phone = g.Phone,
                     IsActive = g.IsActive,
@@ -129,6 +165,11 @@ namespace GymCrest.Infrastructure.Repositories
                         .Where(s => s.GymId == g.Id && s.IsActive)
                         .OrderByDescending(s => s.CreatedOn)
                         .Select(s => (DateTime?)s.EndDate)
+                        .FirstOrDefault(),
+                    SubscriptionStart = _dbContext.SubscriptionRecords
+                        .Where(s => s.GymId == g.Id && s.IsActive)
+                        .OrderByDescending(s => s.CreatedOn)
+                        .Select(s => (DateTime?)s.StartDate)
                         .FirstOrDefault(),
                     IsTrialPlan = _dbContext.SubscriptionRecords
                         .Where(s => s.GymId == g.Id && s.IsActive)

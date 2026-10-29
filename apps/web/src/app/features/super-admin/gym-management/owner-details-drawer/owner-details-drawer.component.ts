@@ -44,8 +44,8 @@ export class OwnerDetailsDrawerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['ownerContext'] && this.ownerContext) {
       this.editForm.patchValue({
-        firstName: this.ownerContext?.name.split(' ')[0] || '',
-        lastName: this.ownerContext?.name.split(' ')[1] || '',
+        firstName: this.ownerContext?.firstName || '',
+        lastName: this.ownerContext?.lastName || '',
         email: this.ownerContext?.email || '',
         phone: this.ownerContext?.phone || ''
       });

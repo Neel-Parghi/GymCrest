@@ -13,5 +13,7 @@ namespace GymCrest.Contracts.Gym.Owners
         public DateTime JoinedDate { get; set; }
         public string Status { get; set; } = string.Empty;
         public string InvitationStatus { get; set; } = string.Empty;
+        public bool IsOnboarded { get; set; }
+        public List<OwnedGymDto> Gyms { get; set; } = [];
     }
 }

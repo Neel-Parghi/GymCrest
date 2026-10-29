@@ -157,6 +157,9 @@ namespace GymCrest.Application.Modules.Gym.Services
 
             _mapper.Map(updateGymOwnerDto, user);
 
+            user.Profile ??= new UserProfile { CreatedOn = DateTime.UtcNow };
+            user.Profile.Phone = updateGymOwnerDto.Phone;
+
             User updatedOwner = _gymManagementRepository.UpdateGymOwner(user);
             await _unitOfWork.SaveChangesAsync();
 

@@ -65,9 +65,13 @@ export class GymOwners implements OnInit {
   getGymOwners(search: string = '') {
     this.gymService.getGymOwnersList(this.currentPage, this.pageSize, search).subscribe({
       next: (res) => {
-        this.displayData = res.data.items;
+        const items = res.data.items.map(owner => ({
+          ...owner,
+          gymNames: owner.gyms?.length ? owner.gyms.map(g => g.gymName).join(', ') : CONSTANTS.UI_LABELS.NO_GYM_YET
+        }));
+        this.displayData = items;
         this.totalItems = res.data.totalCount;
-        this.filteredData = res.data.items;
+        this.filteredData = items;
       },
       error: (err: any) => {
         this.notification.error(err.error?.message || CONSTANTS.GYM_OWNER_LOAD_ERROR_MESSAGE);

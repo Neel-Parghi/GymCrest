@@ -36,6 +36,17 @@ export class GymDetailsDrawerComponent implements OnChanges {
   get gym() { return this._gym; }
   private _gym?: GymListResponse;
 
+  get ownerInitials(): string {
+    const parts = (this._gym?.ownerName || '').trim().split(/\s+/).filter(Boolean);
+    return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('') || '?';
+  }
+
+  get addressText(): string {
+    const a = this._gym?.address;
+    if (!a) return '';
+    return [a.line1, a.line2, a.city, a.state, a.postalCode, a.country].filter(Boolean).join(', ');
+  }
+
   @Output() closeDrawer = new EventEmitter<void>();
   @Output() gymUpdated = new EventEmitter<any>();
 
@@ -70,6 +81,11 @@ export class GymDetailsDrawerComponent implements OnChanges {
     description: ['', [Validators.maxLength(FIELD_LIMITS.DESCRIPTION)]],
     gstNumber: ['', [Validators.maxLength(FIELD_LIMITS.GST_NUMBER), gstValidator]],
     registrationNumber: ['', [Validators.maxLength(FIELD_LIMITS.REGISTRATION_NUMBER), registrationNumberValidator]],
+    establishedDate: [''],
+    invoicePrefix: ['', [Validators.required, Validators.maxLength(10)]],
+    defaultTaxRate: [18 as number | null, [Validators.required, Validators.min(0), Validators.max(50)]],
+    overdueGraceDays: [7 as number | null, [Validators.required, Validators.min(0), Validators.max(365)]],
+    autoEmailReceipts: [true],
     isActive: [true],
     isVerified: [false]
   });
@@ -85,6 +101,11 @@ export class GymDetailsDrawerComponent implements OnChanges {
       description: gym.description,
       gstNumber: gym.gstNumber,
       registrationNumber: gym.registrationNumber,
+      establishedDate: gym.establishedDate ? gym.establishedDate.substring(0, 10) : '',
+      invoicePrefix: gym.invoicePrefix || 'GF-',
+      defaultTaxRate: gym.defaultTaxRate ?? 18,
+      overdueGraceDays: gym.overdueGraceDays ?? 7,
+      autoEmailReceipts: gym.autoEmailReceipts ?? true,
       isActive: gym.isActive,
       isVerified: gym.isVerified
     });
@@ -110,7 +131,8 @@ export class GymDetailsDrawerComponent implements OnChanges {
 
   save() {
     if (this.editForm.valid && this._gym?.id) {
-      this.gymUpdated.emit(this.editForm.getRawValue());
+      const value = this.editForm.getRawValue();
+      this.gymUpdated.emit({ ...value, establishedDate: value.establishedDate || null });
       this.isEditing = false;
       this.editForm.disable();
       this.onClose();
