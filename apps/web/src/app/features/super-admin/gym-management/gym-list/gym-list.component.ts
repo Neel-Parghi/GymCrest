@@ -122,10 +122,6 @@ export class GymList implements OnInit {
       this.openDrawer(event.row, event.action);
     }
     if (event.action == CONSTANTS.ACTIONS.DELETE) {
-      if (event.row.branchesCount > 0) {
-        this.notification.error(CONSTANTS.GYM_DELETE_VALIDATION_MESSAGE);
-        return;
-      }
       this.handleDelete(event.row);
     }
   }
@@ -144,7 +140,7 @@ export class GymList implements OnInit {
           const data = res?.data || res;
 
           if (data?.Success === false || data?.success === false) {
-            const message = (data?.Message || data?.message) === 'GYM_HAS_BRANCHES'
+            const message = (data?.Message || data?.message) === 'GYM_HAS_USERS'
               ? CONSTANTS.GYM_DELETE_VALIDATION_MESSAGE
               : (data?.Message || data?.message || CONSTANTS.GYM_DELETE_ERROR_MESSAGE);
 

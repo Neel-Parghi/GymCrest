@@ -57,7 +57,7 @@ namespace GymCrest.Api.Controllers.Gym
             bool deleted = await _gymManagementService.DeleteGymAsync(id);
             if (!deleted)
             {
-                return Ok(new { Success = false, Message = "GYM_HAS_BRANCHES" });
+                return Ok(new { Success = false, Message = "GYM_HAS_USERS" });
             }
             return Ok(new { Success = true, Message = "Gym deleted successfully" });
         }

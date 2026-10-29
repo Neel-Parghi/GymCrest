@@ -178,25 +178,35 @@ namespace GymCrest.Application.Modules.Gym.Services
 
         public async Task<bool> DeleteGymAsync(Guid gymId)
         {
-            List<Branch>? branches = await _gymManagementRepository.GetBranchesByGymIdAsync(gymId);
-            if (branches != null && branches.Any())
+            Domain.Entities.Gym? gym = await _gymManagementRepository.GetGymByIdAsync(gymId);
+            if (gym == null)
+            {
+                throw new Exception("Gym not found.");
+            }
+
+            if (await _gymManagementRepository.GymHasUsersAsync(gymId, gym.OwnerUserId))
             {
                 return false;
             }
 
             await _gymManagementRepository.DeleteGymAsync(gymId);
-            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteGymOwnerAsync(Guid ownerId)
         {
             User? owner = await _gymManagementRepository.GetGymOwnerByIdAsync(ownerId);
-            if (owner == null) return false;
+            if (owner == null)
+            {
+                throw new Exception("Gym Owner not found.");
+            }
 
-            owner.IsActive = false;
-            _gymManagementRepository.UpdateGymOwner(owner);
-            await _unitOfWork.SaveChangesAsync();
+            if (await _gymManagementRepository.OwnerHasGymsAsync(ownerId))
+            {
+                return false;
+            }
+
+            await _gymManagementRepository.DeleteGymOwnerAsync(owner);
             return true;
         }
         

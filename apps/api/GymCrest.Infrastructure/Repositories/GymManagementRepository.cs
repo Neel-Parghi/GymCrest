@@ -5,6 +5,7 @@ using GymCrest.Domain.Interface;
 using GymCrest.Infrastructure.Persistence;
 using GymCrest.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GymCrest.Infrastructure.Repositories
 {
@@ -165,13 +166,97 @@ namespace GymCrest.Infrastructure.Repositories
             return gym;
         }
 
+        public async Task<bool> GymHasUsersAsync(Guid gymId, Guid ownerUserId)
+        {
+            return await _dbContext.GymMembers.AnyAsync(m => m.GymId == gymId)
+                || await _dbContext.Staff.AnyAsync(s => s.GymId == gymId)
+                || await _dbContext.Users.AnyAsync(u => u.GymId == gymId && u.Id != ownerUserId);
+        }
+
+        public async Task<bool> OwnerHasGymsAsync(Guid ownerId)
+        {
+            return await _dbContext.Gyms.AnyAsync(g => g.OwnerUserId == ownerId);
+        }
+
+        public async Task DeleteGymOwnerAsync(User owner)
+        {
+            IExecutionStrategy strategy = _dbContext.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
+            {
+                await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
+
+                await _dbContext.GymMembers
+                    .Where(m => m.UserId == owner.Id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(m => m.UserId, (Guid?)null));
+                await _dbContext.Staff
+                    .Where(s => s.UserId == owner.Id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(st => st.UserId, (Guid?)null));
+
+                await _dbContext.GymPlans.Where(p => p.GymOwnerId == owner.Id).ExecuteDeleteAsync();
+                await _dbContext.WorkoutPlans.IgnoreQueryFilters().Where(p => p.CreatedBy == owner.Id && p.IsCustom).ExecuteDeleteAsync();
+                await _dbContext.DietPlans.IgnoreQueryFilters().Where(p => p.CreatedBy == owner.Id && p.IsCustom).ExecuteDeleteAsync();
+
+                Guid? profileAddressId = owner.Profile?.AddressId;
+                await _dbContext.Users.Where(u => u.Id == owner.Id).ExecuteDeleteAsync();
+                if (profileAddressId.HasValue)
+                {
+                    await _dbContext.Addresses.Where(a => a.Id == profileAddressId.Value).ExecuteDeleteAsync();
+                }
+
+                await transaction.CommitAsync();
+            });
+        }
+
         public async Task DeleteGymAsync(Guid gymId)
         {
-            Gym? gym = await _dbContext.Gyms.FindAsync(gymId);
-            if (gym != null)
+            IExecutionStrategy strategy = _dbContext.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                gym.IsActive = false;
-            }
+                await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
+
+                Gym? gym = await _dbContext.Gyms.AsNoTracking().FirstOrDefaultAsync(g => g.Id == gymId);
+                if (gym == null) return;
+
+                List<Guid> addressIds = await _dbContext.Branches
+                    .Where(b => b.GymId == gymId)
+                    .Select(b => b.AddressId)
+                    .ToListAsync();
+                if (gym.AddressId.HasValue) addressIds.Add(gym.AddressId.Value);
+
+                await _dbContext.UserProfiles
+                    .Where(p => p.UserId == gym.OwnerUserId)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(p => p.IsOnboarded, false)
+                        .SetProperty(p => p.CurrentOnboardingStep, 0));
+                await _dbContext.Users
+                    .Where(u => u.GymId == gymId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.GymId, (Guid?)null));
+                await _dbContext.Feedbacks
+                    .Where(f => f.GymId == gymId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(f => f.GymId, (Guid?)null));
+
+                await _dbContext.WorkoutPlans.IgnoreQueryFilters().Where(p => p.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.DietPlans.IgnoreQueryFilters().Where(p => p.GymId == gymId).ExecuteDeleteAsync();
+
+                await _dbContext.SaaSPaymentTransactions.Where(t => t.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.SubscriptionRecords.Where(s => s.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.AnnouncementTemplates.Where(t => t.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.GymAnnouncements.Where(a => a.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.UserNotifications.Where(n => n.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.GymHolidays.Where(h => h.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.MaintenanceLogs.Where(l => l.Equipment.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.Equipment.Where(e => e.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.InventoryItems.Where(i => i.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.StaffPayrollRules.Where(r => r.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.StaffPayoutLogs.Where(l => l.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.StaffAttendanceLogs.Where(l => l.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.GymConfigurations.Where(c => c.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.Branches.Where(b => b.GymId == gymId).ExecuteDeleteAsync();
+                await _dbContext.Gyms.Where(g => g.Id == gymId).ExecuteDeleteAsync();
+                await _dbContext.Addresses.Where(a => addressIds.Contains(a.Id)).ExecuteDeleteAsync();
+
+                await transaction.CommitAsync();
+            });
         }
 
         public async Task<List<Branch>> GetBranchesByGymIdAsync(Guid gymId)
