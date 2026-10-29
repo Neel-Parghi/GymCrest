@@ -27,6 +27,7 @@
 
 .picker-header {
   display: flex;
+  flex-shrink: 0;
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 16px;
@@ -68,6 +69,7 @@
   border-radius: 10px;
   padding: 10px 14px;
   margin-bottom: 12px;
+  flex-shrink: 0;
 
   i {
     color: #9ca3af;
@@ -84,7 +86,11 @@
 }
 
 .picker-list {
+  // Takes the card's remaining height and scrolls, so a long member list stays inside the modal
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -107,6 +113,7 @@
   padding: 10px;
   border-radius: 10px;
   cursor: pointer;
+  flex-shrink: 0;
   text-align: left;
   font-family: inherit;
   transition: background 0.15s ease;

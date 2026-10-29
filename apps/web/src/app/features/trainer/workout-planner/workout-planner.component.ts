@@ -376,7 +376,7 @@ export class WorkoutPlannerComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.notification.error(CONSTANTS.WORKOUT_PLANNER_MODULE.DELETE_ERROR);
+          this.notification.error(err.error?.message || CONSTANTS.WORKOUT_PLANNER_MODULE.DELETE_ERROR);
           console.error(err);
         }
       });

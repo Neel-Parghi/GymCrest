@@ -162,6 +162,10 @@ export class DropdownComponent implements ControlValueAccessor, OnInit {
     return this.options.filter(o => o.label.toLowerCase().includes(search));
   }
 
+  trackByValue(_: number, option: DropdownOption): any {
+    return option.value;
+  }
+
   onSearch(event: Event) {
     event.stopPropagation();
   }

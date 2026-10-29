@@ -44,7 +44,6 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpPut("{id}")]
-        [BlockDemoAccount]
         [Authorize(Roles = "GymOwner,Staff")]
         public async Task<IActionResult> UpdateAnnouncement(Guid id, [FromBody] GymAnnouncementRequest request)
         {

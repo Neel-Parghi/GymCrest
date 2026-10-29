@@ -11,6 +11,7 @@ import { DateTimePickerComponent } from '../../../shared/components/date-time-pi
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { AppGridConfig } from '../../../shared/constants/grid-config';
 import { CONSTANTS } from '../../../core/constants/constants';
+import { ConfirmationService } from '../../../core/services/confirmation.service';
 
 @Component({
   selector: 'app-announcements',
@@ -24,6 +25,7 @@ export class AnnouncementsComponent implements OnInit {
   private announcementService = inject(AnnouncementService);
   private templateService = inject(TemplateService);
   private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationService);
 
   announcements: any[] = [];
   templates: any[] = [];
@@ -133,7 +135,7 @@ export class AnnouncementsComponent implements OnInit {
           this.isSubmitting = false;
         },
         error: (err) => {
-          this.notificationService.error('Failed to update announcement');
+          this.notificationService.error(err.error?.message || 'Failed to update announcement');
           this.isSubmitting = false;
           console.error(err);
         }
@@ -147,7 +149,7 @@ export class AnnouncementsComponent implements OnInit {
           this.isSubmitting = false;
         },
         error: (err) => {
-          this.notificationService.error('Failed to create announcement');
+          this.notificationService.error(err.error?.message || 'Failed to create announcement');
           this.isSubmitting = false;
           console.error(err);
         }
@@ -173,18 +175,26 @@ export class AnnouncementsComponent implements OnInit {
   }
 
   deleteAnnouncement(id: string): void {
-    if (confirm('Are you sure you want to delete this announcement?')) {
-      this.announcementService.deleteAnnouncement(id).subscribe({
-        next: () => {
-          this.notificationService.success('Announcement deleted');
-          this.loadAnnouncements();
-        },
-        error: (err) => {
-          this.notificationService.error('Failed to delete announcement');
-          console.error(err);
-        }
-      });
-    }
+    this.confirmationService.confirm({
+      title: 'Delete Announcement?',
+      message: 'Are you sure you want to delete this notification Announcement? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger'
+    }).then(confirmed => {
+      if(confirmed){
+        this.announcementService.deleteAnnouncement(id).
+        subscribe({
+          next: () => {
+            this.notificationService.success('Announcement deleted');
+            this.loadAnnouncements();
+          },
+          error: (err) => {
+            this.notificationService.error(err.error?.message || 'Failed to delete announcement');
+          }
+        })
+      }
+    })
   }
 
   private unwrapArray(response: any): any[] {
