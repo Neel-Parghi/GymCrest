@@ -76,8 +76,8 @@ export class PTMemberDetailDietChartComponent implements OnChanges {
           this.notification.success('Active diet plan successfully removed.');
           this.customDietSaved.emit(); // Emitting this reloads the view
         },
-        error: () => {
-          this.notification.error('Failed to remove active diet plan.');
+        error: (err) => {
+          this.notification.error(err.error?.message || 'Failed to remove active diet plan.');
         }
       });
     }

@@ -171,7 +171,7 @@ export class DietLibraryComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to delete template:', err);
-        this.notification.error(CONSTANTS.DIET_PLANNER_MODULE.DELETE_ERROR);
+        this.notification.error(err.error?.message || CONSTANTS.DIET_PLANNER_MODULE.DELETE_ERROR);
         this.closeDeleteConfirm();
       }
     });

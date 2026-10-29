@@ -22,7 +22,7 @@
       <input type="text" [formControl]="searchControl" placeholder="Search..." (click)="$event.stopPropagation()" [maxlength]="limits.SEARCH">
     </div>
 
-    <div *ngFor="let option of filteredOptions" class="option" [class.selected]="option.value === value"
+    <div *ngFor="let option of filteredOptions; trackBy: trackByValue" class="option" [class.selected]="option.value === value"
       (click)="selectOption(option)">
       <i *ngIf="option.icon" [class]="option.icon"></i>
       {{ option.label }}

@@ -322,7 +322,7 @@ export class MembersListComponent implements OnInit {
             this.memberService.clearCache();
             this.loadMembers();
           },
-          error: () => this.notificationService.error(CONSTANTS.MEMBERS_MODULE.DELETE_ERROR)
+          error: (err) => this.notificationService.error(err.error?.message || CONSTANTS.MEMBERS_MODULE.DELETE_ERROR)
         });
       }
     });

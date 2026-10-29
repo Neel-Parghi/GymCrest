@@ -221,7 +221,7 @@ export class SettingsComponent implements OnInit {
         this.notification.success(CONSTANTS.GYM_OWNER_SETTINGS.HOLIDAY_DELETE_SUCCESS);
         this.loadHolidays();
       },
-      error: () => this.notification.error(CONSTANTS.GYM_OWNER_SETTINGS.HOLIDAY_DELETE_ERROR)
+      error: (err) => this.notification.error(err.error?.message || CONSTANTS.GYM_OWNER_SETTINGS.HOLIDAY_DELETE_ERROR)
     });
   }
 }
