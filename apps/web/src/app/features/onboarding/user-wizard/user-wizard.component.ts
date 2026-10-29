@@ -9,7 +9,7 @@ import { UserService } from '../../../core/services/user.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { DateTimePickerComponent } from '../../../shared/components/date-time-picker/date-time-picker.component';
-import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { BrandLoaderComponent } from '../../../shared/components/brand-loader/brand-loader.component';
 import { ValidationMessage } from '../../../shared/components/validation-message/validation-message.component';
 import {
   ACTIVITY_LEVELS, ActivityLevel, DIET_TYPES, DietType, FitnessGoalId
@@ -62,7 +62,7 @@ interface WizardDraft {
 @Component({
   selector: 'app-user-wizard',
   standalone: true,
-  imports: [ReactiveFormsModule, DropdownComponent, DateTimePickerComponent, LoadingComponent, ValidationMessage],
+  imports: [ReactiveFormsModule, DropdownComponent, DateTimePickerComponent, BrandLoaderComponent, ValidationMessage],
   templateUrl: './user-wizard.component.html',
   styleUrls: ['./user-wizard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -326,7 +326,9 @@ export class UserWizardComponent implements OnInit {
 
         const navigateToDashboard = () => {
           sessionStorage.setItem('justFinishedOnboarding', 'true');
-          this.router.navigate(['/user/dashboard']);
+          this.router.navigate(['/user/dashboard']).then(opened => {
+            if (!opened) this.isSubmitting.set(false);
+          });
         };
 
         this.authService.refreshToken().subscribe({
