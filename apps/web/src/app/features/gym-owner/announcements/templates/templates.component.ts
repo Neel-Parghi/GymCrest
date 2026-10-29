@@ -196,7 +196,7 @@ export class TemplatesComponent implements OnInit {
             this.loadTemplates();
           },
           error: (err) => {
-            this.notificationService.error('Failed to delete template');
+            this.notificationService.error(err.error?.message || 'Failed to delete template');
           }
         });
       }
