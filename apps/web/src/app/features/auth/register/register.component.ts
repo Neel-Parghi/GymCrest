@@ -137,6 +137,16 @@ export class RegisterComponent {
     }
   }
 
+  changeEmail() {
+    this.isOtpStep = false;
+    this.registeredEmail = '';
+    this.otpControls.forEach(c => c.setValue(''));
+    this.updateOtpCode();
+    this.resendCooldown = 0;
+    if (this.resendTimer) clearInterval(this.resendTimer);
+    setTimeout(() => (document.getElementById('email') as HTMLInputElement | null)?.select());
+  }
+
   onOtpKeyup(event: KeyboardEvent, index: number) {
     const input = event.target as HTMLInputElement;
     if (event.key === 'Backspace' || event.key === 'Tab' || event.key === 'Shift') return;

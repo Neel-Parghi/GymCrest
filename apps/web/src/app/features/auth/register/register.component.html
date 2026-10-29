@@ -125,13 +125,16 @@
           <form *ngIf="isOtpStep" (ngSubmit)="verifyOtp()" class="auth-form">
             <div class="form-item">
               <label>Verification Code</label>
-              <p class="otp-instruction">We've sent a 6-digit code to <strong>{{registeredEmail}}</strong>.</p>
+              <p class="otp-instruction">We've sent a 6-digit code to <strong>{{registeredEmail}}</strong>.
+                <button type="button" class="change-email-btn" (click)="changeEmail()" [disabled]="isLoading">Not your
+                  email?</button></p>
               <div class="otp-container" (paste)="onOtpPaste($event)">
                 <input *ngFor="let item of otpControls; let i = index; trackBy: trackByIndex" type="text"
                   inputmode="numeric" autocomplete="one-time-code" maxlength="1" [id]="'otp-' + i"
                   [formControl]="otpControls[i]" class="otp-box" (keyup)="onOtpKeyup($event, i)"
                   (keydown)="onOtpKeydown($event, i)" (input)="updateOtpCode()" required />
               </div>
+              <small class="field-hint spam-hint">Can't find it? Check your spam or junk folder.</small>
             </div>
 
             <button class="submit-btn" type="submit" [disabled]="otpCode.length !== 6 || isLoading">

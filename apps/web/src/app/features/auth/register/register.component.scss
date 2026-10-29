@@ -146,6 +146,11 @@
   line-height: 1.35;
 }
 
+.spam-hint {
+  display: block;
+  text-align: center;
+}
+
 .otp-instruction {
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -155,6 +160,21 @@
   strong {
     color: var(--text-primary);
     word-break: break-all;
+  }
+
+  .change-email-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-weight: 600;
+    color: var(--primary-precision, #005bbc);
+    cursor: pointer;
+
+    &:hover:not([disabled]) {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
 
   @include bp.mobile {

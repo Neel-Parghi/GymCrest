@@ -61,7 +61,10 @@ namespace GymCrest.Application.Modules.Auth.Service
             {
                 if (existingUser.Security == null || !existingUser.Security.IsEmailVerified)
                 {
-                    // Allow re-registering or just regenerating OTP if email is not verified
+                    existingUser.FirstName = userDto.FirstName;
+                    existingUser.LastName = userDto.LastName ?? string.Empty;
+                    existingUser.PasswordHash = _passwordService.HashPassword(userDto.Password);
+                    existingUser.Role = userDto.Role;
                     existingUser.Security ??= new UserSecurity { CreatedOn = DateTime.UtcNow };
                     string existingOtp = new Random().Next(100000, 999999).ToString();
                     existingUser.Security.OtpCode = existingOtp;
