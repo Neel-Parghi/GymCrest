@@ -45,6 +45,7 @@ export class ProfileComponent implements OnInit {
   isDeletingAccount = false;
 
   isTrainer = false;
+  isGymOwner = false;
   specControl = new FormControl('', Validators.maxLength(FIELD_LIMITS.SHORT_TEXT));
 
   constructor(
@@ -97,6 +98,7 @@ export class ProfileComponent implements OnInit {
 
         this.profile = data;
         this.isTrainer = data.role === 'Trainer';
+        this.isGymOwner = data.role === 'GymOwner';
 
         this.profileForm.patchValue({
           firstName: data.firstName,
@@ -293,9 +295,9 @@ export class ProfileComponent implements OnInit {
 
     this.isDeletingAccount = true;
     this.userService.scheduleAccountDeletion().subscribe({
-      next: () => {
+      next: (res: any) => {
         this.isDeletingAccount = false;
-        this.notification.success('Account deletion scheduled successfully. You will receive an email confirmation.');
+        this.notification.success(res?.data?.message || res?.message || 'Account deletion scheduled successfully.');
       },
       error: (err) => {
         this.isDeletingAccount = false;

@@ -16,6 +16,6 @@ namespace GymCrest.Application.Modules.Auth.Interface
         Task ForgotPasswordAsync(ForgotPasswordRequestDto dto);
         Task ResetPasswordAsync(ResetPasswordRequestDto dto);
         Task LogoutAsync(string refreshToken);
-        Task RequestAccountDeletionAsync(Guid userId);
+        Task<bool> RequestAccountDeletionAsync(Guid userId);
     }
 }

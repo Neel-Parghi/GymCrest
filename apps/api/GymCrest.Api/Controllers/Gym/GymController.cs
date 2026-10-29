@@ -34,9 +34,9 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetGymList([FromQuery] PaginationParams pagination)
+        public async Task<ActionResult> GetGymList([FromQuery] GymFilterParams filters)
         {
-            return Ok(await _gymManagementService.GetGymListAsync(pagination));
+            return Ok(await _gymManagementService.GetGymListAsync(filters));
         }
 
         [HttpPut("{id}")]
@@ -57,7 +57,7 @@ namespace GymCrest.Api.Controllers.Gym
             bool deleted = await _gymManagementService.DeleteGymAsync(id);
             if (!deleted)
             {
-                return Ok(new { Success = false, Message = "GYM_HAS_BRANCHES" });
+                return Ok(new { Success = false, Message = "GYM_HAS_USERS" });
             }
             return Ok(new { Success = true, Message = "Gym deleted successfully" });
         }

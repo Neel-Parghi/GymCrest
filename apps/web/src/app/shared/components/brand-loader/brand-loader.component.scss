@@ -1,0 +1,65 @@
+.brand-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: #0a1f44;
+  animation: brand-loader-in 0.25s ease-out;
+}
+
+.brand-loader-mark {
+  width: 80px;
+  height: 80px;
+  overflow: visible;
+}
+
+.brand-loader-g {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: brand-loader-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.brand-loader-message {
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@keyframes brand-loader-draw {
+  0% {
+    stroke-dashoffset: 1;
+  }
+
+  50%,
+  65% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes brand-loader-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-loader {
+    animation: none;
+  }
+
+  .brand-loader-g {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

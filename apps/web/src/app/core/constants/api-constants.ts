@@ -62,6 +62,8 @@ export const API_CONSTANTS = {
     LIST: 'gym-owners',
     UPDATE: 'gym-owners',
     DELETE: 'gym-owners',
+    APPROVE_DELETION: 'gym-owners/{id}/deletion/approve',
+    DECLINE_DELETION: 'gym-owners/{id}/deletion/decline',
     DASHBOARD: 'gym-owner/dashboard/stats'
   },
   PRICING: {

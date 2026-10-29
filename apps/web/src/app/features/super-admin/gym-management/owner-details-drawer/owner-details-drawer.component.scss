@@ -76,4 +76,92 @@
     padding: 0 16px;
   }
 }
-
+
+.gym-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+
+  .gym-link-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-size: 0.9rem;
+      color: #0f172a;
+    }
+
+    span {
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+  }
+}
+
+.status-pill {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #dcfce7;
+  color: #166534;
+
+  &.inactive {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+}
+
+.no-gyms {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.deletion-request {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--error-border);
+  border-radius: 10px;
+  background: var(--error-bg);
+
+  .deletion-request-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 0.9rem;
+      color: var(--error-color);
+    }
+
+    span {
+      font-size: 0.82rem;
+      color: #475569;
+    }
+  }
+
+  .deletion-request-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

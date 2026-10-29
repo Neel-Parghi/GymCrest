@@ -117,6 +117,11 @@ export class DataGrid {
     this.selectionChange.emit(this.selectedRows);
   }
 
+  clearSelection() {
+    this.selectedRows = [];
+    this.selectionChange.emit(this.selectedRows);
+  }
+
   isAllSelected() {
     return this.data?.length > 0 && this.selectedRows.length === this.data.length;
   }

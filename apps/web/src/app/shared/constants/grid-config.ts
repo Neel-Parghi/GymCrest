@@ -9,6 +9,7 @@ export const AppGridConfig: Record<string, GridConfigDef> = {
       { key: 'planName', label: 'Current Plan' },
       { key: 'paymentStatus', label: 'Payment', type: 'badge' },
       { key: 'branchesCount', label: 'Branches' },
+      { key: 'membersCount', label: 'Members' },
       { key: 'isVerified', label: 'Verification', type: 'bool' },
       { key: 'isActive', label: 'Status', type: 'bool' },
       { key: 'actions', label: 'Manage', type: 'action' }
@@ -21,9 +22,10 @@ export const AppGridConfig: Record<string, GridConfigDef> = {
       { key: 'email', label: 'Email' },
       { key: 'joinedDate', label: 'Joined Date', type: 'date' },
       { key: 'phone', label: 'Phone Number' },
-      { key: 'gymsOwned', label: 'Gyms Owned' },
+      { key: 'gymNames', label: 'Gyms' },
       { key: 'invitationStatus', label: 'Invite Status', type: 'badge' },
       { key: 'status', label: 'Status', type: 'bool' },
+      { key: 'deletionRequestedOn', label: 'Deletion Requested', type: 'date' },
       { key: 'actions', label: 'Actions', type: 'action' }
     ],
     selectable: true

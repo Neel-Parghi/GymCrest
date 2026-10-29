@@ -15,6 +15,7 @@ import { PaymentService } from '../../../core/services/payment.service';
 import { ValidationMessage } from "../../../shared/components/validation-message/validation-message.component";
 import { DateTimePickerComponent } from '../../../shared/components/date-time-picker/date-time-picker.component';
 import { TimePickerComponent } from '../../../shared/components/time-picker/time-picker.component';
+import { BrandLoaderComponent } from '../../../shared/components/brand-loader/brand-loader.component';
 import { CONSTANTS } from '../../../core/constants/constants';
 import { STORAGE_KEYS } from '../../../shared/utils/storage-keys';
 import { take } from 'rxjs';
@@ -24,7 +25,7 @@ declare var Razorpay: any;
 @Component({
   selector: 'app-owner-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ValidationMessage, DateTimePickerComponent, TimePickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, ValidationMessage, DateTimePickerComponent, TimePickerComponent, BrandLoaderComponent],
   templateUrl: './owner-wizard.component.html',
   styleUrls: ['./owner-wizard.component.scss']
 })
@@ -43,6 +44,7 @@ export class OwnerWizardComponent implements OnInit {
   selectedPlanId: string | null = null;
   isProcessingPayment = false;
   isSubmitting = false;
+  isFinishing = false;
   createdGymId: string | null = null;
 
   gymForm!: FormGroup;
@@ -437,6 +439,7 @@ export class OwnerWizardComponent implements OnInit {
 
   private verifyAndFinish(response: any) {
     this.isSubmitting = true;
+    this.isFinishing = true;
 
     this.paymentService.verifyPayment({
       orderId: response.razorpay_order_id,
@@ -451,6 +454,7 @@ export class OwnerWizardComponent implements OnInit {
           return;
         }
         this.toastr.error('Payment verification failed. Please try again or contact support.');
+        this.isFinishing = false;
         this.isSubmitting = false;
         this.isProcessingPayment = false;
       })
@@ -476,14 +480,19 @@ export class OwnerWizardComponent implements OnInit {
   /** Plan is paid: fetch a token that carries the new gym, then open the dashboard. */
   private finishOnboarding() {
     this.isSubmitting = true;
+    this.isFinishing = true;
     localStorage.removeItem(STORAGE_KEYS.OWNER_WIZARD_DRAFT);
     this.toastr.success('Welcome to GymCrest!');
     this.gymService.clearMyGymCache();
-    const openDashboard = () => this.router.navigate(['/gym-owner/dashboard']);
+    
+    const openDashboard = () => this.router.navigate(['/gym-owner/dashboard']).then(opened => {
+      if (!opened) this.isFinishing = false;
+    });
     this.authService.refreshToken().subscribe({
       next: () => this.profileService.getProfile(true).subscribe({ next: openDashboard, error: openDashboard }),
       // Without a fresh token the guards would send the owner back here; signing in again picks up the new gym
       error: () => {
+        this.isFinishing = false;
         this.toastr.info('Your plan is active. Please sign in again to open your dashboard.');
         this.authService.logout();
       }

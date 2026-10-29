@@ -127,24 +127,27 @@ namespace GymCrest.Application.Modules.Gym.Services
             return gym.Id;
         }
     
-        public async Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(PaginationParams pagination)
+        public async Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(GymOwnerFilterParams filters)
         {
             (List<GymOwnersDto>items, int totalCount) = await _gymManagementRepository.GetGymOwnersList(
-                pagination.PageNumber,
-                pagination.PageSize,
-                pagination.SearchTerm);
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchTerm,
+                filters.Status,
+                filters.InvitationStatus);
 
-            return new PagedResponse<GymOwnersDto>(items, totalCount, pagination.PageNumber, pagination.PageSize);
+            return new PagedResponse<GymOwnersDto>(items, totalCount, filters.PageNumber, filters.PageSize);
         }
 
-        public async Task<PagedResponse<GymListResponseDto>> GetGymListAsync(PaginationParams pagination)
+        public async Task<PagedResponse<GymListResponseDto>> GetGymListAsync(GymFilterParams filters)
         {
             (List<GymListResponseDto> items, int totalCount) = await _gymManagementRepository.GetGymListAsync(
-                pagination.PageNumber,
-                pagination.PageSize,
-                pagination.SearchTerm);
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchTerm,
+                filters.IsActive);
 
-            return new PagedResponse<GymListResponseDto>(items, totalCount, pagination.PageNumber, pagination.PageSize);
+            return new PagedResponse<GymListResponseDto>(items, totalCount, filters.PageNumber, filters.PageSize);
         }
 
         public async Task<GymOwnersDto> UpdateGymOwner(UpdateGymOwnerDto updateGymOwnerDto)
@@ -156,6 +159,9 @@ namespace GymCrest.Application.Modules.Gym.Services
             }
 
             _mapper.Map(updateGymOwnerDto, user);
+
+            user.Profile ??= new UserProfile { CreatedOn = DateTime.UtcNow };
+            user.Profile.Phone = updateGymOwnerDto.Phone;
 
             User updatedOwner = _gymManagementRepository.UpdateGymOwner(user);
             await _unitOfWork.SaveChangesAsync();
@@ -178,28 +184,68 @@ namespace GymCrest.Application.Modules.Gym.Services
 
         public async Task<bool> DeleteGymAsync(Guid gymId)
         {
-            List<Branch>? branches = await _gymManagementRepository.GetBranchesByGymIdAsync(gymId);
-            if (branches != null && branches.Any())
+            Domain.Entities.Gym? gym = await _gymManagementRepository.GetGymByIdAsync(gymId);
+            if (gym == null)
+            {
+                throw new Exception("Gym not found.");
+            }
+
+            if (await _gymManagementRepository.GymHasUsersAsync(gymId, gym.OwnerUserId))
             {
                 return false;
             }
 
             await _gymManagementRepository.DeleteGymAsync(gymId);
-            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteGymOwnerAsync(Guid ownerId)
         {
             User? owner = await _gymManagementRepository.GetGymOwnerByIdAsync(ownerId);
-            if (owner == null) return false;
+            if (owner == null)
+            {
+                throw new Exception("Gym Owner not found.");
+            }
 
-            owner.IsActive = false;
-            _gymManagementRepository.UpdateGymOwner(owner);
-            await _unitOfWork.SaveChangesAsync();
+            if (await _gymManagementRepository.OwnerHasGymsAsync(ownerId))
+            {
+                return false;
+            }
+
+            await _gymManagementRepository.DeleteGymOwnerAsync(owner);
             return true;
         }
         
+        public async Task<string?> ApproveOwnerDeletionAsync(Guid ownerId)
+        {
+            User? owner = await _gymManagementRepository.GetGymOwnerByIdAsync(ownerId);
+            if (owner == null)
+            {
+                throw new Exception("Gym Owner not found.");
+            }
+
+            List<Guid> gymIds = await _gymManagementRepository.GetGymIdsByOwnerAsync(ownerId);
+            foreach (Guid gymId in gymIds)
+            {
+                if (await _gymManagementRepository.GymHasUsersAsync(gymId, ownerId))
+                {
+                    return "OWNER_GYM_HAS_USERS";
+                }
+            }
+
+            foreach (Guid gymId in gymIds)
+            {
+                await _gymManagementRepository.DeleteGymAsync(gymId);
+            }
+            await _gymManagementRepository.DeleteGymOwnerAsync(owner);
+            return null;
+        }
+
+        public async Task DeclineOwnerDeletionAsync(Guid ownerId)
+        {
+            await _gymManagementRepository.ClearDeletionRequestAsync(ownerId);
+        }
+
         public async Task AddBranchAsync(Guid gymId, BranchDto branchDto)
         {
             Address branchAddress = _mapper.Map<Address>(branchDto.Address);

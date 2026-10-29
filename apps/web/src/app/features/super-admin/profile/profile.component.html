@@ -262,17 +262,30 @@
           <div class="security-pane" *ngIf="activeSecuritySubTab === 'delete'">
             <div class="pane-header">
               <h3 class="text-danger">Delete Account</h3>
+              @if (isGymOwner) {
+              <p>Ask the GymCrest team to delete your account and your gym. This action cannot be undone.</p>
+              } @else {
               <p>Schedule your account for permanent deletion. This action cannot be undone.</p>
+              }
             </div>
 
             <div class="reset-preview-card danger-zone-card">
               <div class="icon-wrap danger-icon-wrap"><i class="fas fa-triangle-exclamation"></i></div>
+              @if (isGymOwner) {
+              <p class="danger-text">Your members and staff rely on your gym, so our team reviews owner requests and
+                contacts you before anything is removed. Once approved, your gym and account are permanently deleted.</p>
+              } @else {
               <p class="danger-text">Once you delete your account, your data will be permanently removed after the
                 scheduled deletion date. (Within 24 Hrs) </p>
+              }
               <span class="demo-disabled-wrapper" [title]="isDemo ? demoRestrictionMessage : ''">
                 <button class="custom-danger-btn" (click)="scheduleAccountDeletion()"
                   [disabled]="isDeletingAccount || isDemo">
+                  @if (isGymOwner) {
+                  {{ isDeletingAccount ? 'Sending...' : 'Request Account Deletion' }}
+                  } @else {
                   {{ isDeletingAccount ? 'Scheduling...' : 'Schedule Account Deletion' }}
+                  }
                 </button>
               </span>
             </div>

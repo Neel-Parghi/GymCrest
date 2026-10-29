@@ -247,7 +247,7 @@ namespace GymCrest.Application.Modules.Auth.Service
             }
         }
 
-        public async Task RequestAccountDeletionAsync(Guid userId)
+        public async Task<bool> RequestAccountDeletionAsync(Guid userId)
         {
             User? user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
@@ -256,6 +256,8 @@ namespace GymCrest.Application.Modules.Auth.Service
             user.Security ??= new UserSecurity { CreatedOn = DateTime.UtcNow };
             user.Security.DeletionRequestedOn = DateTime.UtcNow;
             await _unitOfWork.SaveChangesAsync();
+
+            return user.Role == UserRole.GymOwner;
         }
 
         private async Task<Guid?> ResolveBranchIdAsync(User user)

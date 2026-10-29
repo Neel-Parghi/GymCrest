@@ -84,11 +84,13 @@ export class GymService extends BaseApiService {
         );
     }
 
-    getGymOwnersList(pageNumber: number = 1, pageSize: number = 10, search: string = '', forceRefresh = false): Observable<ApiResponse<PagedResponse<GymOwnerResponse>>> {
-        if (search || pageNumber !== 1 || pageSize !== 10 || forceRefresh) {
+    getGymOwnersList(pageNumber: number = 1, pageSize: number = 10, search: string = '', filters: Record<string, string> = {}, forceRefresh = false): Observable<ApiResponse<PagedResponse<GymOwnerResponse>>> {
+        const activeFilters = Object.entries(filters).filter(([, value]) => !!value);
+        if (search || activeFilters.length || pageNumber !== 1 || pageSize !== 10 || forceRefresh) {
             const params: Record<string, string | number> = { pageNumber, pageSize };
             if (search)
                 params['searchTerm'] = search;
+            activeFilters.forEach(([key, value]) => params[key] = value);
             return this.get<ApiResponse<PagedResponse<GymOwnerResponse>>>(API_CONSTANTS.GYM_OWNER.LIST, params);
         }
 
@@ -101,11 +103,13 @@ export class GymService extends BaseApiService {
         return this.gymOwnersCache$;
     }
 
-    getGymList(pageNumber: number = 1, pageSize: number = 10, search: string = '', forceRefresh = false): Observable<ApiResponse<PagedResponse<GymListResponse>>> {
-        if (search || pageNumber !== 1 || pageSize !== 10 || forceRefresh) {
+    getGymList(pageNumber: number = 1, pageSize: number = 10, search: string = '', filters: Record<string, string> = {}, forceRefresh = false): Observable<ApiResponse<PagedResponse<GymListResponse>>> {
+        const activeFilters = Object.entries(filters).filter(([, value]) => !!value);
+        if (search || activeFilters.length || pageNumber !== 1 || pageSize !== 10 || forceRefresh) {
             const params: Record<string, string | number> = { pageNumber, pageSize };
             if (search)
                 params['searchTerm'] = search;
+            activeFilters.forEach(([key, value]) => params[key] = value);
             return this.get<ApiResponse<PagedResponse<GymListResponse>>>(API_CONSTANTS.GYM.LIST, params);
         }
 
@@ -120,6 +124,21 @@ export class GymService extends BaseApiService {
 
     deleteGymOwner(ownerId: string): Observable<ApiResponse<unknown>> {
         return this.delete<ApiResponse<unknown>>(`${API_CONSTANTS.GYM_OWNER.DELETE}/${ownerId}`).pipe(
+            tap(() => this.clearGymOwnersCache())
+        );
+    }
+
+    approveOwnerDeletion(ownerId: string): Observable<ApiResponse<unknown>> {
+        return this.post<ApiResponse<unknown>>(API_CONSTANTS.GYM_OWNER.APPROVE_DELETION.replace('{id}', ownerId), {}).pipe(
+            tap(() => {
+                this.clearGymOwnersCache();
+                this.clearGymListCache();
+            })
+        );
+    }
+
+    declineOwnerDeletion(ownerId: string): Observable<ApiResponse<unknown>> {
+        return this.post<ApiResponse<unknown>>(API_CONSTANTS.GYM_OWNER.DECLINE_DELETION.replace('{id}', ownerId), {}).pipe(
             tap(() => this.clearGymOwnersCache())
         );
     }
@@ -141,7 +160,10 @@ export class GymService extends BaseApiService {
 
     deleteGym(gymId: string): Observable<ApiResponse<unknown>> {
         return this.delete<ApiResponse<unknown>>(`${API_CONSTANTS.GYM.DELETE}/${gymId}`).pipe(
-            tap(() => this.clearGymListCache())
+            tap(() => {
+                this.clearGymListCache();
+                this.clearGymOwnersCache();
+            })
         );
     }
 

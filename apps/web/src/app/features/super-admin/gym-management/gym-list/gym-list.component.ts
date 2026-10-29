@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid.component';
 import { AppGridConfig } from '../../../../shared/constants/grid-config';
@@ -7,7 +7,7 @@ import { FilterBarComponent } from '../../../../shared/components/filter-bar/fil
 import { FilterConfig } from '../../../../shared/models/filter.model';
 import { GymService } from '../../../../core/services/gym.service';
 import { GymListResponse } from '../../../../shared/models/gym.model';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 
 import { GymDetailsDrawerComponent } from '../gym-details-drawer/gym-details-drawer.component';
 import { CONSTANTS } from '../../../../core/constants/constants';
@@ -25,6 +25,8 @@ export class GymList implements OnInit {
   private gymService = inject(GymService);
   private notification = inject(NotificationService);
   private confirmation = inject(ConfirmationService);
+
+  @ViewChild('grid') grid?: DataGrid;
 
   gridConfig = AppGridConfig['GymList'];
   isAddGymModalOpen = false;
@@ -57,18 +59,23 @@ export class GymList implements OnInit {
     }
   ];
 
-  selectedGyms: any[] = [];
+  selectedGyms: GymListResponse[] = [];
+  isBulkDeleting = false;
+
+  private search = '';
+  private filters: Record<string, string> = {};
 
   ngOnInit(): void {
     this.loadGyms();
   }
 
-  loadGyms(search: string = '') {
+  loadGyms() {
     this.isLoading = true;
-    this.gymService.getGymList(this.currentPage, this.pageSize, search)
+    this.gymService.getGymList(this.currentPage, this.pageSize, this.search, this.filters)
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (res) => {
+          this.grid?.clearSelection();
           this.displayData = res.data.items;
           this.totalItems = res.data.totalCount;
           this.filteredData = res.data.items;
@@ -91,7 +98,9 @@ export class GymList implements OnInit {
 
   applyFilters(filters: any) {
     this.currentPage = 1;
-    this.loadGyms(filters.search);
+    this.search = filters.search || '';
+    this.filters = { isActive: filters.isActive || '' };
+    this.loadGyms();
   }
 
   updateDisplayData() {
@@ -122,10 +131,6 @@ export class GymList implements OnInit {
       this.openDrawer(event.row, event.action);
     }
     if (event.action == CONSTANTS.ACTIONS.DELETE) {
-      if (event.row.branchesCount > 0) {
-        this.notification.error(CONSTANTS.GYM_DELETE_VALIDATION_MESSAGE);
-        return;
-      }
       this.handleDelete(event.row);
     }
   }
@@ -144,7 +149,7 @@ export class GymList implements OnInit {
           const data = res?.data || res;
 
           if (data?.Success === false || data?.success === false) {
-            const message = (data?.Message || data?.message) === 'GYM_HAS_BRANCHES'
+            const message = (data?.Message || data?.message) === 'GYM_HAS_USERS'
               ? CONSTANTS.GYM_DELETE_VALIDATION_MESSAGE
               : (data?.Message || data?.message || CONSTANTS.GYM_DELETE_ERROR_MESSAGE);
 
@@ -168,8 +173,44 @@ export class GymList implements OnInit {
     this.isEditMode = action === CONSTANTS.ACTIONS.EDIT;
   }
 
-  onSelectionChange(selected: any[]) {
+  onSelectionChange(selected: GymListResponse[]) {
     this.selectedGyms = selected;
+  }
+
+  clearSelection() {
+    this.grid?.clearSelection();
+  }
+
+  async deleteSelected() {
+    const gyms = [...this.selectedGyms];
+    const confirmed = await this.confirmation.confirm({
+      title: CONSTANTS.CONFIRMATIONS.DELETE_GYMS_TITLE,
+      message: CONSTANTS.CONFIRMATIONS.DELETE_GYMS_MESSAGE.replace('{count}', String(gyms.length)),
+      confirmText: CONSTANTS.ACTIONS.DELETE,
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    this.isBulkDeleting = true;
+    forkJoin(gyms.map(gym => this.gymService.deleteGym(gym.id).pipe(
+      map((res: any) => {
+        const data = res?.data || res;
+        return data?.Success !== false && data?.success !== false;
+      }),
+      catchError(() => of(false))
+    )))
+      .pipe(finalize(() => this.isBulkDeleting = false))
+      .subscribe(results => {
+        const deleted = results.filter(Boolean).length;
+        const skipped = results.length - deleted;
+        if (deleted) {
+          this.notification.success(CONSTANTS.BULK_DELETE_SUCCESS_MESSAGE.replace('{count}', String(deleted)));
+        }
+        if (skipped) {
+          this.notification.error(CONSTANTS.GYM_BULK_DELETE_SKIPPED_MESSAGE.replace('{count}', String(skipped)));
+        }
+        this.loadGyms();
+      });
   }
 
   openAddGymModal() {

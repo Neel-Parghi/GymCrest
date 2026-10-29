@@ -3,6 +3,20 @@
   width="550px" (closeDrawer)="onClose()">
 
   <div drawer-body>
+    @if (ownerContext?.deletionRequestedOn) {
+    <div class="deletion-request">
+      <div class="deletion-request-text">
+        <strong>Deletion requested</strong>
+        <span>{{ ownerContext?.name }} asked to delete their account and gym on
+          {{ ownerContext?.deletionRequestedOn | date:'mediumDate' }}.</span>
+      </div>
+      <div class="deletion-request-actions">
+        <button class="btn-outline" (click)="onDeclineDeletion()">Decline</button>
+        <button class="btn-danger" (click)="onApproveDeletion()">Approve &amp; delete</button>
+      </div>
+    </div>
+    }
+
     <form [formGroup]="editForm" class="form-grid">
       <div class="form-group">
         <label>First Name</label>
@@ -31,14 +45,46 @@
           fieldName="Phone"></app-validation-message>
       </div>
 
-      <div class="form-group lg">
-        <label>Total Gyms Owned</label>
-        <input type="text" [value]="ownerContext?.gymsOwned || 0" placeholder="0" disabled />
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" [value]="ownerContext?.location || ''" placeholder="Not set" disabled />
+      </div>
+
+      <div class="form-group">
+        <label>Joined Date</label>
+        <input type="text" [value]="ownerContext?.joinedDate | date:'mediumDate'" placeholder="N/A" disabled />
+      </div>
+
+      <div class="form-group">
+        <label>Account Status</label>
+        <input type="text" [value]="ownerContext?.status || 'N/A'" disabled />
+      </div>
+
+      <div class="form-group">
+        <label>Onboarding</label>
+        <input type="text" [value]="ownerContext?.isOnboarded ? 'Completed' : 'Not completed'" disabled />
       </div>
 
       <div class="form-group lg">
-        <label>Joined Date</label>
-        <input type="text" [value]="ownerContext?.joinedDate | date:'mediumDate'" placeholder="N/A" disabled />
+        <label>Gyms Owned ({{ ownerContext?.gyms?.length || 0 }})</label>
+        @if (ownerContext?.gyms?.length) {
+        <ul class="gym-links">
+          @for (gym of ownerContext?.gyms; track gym.id) {
+          <li>
+            <div class="gym-link-info">
+              <strong>{{ gym.gymName }}</strong>
+              <span>
+                {{ gym.city || 'No city' }} · {{ gym.branchesCount }} {{ gym.branchesCount === 1 ? 'branch' : 'branches' }}
+                · added {{ gym.createdOn | date:'mediumDate' }}
+              </span>
+            </div>
+            <span class="status-pill" [class.inactive]="!gym.isActive">{{ gym.isActive ? 'Active' : 'Inactive' }}</span>
+          </li>
+          }
+        </ul>
+        } @else {
+        <p class="no-gyms">No gym linked yet. They'll set one up during onboarding.</p>
+        }
       </div>
 
       <div class="form-group lg status-row">
