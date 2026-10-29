@@ -18,6 +18,8 @@ namespace GymCrest.Application.Modules.Gym.Interfaces
         Task UpdateGymAsync(UpdateGymDto updateGymDto);
         Task<bool> DeleteGymAsync(Guid gymId);
         Task<bool> DeleteGymOwnerAsync(Guid ownerId);
+        Task<string?> ApproveOwnerDeletionAsync(Guid ownerId);
+        Task DeclineOwnerDeletionAsync(Guid ownerId);
         Task AddBranchAsync(Guid gymId, BranchDto branchDto);
         Task<List<BranchDto>> GetBranchesByGymIdAsync(Guid gymId);
         Task UpdateBranchAsync(Guid branchId, BranchDto branchDto);

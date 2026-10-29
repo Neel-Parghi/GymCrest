@@ -45,7 +45,8 @@ export class GymOwners implements OnInit {
       label: 'Status',
       options: [
         { label: CONSTANTS.UI_LABELS.ACTIVE, value: 'Active' },
-        { label: CONSTANTS.UI_LABELS.INACTIVE, value: 'Inactive' }
+        { label: CONSTANTS.UI_LABELS.INACTIVE, value: 'Inactive' },
+        { label: 'Deletion requested', value: 'DeletionRequested' }
       ]
     },
     {
@@ -194,6 +195,50 @@ export class GymOwners implements OnInit {
       }
     })
 
+  }
+
+  async approveDeletion(owner: GymOwnerResponse) {
+    const confirmed = await this.confirmation.confirm({
+      title: CONSTANTS.CONFIRMATIONS.APPROVE_OWNER_DELETION_TITLE,
+      message: CONSTANTS.CONFIRMATIONS.APPROVE_OWNER_DELETION_MESSAGE.replace('{name}', owner.name),
+      confirmText: CONSTANTS.ACTIONS.DELETE,
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    this.gymService.approveOwnerDeletion(owner.id).subscribe({
+      next: (res: any) => {
+        const data = res?.data || res;
+        if (data?.Success === false || data?.success === false) {
+          const code = data?.Message || data?.message;
+          this.notification.error(code === 'OWNER_GYM_HAS_USERS'
+            ? CONSTANTS.OWNER_DELETION_GYM_IN_USE_MESSAGE
+            : (code || CONSTANTS.OWNER_DELETION_ERROR_MESSAGE));
+          return;
+        }
+        this.notification.success(CONSTANTS.OWNER_DELETION_APPROVED_MESSAGE);
+        this.isViewDrawerOpen = false;
+        this.getGymOwners();
+      },
+      error: (err) => this.notification.error(err.error?.message || CONSTANTS.OWNER_DELETION_ERROR_MESSAGE)
+    });
+  }
+
+  async declineDeletion(owner: GymOwnerResponse) {
+    const confirmed = await this.confirmation.confirm({
+      title: CONSTANTS.CONFIRMATIONS.DECLINE_OWNER_DELETION_TITLE,
+      message: CONSTANTS.CONFIRMATIONS.DECLINE_OWNER_DELETION_MESSAGE.replace('{name}', owner.name)
+    });
+    if (!confirmed) return;
+
+    this.gymService.declineOwnerDeletion(owner.id).subscribe({
+      next: () => {
+        this.notification.success(CONSTANTS.OWNER_DELETION_DECLINED_MESSAGE);
+        this.isViewDrawerOpen = false;
+        this.getGymOwners();
+      },
+      error: (err) => this.notification.error(err.error?.message || CONSTANTS.OWNER_DELETION_ERROR_MESSAGE)
+    });
   }
 
   reInvite(ownerId: string) {

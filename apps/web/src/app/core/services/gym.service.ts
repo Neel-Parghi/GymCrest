@@ -128,6 +128,21 @@ export class GymService extends BaseApiService {
         );
     }
 
+    approveOwnerDeletion(ownerId: string): Observable<ApiResponse<unknown>> {
+        return this.post<ApiResponse<unknown>>(API_CONSTANTS.GYM_OWNER.APPROVE_DELETION.replace('{id}', ownerId), {}).pipe(
+            tap(() => {
+                this.clearGymOwnersCache();
+                this.clearGymListCache();
+            })
+        );
+    }
+
+    declineOwnerDeletion(ownerId: string): Observable<ApiResponse<unknown>> {
+        return this.post<ApiResponse<unknown>>(API_CONSTANTS.GYM_OWNER.DECLINE_DELETION.replace('{id}', ownerId), {}).pipe(
+            tap(() => this.clearGymOwnersCache())
+        );
+    }
+
     updateGymOwner(ownerId: string, payload: UpdateGymOwnerRequest): Observable<ApiResponse<unknown>> {
         return this.put<ApiResponse<unknown>>(`${API_CONSTANTS.GYM_OWNER.UPDATE}/${ownerId}`, payload).pipe(
             tap(() => {

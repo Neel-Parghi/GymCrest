@@ -42,6 +42,8 @@ namespace GymCrest.Infrastructure.Repositories
                 query = query.Where(u => u.IsActive);
             else if (string.Equals(status, "Inactive", StringComparison.OrdinalIgnoreCase))
                 query = query.Where(u => !u.IsActive);
+            else if (string.Equals(status, "DeletionRequested", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => u.Security != null && u.Security.DeletionRequestedOn != null);
 
             DateTime now = DateTime.UtcNow;
             if (string.Equals(invitationStatus, "Accepted", StringComparison.OrdinalIgnoreCase))
@@ -80,6 +82,7 @@ namespace GymCrest.Infrastructure.Repositories
                 InvitationStatus = (u.Security != null && u.Security.IsInvitationAccepted) ? "Accepted" :
                                      ((u.Security != null && u.Security.InvitationExpiry > DateTime.UtcNow) ? "Pending" : "Expired"),
                 IsOnboarded = u.Profile != null && u.Profile.IsOnboarded,
+                DeletionRequestedOn = u.Security != null ? u.Security.DeletionRequestedOn : null,
                 Gyms = u.Gyms!
                     .OrderBy(g => g.CreatedOn)
                     .Select(g => new OwnedGymDto
@@ -230,6 +233,18 @@ namespace GymCrest.Infrastructure.Repositories
             return await _dbContext.GymMembers.AnyAsync(m => m.GymId == gymId)
                 || await _dbContext.Staff.AnyAsync(s => s.GymId == gymId)
                 || await _dbContext.Users.AnyAsync(u => u.GymId == gymId && u.Id != ownerUserId);
+        }
+
+        public async Task<List<Guid>> GetGymIdsByOwnerAsync(Guid ownerId)
+        {
+            return await _dbContext.Gyms.Where(g => g.OwnerUserId == ownerId).Select(g => g.Id).ToListAsync();
+        }
+
+        public async Task ClearDeletionRequestAsync(Guid userId)
+        {
+            await _dbContext.UserSecurities
+                .Where(s => s.UserId == userId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.DeletionRequestedOn, (DateTime?)null));
         }
 
         public async Task<bool> OwnerHasGymsAsync(Guid ownerId)

@@ -20,6 +20,8 @@ namespace GymCrest.Domain.Interface
         Gym UpdateGym(Gym gym);
         Task<bool> GymHasUsersAsync(Guid gymId, Guid ownerUserId);
         Task<bool> OwnerHasGymsAsync(Guid ownerId);
+        Task<List<Guid>> GetGymIdsByOwnerAsync(Guid ownerId);
+        Task ClearDeletionRequestAsync(Guid userId);
         Task DeleteGymOwnerAsync(User owner);
         Task DeleteGymAsync(Guid gymId);
         Task<List<Branch>> GetBranchesByGymIdAsync(Guid gymId);

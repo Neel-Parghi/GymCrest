@@ -106,6 +106,7 @@ export interface GymOwnerResponse {
   invitationStatus: string;
   status: boolean;
   isOnboarded?: boolean;
+  deletionRequestedOn?: string | null;
   gyms?: OwnedGym[];
   gymNames?: string;
 }

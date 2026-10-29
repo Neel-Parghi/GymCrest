@@ -25,6 +25,7 @@ export const AppGridConfig: Record<string, GridConfigDef> = {
       { key: 'gymNames', label: 'Gyms' },
       { key: 'invitationStatus', label: 'Invite Status', type: 'badge' },
       { key: 'status', label: 'Status', type: 'bool' },
+      { key: 'deletionRequestedOn', label: 'Deletion Requested', type: 'date' },
       { key: 'actions', label: 'Actions', type: 'action' }
     ],
     selectable: true

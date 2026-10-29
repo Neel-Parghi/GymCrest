@@ -132,3 +132,36 @@
   font-size: 0.85rem;
   color: #64748b;
 }
+
+.deletion-request {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--error-border);
+  border-radius: 10px;
+  background: var(--error-bg);
+
+  .deletion-request-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 0.9rem;
+      color: var(--error-color);
+    }
+
+    span {
+      font-size: 0.82rem;
+      color: #475569;
+    }
+  }
+
+  .deletion-request-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

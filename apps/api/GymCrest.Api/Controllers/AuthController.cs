@@ -162,15 +162,23 @@ namespace GymCrest.Api.Controllers
 
             try
             {
+                bool needsReview = await _authService.RequestAccountDeletionAsync(userId);
+                if (needsReview)
+                {
+                    return Accepted(new
+                    {
+                        message = "Your deletion request has been sent to the GymCrest team. We'll review it and contact you before your gym is removed.",
+                        deleted = false,
+                        pendingReview = true
+                    });
+                }
+
                 int gracePeriodHours = config.GetValue("AccountDeletion:GracePeriodHours", DefaultDeletionGracePeriodHours);
                 if (gracePeriodHours <= 0)
                 {
                     await deletionJob.ExecuteAsync(userId);
                     return Ok(new { message = "Your account has been deleted.", deleted = true });
                 }
-
-                // 1. Mark the user's account with DeletionRequestedOn
-                await _authService.RequestAccountDeletionAsync(userId);
 
                 // 2. Schedule the job to run once the grace period ends
                 backgroundJobs.Schedule<AccountDeletionJob>(job => job.ExecuteAsync(userId), TimeSpan.FromHours(gracePeriodHours));

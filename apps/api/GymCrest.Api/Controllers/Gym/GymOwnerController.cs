@@ -36,6 +36,24 @@ namespace GymCrest.Api.Controllers.Gym
             return Ok(user);
         }
 
+        [HttpPost("{id}/deletion/approve")]
+        public async Task<IActionResult> ApproveDeletion(Guid id)
+        {
+            string? error = await _gymManagementService.ApproveOwnerDeletionAsync(id);
+            if (error != null)
+            {
+                return Ok(new { Success = false, Message = error });
+            }
+            return Ok(new { Success = true, Message = "Gym owner and their gym deleted" });
+        }
+
+        [HttpPost("{id}/deletion/decline")]
+        public async Task<IActionResult> DeclineDeletion(Guid id)
+        {
+            await _gymManagementService.DeclineOwnerDeletionAsync(id);
+            return Ok(new { Success = true, Message = "Deletion request declined" });
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGymOwner(Guid id)
         {

@@ -32,5 +32,6 @@
 }
 
 <app-owner-details-drawer [isOpen]="isViewDrawerOpen" [isEditing]="isEditMode" [ownerContext]="selectedContext"
-  (closeDrawer)="isViewDrawerOpen = false" (resendInvite)="reInvite($event)" (saveOwner)="updateGymOwner($event)">
+  (closeDrawer)="isViewDrawerOpen = false" (resendInvite)="reInvite($event)" (saveOwner)="updateGymOwner($event)"
+  (approveDeletion)="approveDeletion($event)" (declineDeletion)="declineDeletion($event)">
 </app-owner-details-drawer>

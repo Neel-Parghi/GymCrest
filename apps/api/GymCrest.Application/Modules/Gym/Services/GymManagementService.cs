@@ -216,6 +216,36 @@ namespace GymCrest.Application.Modules.Gym.Services
             return true;
         }
         
+        public async Task<string?> ApproveOwnerDeletionAsync(Guid ownerId)
+        {
+            User? owner = await _gymManagementRepository.GetGymOwnerByIdAsync(ownerId);
+            if (owner == null)
+            {
+                throw new Exception("Gym Owner not found.");
+            }
+
+            List<Guid> gymIds = await _gymManagementRepository.GetGymIdsByOwnerAsync(ownerId);
+            foreach (Guid gymId in gymIds)
+            {
+                if (await _gymManagementRepository.GymHasUsersAsync(gymId, ownerId))
+                {
+                    return "OWNER_GYM_HAS_USERS";
+                }
+            }
+
+            foreach (Guid gymId in gymIds)
+            {
+                await _gymManagementRepository.DeleteGymAsync(gymId);
+            }
+            await _gymManagementRepository.DeleteGymOwnerAsync(owner);
+            return null;
+        }
+
+        public async Task DeclineOwnerDeletionAsync(Guid ownerId)
+        {
+            await _gymManagementRepository.ClearDeletionRequestAsync(ownerId);
+        }
+
         public async Task AddBranchAsync(Guid gymId, BranchDto branchDto)
         {
             Address branchAddress = _mapper.Map<Address>(branchDto.Address);

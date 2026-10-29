@@ -26,6 +26,8 @@ export class OwnerDetailsDrawerComponent implements OnChanges {
   @Output() resendInvite = new EventEmitter<string>();
   @Output() saveOwner = new EventEmitter<any>();
   @Output() isEditingChange = new EventEmitter<boolean>();
+  @Output() approveDeletion = new EventEmitter<GymOwnerResponse>();
+  @Output() declineDeletion = new EventEmitter<GymOwnerResponse>();
 
   editForm!: FormGroup;
 
@@ -94,6 +96,18 @@ export class OwnerDetailsDrawerComponent implements OnChanges {
   onClose() {
     this.cancelEdit();
     this.closeDrawer.emit();
+  }
+
+  onApproveDeletion() {
+    if (this.ownerContext) {
+      this.approveDeletion.emit(this.ownerContext);
+    }
+  }
+
+  onDeclineDeletion() {
+    if (this.ownerContext) {
+      this.declineDeletion.emit(this.ownerContext);
+    }
   }
 
   onResendInvite() {
