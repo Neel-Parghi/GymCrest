@@ -34,9 +34,9 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetGymList([FromQuery] PaginationParams pagination)
+        public async Task<ActionResult> GetGymList([FromQuery] GymFilterParams filters)
         {
-            return Ok(await _gymManagementService.GetGymListAsync(pagination));
+            return Ok(await _gymManagementService.GetGymListAsync(filters));
         }
 
         [HttpPut("{id}")]

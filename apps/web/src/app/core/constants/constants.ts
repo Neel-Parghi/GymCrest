@@ -68,6 +68,10 @@ export const CONSTANTS = {
     //#region Confirmations
     CONFIRMATIONS: {
         DELETE_GYM_TITLE: 'Delete Gym',
+        DELETE_GYMS_TITLE: 'Delete Gyms',
+        DELETE_GYMS_MESSAGE: 'Delete {count} selected gyms? Gyms with members or staff are skipped. This action cannot be undone.',
+        DELETE_OWNERS_TITLE: 'Delete Gym Owners',
+        DELETE_OWNERS_MESSAGE: 'Delete {count} selected gym owners? Owners who still own a gym are skipped. This action cannot be undone.',
         DELETE_GYM_MESSAGE: 'Are you sure you want to delete "{name}"? Its branches, subscription and settings will be permanently removed. This action cannot be undone.',
         DELETE_PLAN_TITLE: 'Delete Plan',
         DELETE_PLAN_MESSAGE: 'Are you sure you want to delete this plan? This action cannot be undone.',
@@ -96,6 +100,9 @@ export const CONSTANTS = {
     GYM_UPDATE_SUCCESS_MESSAGE: 'Gym updated successfully!',
     GYM_UPDATE_ERROR_MESSAGE: 'Failed to update gym!',
     GYM_DELETE_SUCCESS_MESSAGE: 'Gym deleted successfully!',
+    BULK_DELETE_SUCCESS_MESSAGE: '{count} deleted successfully',
+    GYM_BULK_DELETE_SKIPPED_MESSAGE: '{count} could not be deleted because they have members or staff',
+    GYM_OWNER_BULK_DELETE_SKIPPED_MESSAGE: '{count} could not be deleted because they still own a gym',
     GYM_DELETE_VALIDATION_MESSAGE: 'This gym has members or staff, so it cannot be deleted.',
     GYM_DELETE_ERROR_MESSAGE: 'Failed to delete gym!',
     GYM_LOAD_ERROR_MESSAGE: 'Failed to load gyms!',

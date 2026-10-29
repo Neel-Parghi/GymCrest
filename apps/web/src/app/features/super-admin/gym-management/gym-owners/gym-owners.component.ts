@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid.component';
 import { AppGridConfig } from '../../../../shared/constants/grid-config';
@@ -43,14 +44,29 @@ export class GymOwners implements OnInit {
       key: 'status',
       label: 'Status',
       options: [
-        { label: 'Active', value: 'Active' },
+        { label: CONSTANTS.UI_LABELS.ACTIVE, value: 'Active' },
+        { label: CONSTANTS.UI_LABELS.INACTIVE, value: 'Inactive' }
+      ]
+    },
+    {
+      key: 'invitationStatus',
+      label: 'Invite',
+      options: [
+        { label: 'Accepted', value: 'Accepted' },
         { label: 'Pending', value: 'Pending' },
-        { label: 'Inactive', value: 'Inactive' }
+        { label: 'Expired', value: 'Expired' }
       ]
     }
   ];
 
+  @ViewChild('grid') grid?: DataGrid;
+
   selectedOwners: GymOwnerResponse[] = [];
+  isBulkDeleting = false;
+
+  // Active search + filters, kept so paging doesn't drop them
+  private search = '';
+  private filters: Record<string, string> = {};
   selectedContext: GymOwnerResponse | null = null;
 
   private userService = inject(UserService);
@@ -62,9 +78,10 @@ export class GymOwners implements OnInit {
     this.getGymOwners();
   }
 
-  getGymOwners(search: string = '') {
-    this.gymService.getGymOwnersList(this.currentPage, this.pageSize, search).subscribe({
+  getGymOwners() {
+    this.gymService.getGymOwnersList(this.currentPage, this.pageSize, this.search, this.filters).subscribe({
       next: (res) => {
+        this.grid?.clearSelection();
         const items = res.data.items.map(owner => ({
           ...owner,
           gymNames: owner.gyms?.length ? owner.gyms.map(g => g.gymName).join(', ') : CONSTANTS.UI_LABELS.NO_GYM_YET
@@ -81,7 +98,12 @@ export class GymOwners implements OnInit {
 
   applyFilters(filters: any) {
     this.currentPage = 1;
-    this.getGymOwners(filters.search);
+    this.search = filters.search || '';
+    this.filters = {
+      status: filters.status || '',
+      invitationStatus: filters.invitationStatus || ''
+    };
+    this.getGymOwners();
   }
 
   updateDisplayData() {
@@ -187,6 +209,42 @@ export class GymOwners implements OnInit {
 
   onSelectionChange(selected: GymOwnerResponse[]) {
     this.selectedOwners = selected;
+  }
+
+  clearSelection() {
+    this.grid?.clearSelection();
+  }
+
+  async deleteSelected() {
+    const owners = [...this.selectedOwners];
+    const confirmed = await this.confirmation.confirm({
+      title: CONSTANTS.CONFIRMATIONS.DELETE_OWNERS_TITLE,
+      message: CONSTANTS.CONFIRMATIONS.DELETE_OWNERS_MESSAGE.replace('{count}', String(owners.length)),
+      confirmText: CONSTANTS.ACTIONS.DELETE,
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    this.isBulkDeleting = true;
+    forkJoin(owners.map(owner => this.gymService.deleteGymOwner(owner.id).pipe(
+      map((res: any) => {
+        const data = res?.data || res;
+        return data?.Success !== false && data?.success !== false;
+      }),
+      catchError(() => of(false))
+    )))
+      .pipe(finalize(() => this.isBulkDeleting = false))
+      .subscribe(results => {
+        const deleted = results.filter(Boolean).length;
+        const skipped = results.length - deleted;
+        if (deleted) {
+          this.notification.success(CONSTANTS.BULK_DELETE_SUCCESS_MESSAGE.replace('{count}', String(deleted)));
+        }
+        if (skipped) {
+          this.notification.error(CONSTANTS.GYM_OWNER_BULK_DELETE_SKIPPED_MESSAGE.replace('{count}', String(skipped)));
+        }
+        this.getGymOwners();
+      });
   }
 
   openAddOwnerModal() {

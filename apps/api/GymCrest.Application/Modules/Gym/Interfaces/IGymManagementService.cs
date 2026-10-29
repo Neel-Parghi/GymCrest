@@ -11,10 +11,10 @@ namespace GymCrest.Application.Modules.Gym.Interfaces
     {
         Task<Guid> OnboardGymAsync(Guid ownerId, GymOnboardingDto gymOnboardingDto, bool activateImmediately);
 
-        Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(PaginationParams pagination);
+        Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(GymOwnerFilterParams filters);
         Task<GymOwnersDto> UpdateGymOwner(UpdateGymOwnerDto updateGymOwnerDto);
 
-        Task<PagedResponse<GymListResponseDto>> GetGymListAsync(PaginationParams pagination);
+        Task<PagedResponse<GymListResponseDto>> GetGymListAsync(GymFilterParams filters);
         Task UpdateGymAsync(UpdateGymDto updateGymDto);
         Task<bool> DeleteGymAsync(Guid gymId);
         Task<bool> DeleteGymOwnerAsync(Guid ownerId);

@@ -10,11 +10,11 @@ namespace GymCrest.Domain.Interface
         Task AddBranchAsync(Branch branch);
         Task AddGymSubscriptionAsync(SubscriptionRecord subscription);
        
-        Task<(List<GymOwnersDto> Items, int TotalCount)> GetGymOwnersList(int pageNumber, int pageSize, string? searchTerm);
+        Task<(List<GymOwnersDto> Items, int TotalCount)> GetGymOwnersList(int pageNumber, int pageSize, string? searchTerm, string? status = null, string? invitationStatus = null);
         Task<User?> GetGymOwnerByIdAsync(Guid id);
         User UpdateGymOwner(User gymOwner);
         
-        Task<(List<GymListResponseDto> Items, int TotalCount)> GetGymListAsync(int pageNumber, int pageSize, string? searchTerm);
+        Task<(List<GymListResponseDto> Items, int TotalCount)> GetGymListAsync(int pageNumber, int pageSize, string? searchTerm, bool? isActive = null);
         Task<List<GymListResponseDto>> GetAllGymsAsync();
         Task<Gym?> GetGymByIdAsync(Guid id);
         Gym UpdateGym(Gym gym);

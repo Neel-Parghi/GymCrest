@@ -19,9 +19,9 @@ namespace GymCrest.Api.Controllers.Gym
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetGymOwnersList([FromQuery] PaginationParams pagination)
+        public async Task<ActionResult> GetGymOwnersList([FromQuery] GymOwnerFilterParams filters)
         {
-            return Ok(await _gymManagementService.GetGymOwnersList(pagination));
+            return Ok(await _gymManagementService.GetGymOwnersList(filters));
         }
 
         [HttpPut("{id}")]

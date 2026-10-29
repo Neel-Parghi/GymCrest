@@ -127,24 +127,27 @@ namespace GymCrest.Application.Modules.Gym.Services
             return gym.Id;
         }
     
-        public async Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(PaginationParams pagination)
+        public async Task<PagedResponse<GymOwnersDto>> GetGymOwnersList(GymOwnerFilterParams filters)
         {
             (List<GymOwnersDto>items, int totalCount) = await _gymManagementRepository.GetGymOwnersList(
-                pagination.PageNumber,
-                pagination.PageSize,
-                pagination.SearchTerm);
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchTerm,
+                filters.Status,
+                filters.InvitationStatus);
 
-            return new PagedResponse<GymOwnersDto>(items, totalCount, pagination.PageNumber, pagination.PageSize);
+            return new PagedResponse<GymOwnersDto>(items, totalCount, filters.PageNumber, filters.PageSize);
         }
 
-        public async Task<PagedResponse<GymListResponseDto>> GetGymListAsync(PaginationParams pagination)
+        public async Task<PagedResponse<GymListResponseDto>> GetGymListAsync(GymFilterParams filters)
         {
             (List<GymListResponseDto> items, int totalCount) = await _gymManagementRepository.GetGymListAsync(
-                pagination.PageNumber,
-                pagination.PageSize,
-                pagination.SearchTerm);
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchTerm,
+                filters.IsActive);
 
-            return new PagedResponse<GymListResponseDto>(items, totalCount, pagination.PageNumber, pagination.PageSize);
+            return new PagedResponse<GymListResponseDto>(items, totalCount, filters.PageNumber, filters.PageSize);
         }
 
         public async Task<GymOwnersDto> UpdateGymOwner(UpdateGymOwnerDto updateGymOwnerDto)

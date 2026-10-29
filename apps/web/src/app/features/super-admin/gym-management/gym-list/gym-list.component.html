@@ -7,7 +7,12 @@
     @if (selectedGyms.length === 0) {
     <button class="btn-add" (click)="openAddGymModal()">Add Gym</button>
     } @else {
-    <button class="primary-btn edit-mode">Edit ({{ selectedGyms.length }} selected)</button>
+    <div class="selection-actions">
+      <button class="btn-outline" (click)="clearSelection()">Clear selection</button>
+      <button class="btn-danger" [disabled]="isBulkDeleting" (click)="deleteSelected()">
+        Delete {{ selectedGyms.length }} selected
+      </button>
+    </div>
     }
   </div>
 
@@ -15,7 +20,7 @@
     (filterChanged)="onFilterChanged($event)">
   </app-filter-bar>
 
-  <app-data-grid [config]="gridConfig" [data]="displayData" [totalItems]="totalItems" [pageSize]="pageSize"
+  <app-data-grid #grid [config]="gridConfig" [data]="displayData" [totalItems]="totalItems" [pageSize]="pageSize"
     [currentPage]="currentPage" (selectionChange)="onSelectionChange($event)" (actionEvent)="handleAction($event)"
     (pageChange)="onPageChanged($event)" (pageSizeChange)="onPageSizeChanged($event)">
   </app-data-grid>

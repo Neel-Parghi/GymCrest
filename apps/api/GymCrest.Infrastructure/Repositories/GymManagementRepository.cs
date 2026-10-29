@@ -34,9 +34,22 @@ namespace GymCrest.Infrastructure.Repositories
             await _dbContext.SubscriptionRecords.AddAsync(subscription);
         }
 
-        public async Task<(List<GymOwnersDto> Items, int TotalCount)> GetGymOwnersList(int pageNumber, int pageSize, string? searchTerm)
+        public async Task<(List<GymOwnersDto> Items, int TotalCount)> GetGymOwnersList(int pageNumber, int pageSize, string? searchTerm, string? status = null, string? invitationStatus = null)
         {
             IQueryable<User> query = _dbContext.Users.Where(x => x.Role == UserRole.GymOwner);
+
+            if (string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => u.IsActive);
+            else if (string.Equals(status, "Inactive", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => !u.IsActive);
+
+            DateTime now = DateTime.UtcNow;
+            if (string.Equals(invitationStatus, "Accepted", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => u.Security != null && u.Security.IsInvitationAccepted);
+            else if (string.Equals(invitationStatus, "Pending", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => u.Security != null && !u.Security.IsInvitationAccepted && u.Security.InvitationExpiry > now);
+            else if (string.Equals(invitationStatus, "Expired", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(u => u.Security == null || (!u.Security.IsInvitationAccepted && !(u.Security.InvitationExpiry > now)));
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -97,9 +110,14 @@ namespace GymCrest.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<(List<GymListResponseDto> Items, int TotalCount)> GetGymListAsync(int pageNumber, int pageSize, string? searchTerm)
+        public async Task<(List<GymListResponseDto> Items, int TotalCount)> GetGymListAsync(int pageNumber, int pageSize, string? searchTerm, bool? isActive = null)
         {
             IQueryable<Gym> query = _dbContext.Gyms.AsQueryable();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(g => g.IsActive == isActive.Value);
+            }
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
