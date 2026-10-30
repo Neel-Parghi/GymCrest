@@ -5,6 +5,7 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { WorkoutState } from '../../../../../core/models/user-dashboard.model';
+import { DANCE_SECONDS, LIFT_SECONDS } from './buddy-timings';
 
 /** Handle the Angular component uses to drive the 3D buddy. */
 export interface BuddyScene {
@@ -49,8 +50,6 @@ const COLORS = {
 const POP_SECONDS = 0.65;
 const WAVE_SECONDS = 1.4;
 const CHEER_SECONDS = 1;
-export const DANCE_SECONDS = 2.6;
-export const LIFT_SECONDS = 3.4;
 /** Speeds up the idle loop (breathing, sway, head bob). */
 const IDLE_SPEED = 1.3;
 
