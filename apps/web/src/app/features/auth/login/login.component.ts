@@ -72,17 +72,20 @@ export class LoginComponent {
             const isOnboarded = t?.isOnboarded === 'True' || t?.isOnboarded === true;
             const role = decodedToken?.role || t?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
-            if (!isOnboarded && role !== 'SuperAdmin') {
-              this.notification.info('Complete the onboarding');
-            } else {
-              this.notification.success(CONSTANTS.AUTH.LOGIN_SUCCESS);
-            }
-
-            this.authApiService.redirectUserByRole();
-          } else {
-            console.error('No token received from login API', response);
-            this.notification.error(CONSTANTS.AUTH.LOGIN_FAILED);
+            // Stay on "Signing in..." until the dashboard has loaded, not just until the token arrives
+            this.authApiService.redirectUserByRole()
+              .then(() => {
+                if (!isOnboarded && role !== 'SuperAdmin') {
+                  this.notification.info('Complete the onboarding');
+                } else {
+                  this.notification.success(CONSTANTS.AUTH.LOGIN_SUCCESS);
+                }
+              })
+              .finally(() => this.isLoading = false);
+            return;
           }
+          console.error('No token received from login API', response);
+          this.notification.error(CONSTANTS.AUTH.LOGIN_FAILED);
           this.isLoading = false;
         },
         error: (err) => {

@@ -263,27 +263,23 @@ export class AuthApiService extends BaseApiService {
     return sessionStorage;
   }
 
-  redirectUserByRole() {
+  /** Resolves once the dashboard has loaded, so callers can keep their loading state until then. */
+  redirectUserByRole(): Promise<boolean> {
     const role = this.getUserRole();
     switch (role) {
       case 'SuperAdmin':
-        this.router.navigate(['/super-admin/dashboard']);
-        break;
+        return this.router.navigate(['/super-admin/dashboard']);
       case 'GymOwner':
       case 'Staff':
-        this.router.navigate(['/gym-owner/dashboard']);
-        break;
+        return this.router.navigate(['/gym-owner/dashboard']);
       case 'Admin':
-        this.router.navigate(['/admin/dashboard']);
-        break;
+        return this.router.navigate(['/admin/dashboard']);
       case 'Trainer':
-        this.router.navigate(['/trainer/dashboard']);
-        break;
+        return this.router.navigate(['/trainer/dashboard']);
       case 'User':
-        this.router.navigate(['/user/dashboard']);
-        break;
+        return this.router.navigate(['/user/dashboard']);
       default:
-        this.router.navigate(['/login']);
+        return this.router.navigate(['/login']);
     }
   }
 
