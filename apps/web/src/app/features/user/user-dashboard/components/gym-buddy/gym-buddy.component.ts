@@ -4,7 +4,8 @@ import {
 } from '@angular/core';
 import { BuddyEvent, BuddyFacts } from '../../../../../core/models/user-dashboard.model';
 import { BuddyLine, buddyLines } from './buddy-lines';
-import { DANCE_SECONDS, LIFT_SECONDS, type BuddyScene } from './buddy-scene';
+import type { BuddyScene } from './buddy-scene';
+import { DANCE_SECONDS, LIFT_SECONDS } from './buddy-timings';
 import { BuddyRoamer } from './buddy-roamer';
 
 /** How long each speech bubble stays up. */
